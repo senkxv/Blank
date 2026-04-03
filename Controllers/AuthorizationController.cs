@@ -4,7 +4,7 @@ namespace Blank.Controllers
 {
     public class AuthorizationController : Controller
     {
-        public IActionResult Login()
+        public IActionResult Authorization()
         {
             return View();
         }

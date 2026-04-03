@@ -6,4 +6,20 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\images\AuthorizationPageImage.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\fonts\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\Authorization.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="wwwroot\images\AuthorizationPageImage.jpg" />
+  </ItemGroup>
+
 </Project>
