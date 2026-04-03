@@ -27,7 +27,7 @@ namespace Blank
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=AuthorizationController}/{action=Login}/{id?}")
+                pattern: "{controller=Authorization}/{action=Login}/{id?}")
                 .WithStaticAssets();
 
             app.Run();
