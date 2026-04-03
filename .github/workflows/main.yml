@@ -27,6 +27,19 @@ jobs:
       - name: Publish
         run: dotnet publish --configuration Release --output ./publish
       
+      - name: Stop website via FTP (rename web.config)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_LOGIN }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 22
+          script: |
+            mv /wwwroot/web.config /wwwroot/web.config.bak
+      
+      - name: Wait for site to stop
+        run: sleep 5
+      
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -37,3 +50,14 @@ jobs:
           server-dir: ./wwwroot/
           protocol: ftp
           port: 21
+          dangerous-clean-slate: true
+      
+      - name: Start website via FTP (restore web.config)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_LOGIN }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 22
+          script: |
+            mv /wwwroot/web.config.bak /wwwroot/web.config
