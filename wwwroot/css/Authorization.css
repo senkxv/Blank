@@ -2,25 +2,95 @@
     --dark-color: #000000;
     --light-gray-color: #999999;
     --dark-gray-color: #666666;
+    --dark-red-color: #990000;
+    --light-red-color: #FF0000;
 }
 
 html {
     font-family: 'Comfortaa', sans-serif;
-    margin-left: 5vh;
+    margin-inline: 5vh;
 }
 
 a {
     color: var(--dark-gray-color);
 }
 
+a:hover {
+    color: var(--light-gray-color);
+}
+
+#registration-link {
+    color: var(--light-red-color);
+}
+
+#registration-link:hover {
+    color: var(--dark-red-color);
+}
+
 .header-welcome-text {
     font-size: 40px;
     line-height: 10px;
     border-color: black;
-    margin-top: 10vh;
+    margin-top: 5vh;
 }
 
 img {
-    width: 300px;
-    height: auto;
+    width: 40vw;
+    height: 100%;
+    float: right;
+}
+
+.main-section-form {
+    margin-top: 10vh;   
+}
+
+label {
+    color: var(--dark-gray-color); 
+}
+
+ul {
+    color: var(--light-gray-color);
+}
+
+[type="password"], [type="text"], [type="email"] {
+    max-width: 730px;
+    min-width: 300px;
+    width: 100%;
+    height: 40px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border-color: var(--light-gray-color);
+    border-width: 1px;
+    padding-left: 10px;
+}
+
+.form-list-password {
+    position: relative;
+    margin-left: 0;
+    list-style: circle;
+    padding-left: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 20px;
+}
+
+.checkbox-user-data-computing {
+    margin-top: 30px;
+}
+
+[type="checkbox"] {
+    margin-right: 10px;
+}
+
+[type="submit"] {
+    margin-top: 30px;
+    border-radius: 15px;
+    border-width: 0px;
+    background: var(--light-red-color);
+    width: auto;
+    height: 30px;
+}
+
+[type="submit"]:hover {
+    background: var(--dark-red-color);
 }
