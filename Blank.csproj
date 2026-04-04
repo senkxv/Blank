@@ -8,8 +8,6 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\fonts\Comfortaa-VariableFont_wght.woff2" />
-    <Content Remove="wwwroot\images\AuthorizationBackground.jpg" />
-    <Content Remove="wwwroot\images\AuthorizationPageImage.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,8 +16,10 @@
 
   <ItemGroup>
     <Resource Include="wwwroot\fonts\Comfortaa-VariableFont_wght.woff2" />
-    <Resource Include="wwwroot\images\AuthorizationBackground.jpg" />
-    <Resource Include="wwwroot\images\AuthorizationPageImage.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>
