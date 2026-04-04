@@ -1,5 +1,23 @@
-﻿html {
+﻿:root {
+    --dark-color: #000000;
+    --light-gray-color: #999999;
+    --dark-gray-color: #666666;
+}
+
+html {
     font-family: 'Comfortaa', sans-serif;
+    margin-left: 5vh;
+}
+
+a {
+    color: var(--dark-gray-color);
+}
+
+.header-welcome-text {
+    font-size: 40px;
+    line-height: 10px;
+    border-color: black;
+    margin-top: 10vh;
 }
 
 img {
