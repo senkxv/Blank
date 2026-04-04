@@ -82,7 +82,7 @@ ul {
 }
 
 [type="submit"] {
-    margin-top: 30px;
+    margin-top: 15px;
     border-radius: 10px;
     color: white;
     transition: .2s linear;
@@ -171,12 +171,28 @@ input:checked + .slider {
 Адаптив
 */
 
-@media(max-width: 480px) {
+@media(max-width: 785px) {
     .header-welcome-text {
-        font-size: 25px;
+        font-size: 20px;
         line-height: 10px;
         border-color: black;
         margin-top: 5vh;
+    }
+
+    [type="submit"]:hover {
+    }
+}
+
+@media(max-width: 400px) {
+    .header-welcome-text {
+        font-size: 15px;
+        line-height: 10px;
+        border-color: black;
+        margin-top: 5vh;
+    }
+
+    .has-account {
+        font-size: 10px;
     }
 
     [type="submit"]:hover {
