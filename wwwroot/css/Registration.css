@@ -192,7 +192,7 @@ input:checked + .slider {
     }
 
     .has-account {
-        font-size: 10px;
+        font-size: 15px;
     }
 
     [type="submit"]:hover {
