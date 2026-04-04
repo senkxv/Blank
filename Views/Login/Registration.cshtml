@@ -15,8 +15,8 @@ Layout = null;
 </head>
 <body>
     <header>
-        <p class="header-welcome-text">Добро пожаловать!<p>
-            <p>У вас уже есть аккаунт? <a id="registration-link" href="LoginController/Authorization">Войти</a></p>
+        <p class="header-welcome-text">Добро пожаловать! Регистрация<p>
+            <p>У вас уже есть аккаунт? <a id="registration-link" href="/Login/Authorization">Войти</a></p>
         </header>
         <aside>
         </aside>
@@ -39,7 +39,10 @@ Layout = null;
                         <input id="FIO" type="text" /><br />
 
                         <label for="password">Пароль</label><br />
-                        <input id="password" type="password" />
+                        <input id="password" type="password" /><br />
+
+                        <label for="password-repeat">Подтвердите пароль</label><br />
+                        <input id="password-repeat" type="password" />
                         <ul class="form-list-password">
                             <li>Используйте 8 и более символов</li>
                             <li>Хотя бы один специальный символ</li>
@@ -50,7 +53,7 @@ Layout = null;
                         <input id="checkbox-user-data-computing" type="checkbox" />
                         <label class="checkbox-user-data-computing" for=" checkbox-user-data-computing"> Соглашение на обработку персональных данных и с условиями использования сервиса.</label><br />
 
-                        <input type="submit" value="Войти" />
+                        <input type="submit" value="Зарегистрироваться" />
                     </form>
                 </div>
             </section>

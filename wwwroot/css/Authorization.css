@@ -65,6 +65,7 @@ label {
     transition: .2s linear;
     background: var(--light-red-color);
     border-width: 0;
+    min-width: 300px;
 }
 
 [type="submit"]:hover {
