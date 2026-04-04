@@ -8,7 +8,10 @@
 
 html {
     font-family: 'Comfortaa', sans-serif;
-    margin-inline: 5vh;
+    background: -webkit-linear-gradient(90deg, #ffffff,#ffffff,#ffb8b8); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(90deg, #ffffff,#ffffff,#ffb8b8); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background-size: cover;
+    padding-inline: 3vw;
 }
 
 a {
@@ -40,8 +43,8 @@ img {
     float: right;
 }
 
-.main-section-form {
-    margin-top: 10vh;   
+.main-section-form, .form {
+    margin-top: 5vh;   
 }
 
 label {
@@ -62,6 +65,7 @@ ul {
     border-color: var(--light-gray-color);
     border-width: 1px;
     padding-left: 10px;
+    background: transparent;
 }
 
 .form-list-password {
@@ -70,11 +74,12 @@ ul {
     list-style: circle;
     padding-left: 20px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-column-gap: 20px;
+    grid-template-columns: auto auto;
+    column-gap: 30px; 
+    max-width: 700px;
 }
 
-.checkbox-user-data-computing {
+.checkbox-user-data-computing, #checkbox-user-data-computing {
     margin-top: 30px;
 }
 
@@ -84,13 +89,39 @@ ul {
 
 [type="submit"] {
     margin-top: 30px;
-    border-radius: 15px;
-    border-width: 0px;
+    border-radius: 10px;
+    color: white;
+    transition: .2s linear;
     background: var(--light-red-color);
-    width: auto;
-    height: 30px;
+    border-width: 0;
 }
 
 [type="submit"]:hover {
-    background: var(--dark-red-color);
+    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--light-red-color);
+}
+
+.form {
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 0px 10px 10px 10px;
+    margin-top: 20px;
+    width: auto;
+    height: auto;
+    max-width: 1000px;
+    box-shadow: 15px 15px 15px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+    border-color: var(--light-gray-color);
+}
+
+/*
+    Адаптив
+*/
+
+@media(max-width: 480px) {
+    .header-welcome-text {
+        font-size: 25px;
+        line-height: 10px;
+        border-color: black;
+        margin-top: 5vh;
+    }
 }

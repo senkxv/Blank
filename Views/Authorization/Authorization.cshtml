@@ -12,35 +12,36 @@
     </head>
     <body>
         <header>
-            <p class="header-welcome-text">Добро пожаловать на сервис "Бланк"!<p>
+            <p class="header-welcome-text">Добро пожаловать!<p>
             <p>Еще не имеете аккаунта? <a id="registration-link" href="/">Зарегистрироваться</a></p>
         </header>
         <aside>
-            <img src="~/images/AuthorizationPageImage.jpg" alt="PC image"/>
         </aside>
         <main>
             <section>
-                <form method="POST" class="main-section-form">
-                    <label for="email">Электронная почта</label><br />
-                    <input id="email" type="email" /><br />
+                <div class="form">
+                    <form method="POST" class="main-section-form">
+                        <label for="email">Электронная почта</label><br />
+                        <input id="email" type="email" /><br />
 
-                    <label for="FIO">ФИО</label><br />
-                    <input id="FIO" type="text" /><br />
+                        <label for="FIO">ФИО</label><br />
+                        <input id="FIO" type="text" /><br />
 
-                    <label for="password">Пароль</label><br />
-                    <input id="password" type="password" />
-                    <ul class="form-list-password">
-                        <li>Используйте 8 и более символов</li>
-                        <li>Хотя бы один специальный символ</li>
-                        <li>Хотя бы один символ в ВЕРХНЕМ регистре</li>
-                        <li>Хотя бы одно число</li>
-                    </ul>
+                        <label for="password">Пароль</label><br />
+                        <input id="password" type="password" />
+                        <ul class="form-list-password">
+                            <li>Используйте 8 и более символов</li>
+                            <li>Хотя бы один специальный символ</li>
+                            <li>Хотя бы один символ в ВЕРХНЕМ регистре</li>
+                            <li>Хотя бы одно число</li>
+                        </ul>
 
-                    <input id="checkbox-user-data-computing" type="checkbox" />
-                    <label class="checkbox-user-data-computing" for=" checkbox-user-data-computing"> Я согласен на обработку персональных данных и с условиями использования сервиса.</label><br />
+                        <input id="checkbox-user-data-computing" type="checkbox" />
+                        <label class="checkbox-user-data-computing" for=" checkbox-user-data-computing"> Я согласен на обработку персональных данных и с условиями использования сервиса.</label><br />
 
-                    <input type="submit" value="Войти" />
-                </form>
+                        <input type="submit" value="Войти" />
+                    </form>
+                </div>
             </section>
         </main>
         <footer>
