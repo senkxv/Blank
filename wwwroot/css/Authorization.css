@@ -37,14 +37,8 @@ a:hover {
     margin-top: 5vh;
 }
 
-img {
-    width: 40vw;
-    height: 100%;
-    float: right;
-}
-
 .main-section-form, .form {
-    margin-top: 5vh;   
+    margin-top: 10vh;   
 }
 
 label {
@@ -113,8 +107,67 @@ ul {
     border-color: var(--light-gray-color);
 }
 
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px; 
+    height: 24px; 
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Полоса (фон) */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+/* Ползунок */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 13px;
+    width: 13px;
+    left: 6px;
+    bottom: 6px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--light-red-color);
+
+    [for="switch"] {
+    }
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.common-switch, [for="switch"] {
+    float: right;
+    margin-top: -40px;
+}
+
+[for="switch"] {
+    margin-right: 70px;
+    color: var(--dark-color);
+}
 /*
-    Адаптив
+Адаптив
 */
 
 @media(max-width: 480px) {
@@ -126,6 +179,5 @@ ul {
     }
 
     [type="submit"]:hover {
-
     }
 }
