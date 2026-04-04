@@ -124,4 +124,8 @@ ul {
         border-color: black;
         margin-top: 5vh;
     }
+
+    [type="submit"]:hover {
+
+    }
 }
