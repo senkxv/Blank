@@ -3,23 +3,37 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Blank</title>
+    <title>@ViewData["Title"]Главная</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Blank.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        
+        <div class="header">
+            <nav>
+                <ul>
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/">Добавить</a></li>
+                    <li><a href="/">Изменить</a></li>
+                    <li><a href="/">Удалить</a></li>
+                    <li><a href="/">Экспорт</a></li>
+                    <li><a href="/">Обновить</a></li>
+                    <li><a href="/">Тип документа</a></li>
+                    <li><a href="/">Помощь</a></li>
+                    <li><a href="/">О нас</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div>
+        <main>
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Blank - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer>
+        <div>
+
         </div>
     </footer>
     @await RenderSectionAsync("Scripts", required: false)
