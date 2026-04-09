@@ -1,4 +1,11 @@
-﻿:root {
+﻿@font-face {
+    src: url('/fonts/SNPro-VariableFont_wght.woff2') format('woff2');
+    font-family: 'SNPro';
+    font-weight: bold;
+    font-display: swap;
+}
+
+:root {
     --dark-color: #000000;
     --light-gray-color: #999999;
     --dark-gray-color: #666666;
@@ -8,10 +15,9 @@
 
 html {
     font-family: 'Comfortaa', sans-serif;
-    background: -webkit-linear-gradient(77deg, #fcfcfc,#e494ff); /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(77deg, #fcfcfc,#e494ff); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    background-size: cover;
-    padding-inline: 3vw;
+    background: -webkit-linear-gradient(45deg, #ffffff,#c2c2c2) no-repeat fixed !important; /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(45deg, #ffffff,#c2c2c2) no-repeat fixed !important; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    no-repeat fixed padding-inline: 3vw;
 }
 
 a {
@@ -23,11 +29,12 @@ a:hover {
 }
 
 #registration-link {
-    color: var(--light-red-color);
+    color: black;
+    font-weight: bold;
 }
 
 #registration-link:hover {
-    color: var(--dark-red-color);
+    color: var(--dark-gray-color);
 }
 
 .header-welcome-text {
@@ -64,13 +71,14 @@ label {
     border-radius: 10px;
     color: white;
     transition: .2s linear;
-    background: var(--light-red-color);
+    background: black;
     border-width: 0;
     min-width: 300px;
+    height: 30px;
 }
 
 [type="submit"]:hover {
-    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--light-red-color);
+    box-shadow: 0 0 0 2px white, 0 0 0 4px black;
     min-width: 300px;
     width: auto;
 }

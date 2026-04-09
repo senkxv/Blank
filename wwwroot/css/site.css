@@ -79,7 +79,6 @@ button {
 
 html {
     height: 100%;
-    scrollbar-gutter: stable;
     scroll-behavior: smooth;
 }
 
@@ -127,4 +126,54 @@ svg * {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+}
+
+/* Основная верстка */
+
+html {
+    display: flex;
+    flex-direction: column;
+    font-family: Comfortaa;
+    background: -webkit-linear-gradient(0deg, #ffffff,#ffffff,#c2c2c2); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(0deg, #ffffff,#ffffff,#c2c2c2); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background-size: cover;
+    align-items: center;
+}
+
+.header ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 30px;
+    list-style: none;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-color: black;
+    border-width: 1px;
+}
+
+.header {
+    display: inline-block;
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+    width: auto;
+    padding-right: 45px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+header div nav ul li a {
+    font-family: Comfortaa;
+    color: black;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #666666;
 }

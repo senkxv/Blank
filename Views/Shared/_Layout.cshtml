@@ -6,27 +6,204 @@
     <title>@ViewData["Title"]Главная</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Blank.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/_Layout.css" asp-append-version="true" />
 </head>
 <body>
     <header>
         <div class="header">
             <nav>
                 <ul>
-                    <li><a href="/">Главная</a></li>
-                    <li><a href="/">Добавить</a></li>
-                    <li><a href="/">Изменить</a></li>
-                    <li><a href="/">Удалить</a></li>
-                    <li><a href="/">Экспорт</a></li>
-                    <li><a href="/">Обновить</a></li>
-                    <li><a href="/">Тип документа</a></li>
-                    <li><a href="/">Помощь</a></li>
-                    <li><a href="/">О нас</a></li>
+                    <li><a href="">Главная</a></li>
+                    <li><a href="">Добавить</a></li>
+                    <li><a href="">Изменить</a></li>
+                    <li><a href="">Удалить</a></li>
+                    <li><a href="">Экспорт</a></li>
+                    <li><a href="">Обновить</a></li>
+                    <li><a href="">Печать</a></li>
+                    <li><a href="">Помощь</a></li>
+                    <li><a href="">О нас</a></li>
                 </ul>
             </nav>
         </div>
     </header>
     <div>
         <main>
+            <pre>/*
+            Подключение шрифтов
+            */
+            font-face {
+            src: url('/fonts/Comfortaa-VariableFont_wght.woff2') format('woff2');
+            font-family: 'Comfortaa';
+            font-weight: bold;
+            font-display: swap;
+            }
+
+            font-face {
+            src: url('/fonts/SNPro-VariableFont_wght.woff2') format('woff2');
+            font-family: 'SNPro';
+            font-weight: bold;
+            font-display: swap;
+            }
+
+            /*
+            Нормализация стилей
+            */
+            *,
+            ::before,
+            ::after {
+            box-sizing: border-box;
+            }
+
+            :where(ul, ol):where([class]) {
+            padding-left: 0;
+            }
+
+            body,
+            :where(blockquote, figure, fieldset):where([class]) {
+            margin: 0;
+            }
+
+            :where( h1, h2, h3, h4, h5, h6, p, ul, ol, dl ):where([class]) {
+            margin-block: 0;
+            }
+
+            :where(dd[class]) {
+            margin-left: 0;
+            }
+
+            :where(fieldset[class]) {
+            padding: 0;
+            border: none;
+            }
+
+            :where(ul[class]) {
+            list-style: none;
+            }
+
+            :where(address[class]) {
+            font-style: normal;
+            }
+
+            p {
+            --paragraphMarginBottom: 24px;
+            margin-block: 0;
+            }
+
+            p:where(:not([class]):not(:last-child)) {
+            margin-bottom: var(--paragraphMarginBottom);
+            }
+
+            img,
+            video {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            }
+
+            input,
+            textarea,
+            select,
+            button {
+            font: inherit;
+            }
+
+            html {
+            height: 100%;
+            scroll-behavior: smooth;
+            }
+
+            body {
+            min-height: 100%;
+            line-height: 1.5;
+            }
+
+            a:where([class]) {
+            display: inline-flex;
+            }
+
+            button,
+            label {
+            cursor: pointer;
+            }
+
+            button {
+            -webkit-tap-highlight-color: transparent;
+            }
+
+            :where([fill]:not( [fill="none"], [fill^="url"] )) {
+            fill: currentColor;
+            }
+
+            :where([stroke]:not( [stroke="none"], [stroke^="url"] )) {
+            stroke: currentColor;
+            }
+
+            svg * {
+            transition-property: fill, stroke;
+            }
+
+            :where(table) {
+            border-collapse: collapse;
+            border-color: currentColor;
+            }
+
+            media (prefers-reduced-motion: reduce) {
+            *,
+            ::before,
+            ::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+            }
+            }
+
+            /* Основная верстка */
+
+            html {
+            display: flex;
+            flex-direction: column;
+            font-family: Comfortaa;
+            background: -webkit-linear-gradient(180deg, #ffffff,#ffffff,#c2c2c2); /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(180deg, #ffffff,#ffffff,#c2c2c2); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            background-size: cover;
+            align-items: center;
+            }
+
+            .header ul {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 30px;
+            list-style: none;
+            }
+
+            header {
+            display: flex;
+            justify-content: center;
+            padding-top: 20px;
+            }
+
+            .header {
+            display: inline-block;
+            border-radius: 30px;
+            background: #edf0f5;
+            width: auto;
+            padding-right: 45px;
+            }
+
+            header div nav ul li a {
+            font-family: Comfortaa;
+            color: black;
+            text-decoration: none;
+            }
+
+            a:hover {
+            color: #666666;
+            }
+
+                как мне в header сделать не просто серый цвет, а эффект стекла. Я когда добавлял блюр, он почему-то добавлялся на всю страницу
+            </pre>
             @RenderBody()
         </main>
     </div>
