@@ -8,8 +8,8 @@
 
 html {
     font-family: 'Comfortaa', sans-serif;
-    background: -webkit-linear-gradient(90deg, #ffffff,#ffffff,#ffb8b8); /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(90deg, #ffffff,#ffffff,#ffb8b8); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: -webkit-linear-gradient(77deg, #fcfcfc,#e494ff); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(77deg, #fcfcfc,#e494ff); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     background-size: cover;
     padding-inline: 3vw;
 }
@@ -31,7 +31,9 @@ a:hover {
 }
 
 .header-welcome-text {
+    font-family: 'SNPro';
     font-size: 40px;
+    font-synthesis-weight: inherit;
     line-height: 10px;
     border-color: black;
     margin-top: 5vh;

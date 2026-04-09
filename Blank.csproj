@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\fonts\Comfortaa-VariableFont_wght.woff2" />
+    <Content Remove="wwwroot\fonts\SNPro-VariableFont_wght.woff2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +17,7 @@
 
   <ItemGroup>
     <Resource Include="wwwroot\fonts\Comfortaa-VariableFont_wght.woff2" />
+    <Resource Include="wwwroot\fonts\SNPro-VariableFont_wght.woff2" />
   </ItemGroup>
 
   <ItemGroup>

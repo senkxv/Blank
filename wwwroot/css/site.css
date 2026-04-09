@@ -8,6 +8,13 @@
     font-display: swap;
 }
 
+@font-face {
+    src: url('/fonts/SNPro-VariableFont_wght.woff2') format('woff2');
+    font-family: 'SNPro';
+    font-weight: bold;
+    font-display: swap;
+}
+
 /*
     Нормализация стилей
  */
