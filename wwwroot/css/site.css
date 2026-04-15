@@ -136,7 +136,7 @@ html {
     display: flex;
     flex-direction: column;
     font-family: Comfortaa;
-    background: linear-gradient(0deg, #ffffff, #E5E4E2) no-repeat;
+    background: url(/images/Background2.png);
     background-size: cover;
 }
 
