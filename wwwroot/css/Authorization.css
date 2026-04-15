@@ -70,14 +70,14 @@ a {
     margin-top: 3vh;
 }
 
-/* Центрирование формы */
+/* Центрирование формы — такой же размер как у Registration */
 .form {
     border: 1px solid black;
     border-radius: 10px;
-    padding: 0px 20px 10px 20px;
+    padding: 10px 20px;
     margin: 20px auto;
-    width: 100%;
-    max-width: 1000px;
+    width: 500px;
+    max-width: 1500px;
     box-shadow: 15px 15px 15px rgba(0,0,0,0.2);
     backdrop-filter: blur(10px);
     border-color: var(--light-gray-color);
@@ -97,7 +97,7 @@ a {
     .main-section-form > div,
     .main-section-form > ul {
         width: 100%;
-        max-width: 500px;
+        max-width: 600px;
     }
 
 label {
@@ -105,18 +105,21 @@ label {
     align-self: flex-start;
 }
 
+/* Поля ввода — как в Registration */
 [type="password"], [type="text"], [type="email"] {
-    max-width: 730px;
-    min-width: 300px;
+    max-width: 100%;
+    min-width: 0;
     width: 100%;
-    height: 40px;
-    margin-bottom: 10px;
+    height: 45px;
+    margin-bottom: 15px;
     border-radius: 10px;
     border: 1px solid var(--light-gray-color);
-    padding-left: 10px;
+    padding-left: 15px;
     background: transparent;
+    font-size: 16px;
 }
 
+/* Кнопка — как в Registration */
 [type="submit"] {
     margin-top: 30px;
     border-radius: 10px;
@@ -124,9 +127,12 @@ label {
     transition: .2s linear;
     background: black;
     border: none;
-    min-width: 300px;
-    height: 30px;
+    min-width: 250px;
+    width: auto;
+    height: 40px;
     cursor: pointer;
+    font-size: 16px;
+    padding: 0 30px;
 }
 
     [type="submit"]:hover {
@@ -140,8 +146,9 @@ label {
     padding-left: 20px;
     display: grid;
     grid-template-columns: auto auto;
-    column-gap: 30px;
-    max-width: 700px;
+    column-gap: 40px;
+    max-width: 100%;
+    font-size: 14px;
 }
 
 .checkbox-user-data-computing, #checkbox-user-data-computing {
@@ -150,14 +157,15 @@ label {
 
 [type="checkbox"] {
     margin-right: 10px;
+    transform: scale(1.1);
 }
 
 /* ===== СВИТЧ (переключатель) ===== */
 .switch {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 24px;
+    width: 60px;
+    height: 28px;
 }
 
     .switch input {
@@ -181,10 +189,10 @@ label {
     .slider:before {
         position: absolute;
         content: "";
-        height: 13px;
-        width: 13px;
-        left: 6px;
-        bottom: 6px;
+        height: 20px;
+        width: 20px;
+        left: 4px;
+        bottom: 4px;
         background-color: white;
         transition: .4s;
         border-radius: 50%;
@@ -195,7 +203,7 @@ input:checked + .slider {
 }
 
     input:checked + .slider:before {
-        transform: translateX(26px);
+        transform: translateX(32px);
     }
 
 .common-switch, [for="switch"] {
@@ -216,7 +224,9 @@ input:checked + .slider {
 /* 1024px - ноутбуки */
 @media (max-width: 1024px) {
     .form {
-        max-width: 90%;
+        max-width: 300px;
+        width: 400px;
+        padding: 15px 20px;
         margin-top: 3vh;
     }
 }
@@ -233,25 +243,32 @@ input:checked + .slider {
     }
 
     .form {
-        padding: 15px 20px;
-        max-width: 95%;
+        padding: 20px 25px;
+        max-width: 98%;
         margin-top: 3vh;
+        width: 300px;
+    }
+
+    .main-section-form > label,
+    .main-section-form > input,
+    .main-section-form > div,
+    .main-section-form > ul {
+        max-width: 100%;
     }
 
     [type="password"], [type="text"], [type="email"] {
-        max-width: 100%;
-        min-width: 0;
         font-size: 14px;
+        height: 42px;
     }
 
     [type="submit"] {
         min-width: 200px;
         width: auto;
+        height: 38px;
     }
 
     .form-list-password {
         grid-template-columns: 1fr;
-        max-width: 100%;
         gap: 8px;
     }
 }
@@ -259,44 +276,48 @@ input:checked + .slider {
 /* 550px - исправление выезжания полей */
 @media (max-width: 550px) {
     .form {
-        padding: 15px !important;
-        width: calc(100% - 20px) !important;
-        max-width: none !important;
+        padding: 15px 20px;
+        width: calc(100% - 20px);
+        max-width: none;
         margin-top: 3vh;
+        width: 300px;
     }
 
     [type="password"],
     [type="text"],
     [type="email"] {
-        max-width: 100% !important;
-        min-width: 0 !important;
-        width: 100% !important;
+        max-width: 100%;
+        min-width: 0;
+        width: 100%;
+        height: 40px;
     }
 
     [type="submit"] {
-        min-width: 100% !important;
-        width: 100% !important;
+        min-width: 100%;
+        width: 100%;
+        height: 42px;
     }
 
     .form-list-password {
-        grid-template-columns: 1fr !important;
-        max-width: 100% !important;
-        padding-left: 15px !important;
+        grid-template-columns: 1fr;
+        max-width: 100%;
+        padding-left: 15px;
+        font-size: 12px;
     }
 
     .checkbox-user-data-computing {
-        display: inline-block !important;
-        width: calc(100% - 30px) !important;
-        font-size: 11px !important;
+        display: inline-block;
+        width: calc(100% - 30px);
+        font-size: 11px;
     }
 
     .common-switch, [for="switch"] {
-        float: right !important;
-        margin-top: -40px !important;
+        float: right;
+        margin-top: -40px;
     }
 
     [for="switch"] {
-        margin-right: 70px !important;
+        margin-right: 70px;
     }
 }
 
@@ -328,11 +349,11 @@ input:checked + .slider {
 
     [type="submit"] {
         font-size: 14px;
-        height: 38px;
+        height: 40px;
     }
 
     .form-list-password {
-        font-size: 12px;
+        font-size: 11px;
     }
 }
 
@@ -358,12 +379,12 @@ input:checked + .slider {
 
     [type="submit"] {
         font-size: 13px;
-        height: 36px;
+        height: 38px;
     }
 
     .form-list-password {
-        font-size: 11px;
-        padding-left: 15px;
+        font-size: 10px;
+        padding-left: 12px;
     }
 
     .checkbox-user-data-computing {
