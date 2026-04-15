@@ -1,6 +1,6 @@
 ﻿@font-face {
     src: url('/fonts/SNPro-VariableFont_wght.woff2') format('woff2');
-    font-family: 'SNPro';
+    font-family: 'SN Pro';
     font-weight: bold;
     font-display: swap;
 }
@@ -37,7 +37,7 @@ a {
     }
 
 .header-welcome-text {
-    font-family: 'SNPro';
+    font-family: 'SN Pro';
     font-size: 40px;
     line-height: 10px;
     border-color: black;
@@ -147,6 +147,14 @@ label {
         max-width: 100%;
         gap: 8px;
     }
+}
+
+header {
+    text-align: center;
+}
+
+.has-account {
+    text-align: center;
 }
 
 /* 480px - телефоны */
