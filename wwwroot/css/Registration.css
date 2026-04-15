@@ -30,7 +30,7 @@ a:hover {
 }
 
 .header-welcome-text {
-    font-family: 'SNPro';
+    font-family: SNPro;
     font-size: 40px;
     font-synthesis-weight: inherit;
     line-height: 10px;
@@ -100,7 +100,7 @@ ul {
 .form {
     border: 1px solid black;
     border-radius: 10px;
-    padding: 0px 10px 10px 10px;
+    padding: 0px 20px 10px 10px;
     margin-top: 20px;
     width: auto;
     height: auto;
@@ -176,19 +176,24 @@ input:checked + .slider {
 
 @media(max-width: 785px) {
     .header-welcome-text {
-        font-size: 20px;
+        font-size: 25px;
         line-height: 10px;
         border-color: black;
         margin-top: 5vh;
+    }
+
+    [type="password"], [type="text"], [type="email"] {
+        max-width: 700px;
+        margin-right: 20px;
     }
 
     [type="submit"]:hover {
     }
 }
 
-@media(max-width: 400px) {
+@media(max-width: 440px) {
     .header-welcome-text {
-        font-size: 15px;
+        font-size: 18px;
         line-height: 10px;
         border-color: black;
         margin-top: 5vh;
@@ -196,6 +201,15 @@ input:checked + .slider {
 
     .has-account {
         font-size: 10px;
+    }
+
+    [type="password"], [type="text"], [type="email"] {
+        max-width: 350px;
+        margin-right: 20px;
+    }
+
+    .form {
+        padding-right: 20px;
     }
 
     [type="submit"]:hover {

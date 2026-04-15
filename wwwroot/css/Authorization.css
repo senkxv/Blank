@@ -17,7 +17,6 @@ html {
     font-family: 'Comfortaa', sans-serif;
     background: -webkit-linear-gradient(45deg, #ffffff,#c2c2c2) no-repeat fixed !important; /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(45deg, #ffffff,#c2c2c2) no-repeat fixed !important; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    no-repeat fixed padding-inline: 3vw;
 }
 
 a {
@@ -86,7 +85,7 @@ label {
 .form {
     border: 1px solid black;
     border-radius: 10px;
-    padding: 0px 10px 10px 10px;
+    padding: 0px 20px 10px 10px;
     margin-top: 20px;
     width: auto;
     height: auto;
@@ -100,14 +99,65 @@ label {
 Адаптив
 */
 
-@media(max-width: 480px) {
+@media(max-width: 785px) {
     .header-welcome-text {
         font-size: 25px;
-        line-height: 10px;
-        border-color: black;
+        line-height: 1.2;
         margin-top: 5vh;
     }
 
-    [type="submit"]:hover {
+    .form {
+        padding: 15px 20px; /* ← добавляет отступы внутри формы */
+        margin-inline: 10px; /* ← отступы от краёв экрана */
+    }
+
+    [type="password"], [type="text"], [type="email"] {
+        max-width: 100%; /* ← на всю ширину формы */
+        min-width: 0; /* ← убираем ограничение */
+        margin-right: 0;
+    }
+
+    .form-list-password {
+        grid-template-columns: 1fr; /* ← одна колонка */
+        column-gap: 0;
+        max-width: 100%;
+    }
+}
+
+@media(max-width: 440px) {
+    .header-welcome-text {
+        font-size: 18px;
+        line-height: 1.2;
+        margin-top: 5vh;
+    }
+
+    .has-account {
+        font-size: 10px;
+    }
+
+    .form {
+        padding: 12px 15px; /* ← меньше отступы, но всё ещё есть */
+        margin-inline: 8px;
+    }
+
+    [type="password"], [type="text"], [type="email"] {
+        max-width: 100%;
+        min-width: 0;
+        margin-right: 0;
+        font-size: 14px;
+    }
+
+    [type="submit"] {
+        min-width: 100%; /* ← кнопка на всю ширину */
+        width: 100%;
+    }
+
+    .form-list-password {
+        font-size: 12px;
+        padding-left: 15px;
+    }
+
+    .checkbox-user-data-computing {
+        font-size: 11px;
     }
 }
