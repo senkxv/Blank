@@ -20,8 +20,4 @@
     <Resource Include="wwwroot\fonts\SNPro-VariableFont_wght.woff2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\images\" />
-  </ItemGroup>
-
 </Project>
