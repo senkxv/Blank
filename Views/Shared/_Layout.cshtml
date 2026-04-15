@@ -1,9 +1,9 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]Главная</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>@ViewData["Title"] - Бланк</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Blank.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/_Layout.css" asp-append-version="true" />
@@ -13,20 +13,21 @@
         <div class="header-container">
             <nav>
                 <ul>
-                    <li><a href="">Главная</a></li>
-                    <li><a href="">Добавить</a></li>
-                    <li><a href="">Изменить</a></li>
-                    <li><a href="">Удалить</a></li>
-                    <li><a href="">Экспорт</a></li>
-                    <li><a href="">Обновить</a></li>
-                    <li><a href="">Печать</a></li>
-                    <li><a href="">Помощь</a></li>
-                    <li><a href="">О нас</a></li>
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/Documents/Add">Добавить</a></li>
+                    <li><a href="/Documents/Edit">Изменить</a></li>
+                    <li><a href="/Documents/Delete">Удалить</a></li>
+                    <li><a href="/Documents/Export">Экспорт</a></li>
+                    <li><a href="/Documents/Update">Обновить</a></li>
+                    <li><a href="/Documents/Print">Печать</a></li>
+                    <li><a href="/Help">Помощь</a></li>
+                    <li><a href="/About">О нас</a></li>
                 </ul>
             </nav>
         </div>
     </header>
-    <div>
+
+    <div class="content-wrapper">
         <main>
             @RenderBody()
         </main>
@@ -35,12 +36,14 @@
     <footer>
         <div class="footer-container">
             <ul>
-                <li><p>Контакты: </p></li>
+                <li><p>Контакты:</p></li>
                 <li>почта: <a href="mailto:senkxv@gmail.com">senkxv@gmail.com</a></li>
                 <li>телефон: <a href="tel:+375256070373">+375 25 607-03-73</a></li>
                 <li>github: <a href="https://github.com/senkxv">github/senkxv</a></li>
             </ul>
         </div>
     </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

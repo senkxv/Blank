@@ -17,7 +17,7 @@
 
 /*
     Нормализация стилей
- */
+*/
 *,
 ::before,
 ::after {
@@ -33,7 +33,7 @@ body,
     margin: 0;
 }
 
-:where( h1, h2, h3, h4, h5, h6, p, ul, ol, dl ):where([class]) {
+:where(h1, h2, h3, h4, h5, h6, p, ul, ol, dl):where([class]) {
     margin-block: 0;
 }
 
@@ -59,9 +59,9 @@ p {
     margin-block: 0;
 }
 
-p:where(:not([class]):not(:last-child)) {
-    margin-bottom: var(--paragraphMarginBottom);
-}
+    p:where(:not([class]):not(:last-child)) {
+        margin-bottom: var(--paragraphMarginBottom);
+    }
 
 img,
 video {
@@ -100,11 +100,11 @@ button {
     -webkit-tap-highlight-color: transparent;
 }
 
-:where([fill]:not( [fill="none"], [fill^="url"] )) {
+:where([fill]:not([fill="none"], [fill^="url"])) {
     fill: currentColor;
 }
 
-:where([stroke]:not( [stroke="none"], [stroke^="url"] )) {
+:where([stroke]:not([stroke="none"], [stroke^="url"])) {
     stroke: currentColor;
 }
 
@@ -128,43 +128,48 @@ svg * {
     }
 }
 
-/* Основная верстка */
+/* ============================================
+    Основная верстка
+   ============================================ */
 
 html {
     display: flex;
     flex-direction: column;
     font-family: Comfortaa;
-    background: -webkit-linear-gradient(0deg, #ffffff,#ffffff,#E5E4E2) no-repeat; /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(0deg, #ffffff,#ffffff,#E5E4E2) no-repeat; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(0deg, #ffffff, #E5E4E2) no-repeat;
     background-size: cover;
 }
 
 body {
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Обёртка для контента (отступы по бокам) */
+.content-wrapper {
+    flex: 1;
+    padding-inline: 3vw;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 main {
     flex: 1;
 }
 
-.header-container ul {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 30px;
-    list-style: none;
-}
+/* ============================================
+    Шапка (header)
+   ============================================ */
 
 header {
     display: flex;
     justify-content: center;
     position: sticky;
-    padding-top: 20px;
-    z-index: 100;
     top: 0;
-    left: 0;
-    right: 0;
+    z-index: 100;
+    padding-top: 20px;
     align-items: center;
 }
 
@@ -173,9 +178,19 @@ header {
     border-radius: 30px;
     backdrop-filter: blur(5px);
     width: auto;
-    padding-right: 45px;
+    padding: 10px 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
+
+    .header-container ul {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 30px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
 
 header div nav ul li a {
     font-family: Comfortaa;
@@ -188,45 +203,145 @@ a {
     text-decoration: none;
 }
 
-a:hover {
-    color: #666666 !important;
-}
+    a:hover {
+        color: #666666 !important;
+    }
+
+/* ============================================
+    Футер (footer)
+   ============================================ */
 
 footer {
-    border-top-color: black;
-    border-top-width: 2px;
-
+    border-top: 2px solid black;
     background: #1c1c1c;
-
     width: 100%;
-
     margin-top: auto;
 }
 
-footer ul {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 30px;
-    list-style: none;
-    font-weight: 300;
-    color: white;
-}
+    footer ul {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 30px;
+        list-style: none;
+        font-weight: 300;
+        color: white;
+        margin: 0;
+        padding: 20px;
+    }
 
-footer ul a {
-    color: gray !important;
-}
+        footer ul a {
+            color: gray !important;
+        }
 
 .footer-container {
-    border-top: solid 1px black;
+    border-top: 1px solid black;
     color: white;
 }
 
-@media (max-width: 700px) {
-    footer {
+/* ============================================
+    Адаптив
+   ============================================ */
+
+/* Планшеты (768px и меньше) */
+@media (max-width: 768px) {
+    .header-container ul {
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .header-container {
+        padding: 8px 16px;
+        border-radius: 20px;
+    }
+
+    header div nav ul li a {
+        font-size: 14px;
+    }
+
+    footer ul {
+        gap: 20px;
+        flex-wrap: wrap;
+        padding: 15px;
+    }
+
+        footer ul li {
+            font-size: 12px;
+        }
+
+    .content-wrapper {
+        padding-inline: 2vw;
+    }
+}
+
+/* Мобильные телефоны (480px и меньше) */
+@media (max-width: 480px) {
+    .header-container ul {
+        gap: 12px;
+    }
+
+    .header-container {
+        padding: 6px 12px;
+        border-radius: 15px;
+    }
+
+    header div nav ul li a {
+        font-size: 11px;
+    }
+
+    footer ul {
         flex-direction: column;
-        gap: 5px;
+        gap: 8px;
+        text-align: center;
+        padding: 12px;
+    }
+
+        footer ul li {
+            font-size: 11px;
+        }
+
+            footer ul li p {
+                margin-bottom: 5px;
+            }
+
+    .footer-container {
+        border-top: 1px solid black;
+        padding: 5px 0;
+    }
+}
+
+/* Очень маленькие телефоны (350px и меньше) */
+@media (max-width: 350px) {
+    .header-container ul {
+        gap: 8px;
+    }
+
+    header div nav ul li a {
         font-size: 10px;
-        margin-right: 10px;
+    }
+
+    .header-container {
+        padding: 5px 10px;
+    }
+
+    footer ul {
+        gap: 6px;
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 926px) and (min-width: 769px) {
+    .header-container ul {
+        gap: 15px;
+    }
+
+    .header-container {
+        padding: 8px 15px;
+        width: 95%;
+    }
+
+    header div nav ul li a {
+        font-size: 12.5px;
     }
 }
