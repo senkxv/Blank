@@ -15,26 +15,26 @@
 
 html {
     font-family: 'Comfortaa', sans-serif;
-    background: -webkit-linear-gradient(45deg, #ffffff,#c2c2c2) no-repeat fixed !important; /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(45deg, #ffffff,#c2c2c2) no-repeat fixed !important; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: -webkit-linear-gradient(45deg, #ffffff,#c2c2c2) no-repeat fixed !important;
+    background: linear-gradient(45deg, #ffffff,#c2c2c2) no-repeat fixed !important;
 }
 
 a {
     color: var(--dark-gray-color);
 }
 
-a:hover {
-    color: var(--light-gray-color);
-}
+    a:hover {
+        color: var(--light-gray-color);
+    }
 
 #registration-link {
     color: black;
     font-weight: bold;
 }
 
-#registration-link:hover {
-    color: var(--dark-gray-color);
-}
+    #registration-link:hover {
+        color: var(--dark-gray-color);
+    }
 
 .header-welcome-text {
     font-family: 'SNPro';
@@ -45,11 +45,11 @@ a:hover {
 }
 
 .main-section-form, .form {
-    margin-top: 10vh;   
+    margin-top: 3vh;
 }
 
 label {
-    color: var(--dark-gray-color); 
+    color: var(--dark-gray-color);
 }
 
 [type="password"], [type="text"], [type="email"] {
@@ -76,11 +76,11 @@ label {
     height: 30px;
 }
 
-[type="submit"]:hover {
-    box-shadow: 0 0 0 2px white, 0 0 0 4px black;
-    min-width: 300px;
-    width: auto;
-}
+    [type="submit"]:hover {
+        box-shadow: 0 0 0 2px white, 0 0 0 4px black;
+        min-width: 300px;
+        width: auto;
+    }
 
 .form {
     border: 1px solid black;
@@ -96,68 +96,146 @@ label {
 }
 
 /*
-Адаптив
+    АДАПТИВ (сохранён внешний вид)
 */
 
-@media(max-width: 785px) {
-    .header-welcome-text {
-        font-size: 25px;
-        line-height: 1.2;
-        margin-top: 5vh;
-    }
-
+/* 1024px - ноутбуки */
+@media (max-width: 1024px) {
     .form {
-        padding: 15px 20px; /* ← добавляет отступы внутри формы */
-        margin-inline: 10px; /* ← отступы от краёв экрана */
-    }
-
-    [type="password"], [type="text"], [type="email"] {
-        max-width: 100%; /* ← на всю ширину формы */
-        min-width: 0; /* ← убираем ограничение */
-        margin-right: 0;
-    }
-
-    .form-list-password {
-        grid-template-columns: 1fr; /* ← одна колонка */
-        column-gap: 0;
-        max-width: 100%;
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 
-@media(max-width: 440px) {
+/* 768px - планшеты */
+@media (max-width: 768px) {
     .header-welcome-text {
-        font-size: 18px;
+        font-size: 32px;
         line-height: 1.2;
-        margin-top: 5vh;
+        text-align: center;
     }
 
     .has-account {
-        font-size: 10px;
+        text-align: center;
+        font-size: 14px;
     }
 
     .form {
-        padding: 12px 15px; /* ← меньше отступы, но всё ещё есть */
-        margin-inline: 8px;
+        padding: 15px 20px;
+        max-width: 95%;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     [type="password"], [type="text"], [type="email"] {
         max-width: 100%;
         min-width: 0;
-        margin-right: 0;
         font-size: 14px;
     }
 
     [type="submit"] {
-        min-width: 100%; /* ← кнопка на всю ширину */
-        width: 100%;
+        min-width: 200px;
+        width: auto;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .form-list-password {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+        gap: 8px;
+    }
+}
+
+/* 480px - телефоны */
+@media (max-width: 480px) {
+    .header-welcome-text {
+        font-size: 24px;
+        line-height: 1.3;
+        margin-top: 3vh;
+    }
+
+    .has-account {
+        font-size: 12px;
+    }
+
+    .main-section-form, .form {
+        margin-top: 5vh;
+    }
+
+    .form {
+        padding: 12px 15px;
+        margin-left: 10px;
+        margin-right: 10px;
+        max-width: calc(100% - 20px);
+    }
+
+    [type="password"], [type="text"], [type="email"] {
+        font-size: 13px;
+        height: 38px;
+        padding-left: 8px;
+    }
+
+    [type="submit"] {
+        min-width: 100%;
+        font-size: 14px;
+        height: 38px;
     }
 
     .form-list-password {
         font-size: 12px;
-        padding-left: 15px;
+        padding-left: 18px;
     }
 
     .checkbox-user-data-computing {
         font-size: 11px;
+        display: inline-block;
+        width: calc(100% - 30px);
+    }
+
+    .common-switch, [for="switch"] {
+        float: none;
+        margin-top: 5px;
+        text-align: right;
+    }
+
+    [for="switch"] {
+        margin-right: 0;
+    }
+}
+
+/* 375px - маленькие телефоны */
+@media (max-width: 375px) {
+    .header-welcome-text {
+        font-size: 20px;
+    }
+
+    .has-account {
+        font-size: 11px;
+    }
+
+    .form {
+        padding: 10px 12px;
+    }
+
+    [type="password"], [type="text"], [type="email"] {
+        font-size: 12px;
+        height: 36px;
+    }
+
+    [type="submit"] {
+        font-size: 13px;
+        height: 36px;
+    }
+
+    .form-list-password {
+        font-size: 11px;
+        padding-left: 15px;
+    }
+
+    .checkbox-user-data-computing {
+        font-size: 10px;
     }
 }
