@@ -28,24 +28,26 @@ Layout = null;
             <section>
                 <div class="form">
                     <form method="POST" action="UserWorkspace/Index" class="main-section-form">
-                        <label for="switch">Режим администратора</label>
-                        <div id="switch" class="common-switch">
-                            <label class="switch">
-                                <input type="checkbox">
-                                <span class="slider"></span>
-                            </label>
+                        <div class="admin-row">
+                            <label for="switch">Режим администратора</label>
+                            <div id="switch" class="common-switch">
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
                         </div>
 
-                        <label for="email">Электронная почта</label><br />
-                        <input id="email" type="email" /><br />
+                        <label for="email">Электронная почта</label>
+                        <input id="email" type="email" />
 
-                        <label for="FIO">ФИО</label><br />
-                        <input id="FIO" type="text" /><br />
+                        <label for="FIO">ФИО</label>
+                        <input id="FIO" type="text" />
 
-                        <label for="password">Пароль</label><br />
-                        <input id="password" type="password" /><br />
+                        <label for="password">Пароль</label>
+                        <input id="password" type="password" />
 
-                        <label for="password-repeat">Подтвердите пароль</label><br />
+                        <label for="password-repeat">Подтвердите пароль</label>
                         <input id="password-repeat" type="password" />
                         <ul class="form-list-password">
                             <li>Используйте 8 и более символов</li>
@@ -54,8 +56,10 @@ Layout = null;
                             <li>Хотя бы одно число</li>
                         </ul>
 
-                        <input id="checkbox-user-data-computing" type="checkbox" />
-                        <label class="checkbox-user-data-computing" for=" checkbox-user-data-computing"> Соглашение на обработку персональных данных и с условиями использования сервиса.</label><br />
+                        <div class="checkbox-wrapper">
+                            <input id="checkbox-user-data-computing" type="checkbox" />
+                            <label class="checkbox-user-data-computing" for="checkbox-user-data-computing">Соглашение на обработку персональных данных и с условиями использования сервиса.</label>
+                        </div>
 
                         <input type="submit" value="Зарегистрироваться" />
                     </form>
