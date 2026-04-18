@@ -1,6 +1,4 @@
-/* 
-    Подключение шрифтов
-*/
+
 @font-face {
     src: url('/fonts/Comfortaa-VariableFont_wght.woff2') format('woff2');
     font-family: 'Comfortaa';
@@ -15,9 +13,6 @@
     font-display: swap;
 }
 
-/*
-    Нормализация стилей
-*/
 *,
 ::before,
 ::after {
@@ -128,9 +123,6 @@ svg * {
     }
 }
 
-/* ============================================
-    Основная верстка
-   ============================================ */
 
 html {
     display: flex;
@@ -146,7 +138,6 @@ body {
     min-height: 100vh;
 }
 
-/* Обёртка для контента (отступы по бокам) */
 .content-wrapper {
     flex: 1;
     padding-inline: 3vw;
@@ -159,9 +150,6 @@ main {
     flex: 1;
 }
 
-/* ============================================
-    Шапка (header)
-   ============================================ */
 
 header {
     display: flex;
@@ -207,9 +195,6 @@ a {
         color: #666666 !important;
     }
 
-/* ============================================
-    Футер (footer)
-   ============================================ */
 
 footer {
     border-top: 2px solid black;
@@ -239,11 +224,6 @@ footer {
     color: white;
 }
 
-/* ============================================
-    Адаптив
-   ============================================ */
-
-/* Планшеты (768px и меньше) */
 @media (max-width: 768px) {
     .header-container ul {
         gap: 20px;
@@ -275,7 +255,7 @@ footer {
     }
 }
 
-/* Мобильные телефоны (480px и меньше) */
+
 @media (max-width: 480px) {
     .header-container ul {
         gap: 12px;
@@ -311,7 +291,7 @@ footer {
     }
 }
 
-/* Очень маленькие телефоны (350px и меньше) */
+
 @media (max-width: 350px) {
     .header-container ul {
         gap: 8px;
