@@ -1,5 +1,5 @@
-﻿﻿@{
-Layout = null;
+﻿@{
+    Layout = null;
 }
 <!DOCTYPE html>
 <html>
@@ -17,56 +17,56 @@ Layout = null;
 </head>
 <body>
     <header>
-        <p class="header-welcome-text">Добро пожаловать! Регистрация<p>
-            <p class="has-account">У вас уже есть аккаунт? <a id="registration-link" href="/Login/Authorization">Войти</a></p>
-        </header>
+        <p class="header-welcome-text">Добро пожаловать! Регистрация</p>
+        <p class="has-account">У вас уже есть аккаунт? <a id="registration-link" href="/Login/Authorization">Войти</a></p>
+    </header>
 
-
-        <aside>
-        </aside>
-        <main>
-            <section>
-                <div class="form">
-                    <form method="POST" action="UserWorkspace/Index" class="main-section-form">
-                        <div class="admin-row">
-                            <label for="switch">Режим администратора</label>
-                            <div id="switch" class="common-switch">
-                                <label class="switch">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
+    <main>
+        <section>
+            <div class="form">
+                <form method="POST" action="UserWorkspace/Index" class="main-section-form">
+                    <div class="admin-row">
+                        <label for="switch">Режим администратора</label>
+                        <div id="switch" class="common-switch">
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
                         </div>
+                    </div>
 
-                        <label for="email">Электронная почта</label>
-                        <input id="email" type="email" />
+                    <label for="email">Электронная почта</label>
+                    <input id="email" type="email" />
 
-                        <label for="FIO">ФИО</label>
-                        <input id="FIO" type="text" />
+                    <label for="FIO">ФИО</label>
+                    <input id="FIO" type="text" />
 
-                        <label for="password">Пароль</label>
-                        <input id="password" type="password" />
+                    <label for="password">Пароль</label>
+                    <input id="password" type="password" />
 
-                        <label for="password-repeat">Подтвердите пароль</label>
-                        <input id="password-repeat" type="password" />
-                        <ul class="form-list-password">
-                            <li>Используйте 8 и более символов</li>
-                            <li>Хотя бы один специальный символ</li>
-                            <li>Хотя бы один символ в ВЕРХНЕМ регистре</li>
-                            <li>Хотя бы одно число</li>
-                        </ul>
+                    <label for="password-repeat">Подтвердите пароль</label>
+                    <input id="password-repeat" type="password" />
+                    <ul class="form-list-password">
+                        <li>Используйте 8 и более символов</li>
+                        <li>Хотя бы один специальный символ</li>
+                        <li>Хотя бы один символ в ВЕРХНЕМ регистре</li>
+                        <li>Хотя бы одно число</li>
+                    </ul>
 
-                        <div class="checkbox-wrapper">
-                            <input id="checkbox-user-data-computing" type="checkbox" />
-                            <label class="checkbox-user-data-computing" for="checkbox-user-data-computing">Соглашение на обработку персональных данных и с условиями использования сервиса.</label>
-                        </div>
+                    <div class="checkbox-wrapper">
+                        <input id="checkbox-user-data-computing" type="checkbox" />
+                        <label class="checkbox-user-data-computing" for="checkbox-user-data-computing">Соглашение на обработку персональных данных и с условиями использования сервиса.</label>
+                    </div>
 
-                        <input type="submit" value="Зарегистрироваться"  />
-                    </form>
-                </div>
-            </section>
-        </main>
-        <footer>
-        </footer>
-    </body>
+                    <input type="submit" value="Зарегистрироваться" />
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer></footer>
+
+    <!-- Подключение JS -->
+    <script src="~/js/RegistrationValidation.js"></script>
+</body>
 </html>

@@ -1,4 +1,4 @@
-﻿﻿@{
+﻿@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -17,29 +17,32 @@
 </head>
 <body>
     <header>
-        <p class="header-welcome-text">Авторизация пользователя<p>
-            <p>Хотите создать аккаунт? <a id="registration-link" href="/Login/Registration">Зарегистрироваться</a></p>
-        </header>
-        <main>
-            <section>
-                <div class="form">
-                    <form method="POST" class="main-section-form">
-                       
-                        <label for="email">Электронная почта</label>
-                        <input id="email" type="email" />
+        <p class="header-welcome-text">Авторизация пользователя</p>
+        <p>Хотите создать аккаунт? <a id="registration-link" href="/Login/Registration">Зарегистрироваться</a></p>
+    </header>
+    
+    <main>
+        <section>
+            <div class="form">
+                <form method="POST" class="main-section-form">
+                    <label for="email">Электронная почта</label>
+                    <input id="email" type="email" />
 
-                        <label for="FIO">ФИО</label>
-                        <input id="FIO" type="text" />
+                    <label for="FIO">ФИО</label>
+                    <input id="FIO" type="text" />
 
-                        <label for="password">Пароль</label>
-                        <input id="password" type="password" />
-                 
-                        <input type="submit" value="Войти" />
-                    </form>
-                </div>
-            </section>
-        </main>
-        <footer>
-        </footer>
-    </body>
+                    <label for="password">Пароль</label>
+                    <input id="password" type="password" />
+
+                    <input type="submit" value="Войти" />
+                </form>
+            </div>
+        </section>
+    </main>
+    
+    <footer></footer>
+
+    <!-- Подключение JS -->
+    <script src="~/js/AuthorizationValidation.js"></script>
+</body>
 </html>
