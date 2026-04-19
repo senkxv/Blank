@@ -1,1 +1,46 @@
-﻿
+﻿@model List<Blank.Models.Documents>
+
+@{
+    ViewData["Title"] = "Главная";
+}
+
+<header>
+    <link rel="stylesheet" href="~/css/UserWorkspace/Index.css" />
+</header>
+
+<div class="table-container">
+
+    <table class="rounded-table">
+        <thead>
+            <tr>
+                <th>Ид документа</th>
+                <th>Ид типа</th>
+                <th>Номер документа</th>
+                <th>Дата создания</th>
+                <th>Ид перевозчика</th>
+                <th>Ид грузоотправителя</th>
+                <th>Ид получателя</th>
+                <th>Ид водителя</th>
+                <th>Ид транспорта</th>
+                <th>Ид пользователя</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var doc in Model)
+            {
+                <tr>
+                    <td>@doc.ид_документа</td>
+                    <td>@doc.ид_типа</td>
+                    <td>@doc.номер_документа</td>
+                    <td>@doc.дата_создания.ToShortDateString()</td>
+                    <td>@doc.ид_перевозчика</td>
+                    <td>@doc.ид_грузоотправителя</td>
+                    <td>@doc.ид_получателя</td>
+                    <td>@doc.ид_водителя</td>
+                    <td>@doc.ид_транспорта</td>
+                    <td>@doc.ид_пользователя</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

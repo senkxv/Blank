@@ -1,3 +1,6 @@
+using Blank.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace Blank
 {
     public class Program
@@ -5,6 +8,11 @@ namespace Blank
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Добавляем DbContext для MySQL
+            builder.Services.AddDbContext<ApplicationDBContext>(options =>
+                options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))
+            );
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Blank.Models
 {
     [Table("Водители")]
-    public class Driver
+    public class Drivers
     {
         [Key]
         [Column("ид_водителя")]
