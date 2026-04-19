@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Blank.Models;
+using Blank.Models.Tables;
+using Blank.Models.Views;
 
 namespace Blank.Data
 {
@@ -23,5 +24,6 @@ namespace Blank.Data
         public DbSet<Positions> Позиции { get; set; }
         public DbSet<Unloading_Point> Пункт_Разгрузки { get; set; }
         public DbSet<Loading_Point> Пункт_Погрузки { get; set; }
+        public DbSet<MainPage>  Главная { get; set; }
     }
 }

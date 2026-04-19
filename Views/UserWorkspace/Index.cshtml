@@ -1,4 +1,4 @@
-﻿@model List<Blank.Models.Documents>
+﻿@model List<Blank.Models.Views.MainPage>
 
 
 <header>
@@ -27,14 +27,11 @@
             {
                 <tr>
                     <td>@doc.ид_документа</td>
-                    <td>@doc.ид_типа</td>
+                    <td>@doc.тип</td>
                     <td>@doc.номер_документа</td>
                     <td>@doc.дата_создания.ToShortDateString()</td>
-                    <td>@doc.ид_перевозчика</td>
-                    <td>@doc.ид_грузоотправителя</td>
-                    <td>@doc.ид_получателя</td>
-                    <td>@doc.ид_водителя</td>
-                    <td>@doc.ид_транспорта</td>
+                    <td>@doc.грузоотправитель</td>
+                    <td>@doc.грузополучатель</td>
                     <td>@doc.ид_пользователя</td>
                 </tr>
             }

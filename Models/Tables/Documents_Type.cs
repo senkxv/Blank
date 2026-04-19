@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Blank.Models
+namespace Blank.Models.Tables
 {
     [Table("типы_документов")]
     public class Document_Type

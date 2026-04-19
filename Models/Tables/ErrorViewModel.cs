@@ -1,4 +1,4 @@
-namespace Blank.Models
+namespace Blank.Models.Tables
 {
     public class ErrorViewModel
     {

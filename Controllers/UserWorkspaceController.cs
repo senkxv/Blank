@@ -14,8 +14,8 @@ namespace Blank.Controllers
 
         public IActionResult Index()
         {
-            var документы = _context.Документы.ToList();
-            return View(документы);
+            var главная = _context.Главная.ToList();
+            return View(главная);
         }
     }
 }
