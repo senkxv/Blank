@@ -1,8 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Blank.Models.Views
+﻿namespace Blank.Models.Views
 {
-    [Table("Главная")]
     public class MainPage
     {
         public int ид_документа { get; set; }

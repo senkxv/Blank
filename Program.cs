@@ -35,7 +35,7 @@ namespace Blank
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Login}/{action=Registration}/{id?}")
+                pattern: "{controller=UserWorkspace}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();

@@ -11,6 +11,19 @@ namespace Blank.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Настройка для представления
+            modelBuilder.Entity<MainPage>(entity =>
+            {
+                entity.HasNoKey();        // говорит EF, что это представление
+                entity.ToView("Главная"); // имя представления в БД
+            });
+        }
+
+        public DbSet<MainPage> Главная { get; set; }
         public DbSet<Organization> Организации { get; set; }
         public DbSet<Drivers> Водители { get; set; }
         public DbSet<Transport> Транспорт { get; set; }
@@ -24,6 +37,5 @@ namespace Blank.Data
         public DbSet<Positions> Позиции { get; set; }
         public DbSet<Unloading_Point> Пункт_Разгрузки { get; set; }
         public DbSet<Loading_Point> Пункт_Погрузки { get; set; }
-        public DbSet<MainPage>  Главная { get; set; }
     }
 }

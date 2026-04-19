@@ -1,5 +1,7 @@
 ﻿using Blank.Data;
+using Blank.Models.Views;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Blank.Controllers
 {
@@ -14,8 +16,8 @@ namespace Blank.Controllers
 
         public IActionResult Index()
         {
-            var главная = _context.Главная.ToList();
-            return View(главная);
+            var данные = _context.Главная.ToList();
+            return View(данные);
         }
     }
 }
