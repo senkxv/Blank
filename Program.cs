@@ -11,7 +11,7 @@ namespace Blank
 
             // Добавляем DbContext для MySQL
             builder.Services.AddDbContext<ApplicationDBContext>(options =>
-                options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))
+                options.UseMySQL(builder.Configuration.GetConnectionString("RemoteConnection"))
             );
 
             // Add services to the container.

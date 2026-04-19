@@ -10,17 +10,18 @@ namespace Blank.Data
         {
         }
 
-        // DbSet для всех таблиц
         public DbSet<Organization> Организации { get; set; }
         public DbSet<Drivers> Водители { get; set; }
         public DbSet<Transport> Транспорт { get; set; }
-        public DbSet<Transport_Type> ТипыТранспорта { get; set; }
-        public DbSet<Transport_Mark> МаркиТранспорта { get; set; }
+        public DbSet<Transport_Type> Типыранспорта { get; set; }
+        public DbSet<Transport_Mark> Марки_Транспорта { get; set; }
         public DbSet<Goods> Товары { get; set; }
-        public DbSet<Document_Type> ТипыДокументов { get; set; }
+        public DbSet<Document_Type> Типы_Документов { get; set; }
         public DbSet<Documents> Документы { get; set; }
         public DbSet<Users> Пользователи { get; set; }
         public DbSet<Posts> Должности { get; set; }
         public DbSet<Positions> Позиции { get; set; }
+        public DbSet<Unloading_Point> Пункт_Разгрузки { get; set; }
+        public DbSet<Loading_Point> Пункт_Погрузки { get; set; }
     }
 }
