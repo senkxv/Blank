@@ -1,44 +1,38 @@
 using Blank.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Blank
+var builder = WebApplication.CreateBuilder(args);
+
+// Добавляем DbContext для MySQL
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
+    options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+// Добавляем страницу с подробными ошибками для базы данных
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddControllersWithViews();
+
+var app = builder.Build();
+
+// Включаем подробные ошибки для разработки
+if (app.Environment.IsDevelopment())
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
-
-            // Добавляем DbContext для MySQL
-            builder.Services.AddDbContext<ApplicationDBContext>(options =>
-                options.UseMySQL(builder.Configuration.GetConnectionString("RemoteConnection"))
-            );
-
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.MapStaticAssets();
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=UserWorkspace}/{action=Index}/{id?}")
-                .WithStaticAssets();
-
-            app.Run();
-        }
-    }
+    app.UseDeveloperExceptionPage();
 }
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthorization();
+app.MapStaticAssets();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=UserWorkspace}/{action=Index}/{id?}")
+    .WithStaticAssets();
+
+app.Run();
