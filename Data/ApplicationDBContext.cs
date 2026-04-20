@@ -24,12 +24,12 @@ namespace Blank.Data
 
             // Настройка связей для Transport
             modelBuilder.Entity<Transport>()
-                .HasOne(t => t.ТипТранспорта)
+                .HasOne(t => t.Тип_Транспорта)
                 .WithMany()
                 .HasForeignKey(t => t.ид_типа_транспорта);
 
             modelBuilder.Entity<Transport>()
-                .HasOne(t => t.МаркаТранспорта)
+                .HasOne(t => t.Марка_Транспорта)
                 .WithMany()
                 .HasForeignKey(t => t.ид_марки);
         }
@@ -38,8 +38,8 @@ namespace Blank.Data
         public DbSet<Organization> Организации { get; set; }
         public DbSet<Drivers> Водители { get; set; }
         public DbSet<Transport> Транспорт { get; set; }
-        public DbSet<Transport_Type> ТипТранспорта { get; set; }
-        public DbSet<Transport_Mark> МаркиТранспорта { get; set; }
+        public DbSet<Transport_Type> Тип_Транспорта { get; set; }
+        public DbSet<Transport_Mark> Марки_Транспорта { get; set; }
         public DbSet<Goods> Товары { get; set; }
         public DbSet<Document_Type> Типы_Документов { get; set; }
         public DbSet<Documents> Документы { get; set; }

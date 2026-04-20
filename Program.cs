@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Добавляем DbContext для MySQL
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
-    options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseMySQL(builder.Configuration.GetConnectionString("RemoteConnection"))
 );
 
 // Добавляем страницу с подробными ошибками для базы данных

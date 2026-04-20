@@ -24,7 +24,7 @@ namespace Blank.Models.Tables
         [Required]
         public int ид_марки { get; set; }
 
-        public virtual Transport_Type ТипТранспорта { get; set; }
-        public virtual Transport_Mark МаркаТранспорта { get; set; }
+        public virtual Transport_Type Тип_Транспорта { get; set; }
+        public virtual Transport_Mark Марка_Транспорта { get; set; }
     }
 }
