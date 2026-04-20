@@ -33,8 +33,8 @@ namespace Blank.Controllers
 
             // Используем навигационные свойства, а не ID
             ViewBag.Transport = _context.Транспорт
-                .Include(t => t.ТипТранспорта)
-                .Include(t => t.МаркаТранспорта)
+                .Include(t => t.Тип_Транспорта)
+                .Include(t => t.Марка_Транспорта)
                 .ToList();
 
             ViewBag.LoadingPoints = _context.Пункт_Погрузки.ToList();
@@ -61,8 +61,8 @@ namespace Blank.Controllers
             ViewBag.Drivers = _context.Водители.ToList();
 
             ViewBag.Transport = _context.Транспорт
-                .Include(t => t.ТипТранспорта)
-                .Include(t => t.МаркаТранспорта)
+                .Include(t => t.Тип_Транспорта)
+                .Include(t => t.Марка_Транспорта)
                 .ToList();
 
             ViewBag.LoadingPoints = _context.Пункт_Погрузки.ToList();
