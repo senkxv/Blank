@@ -21,17 +21,6 @@ namespace Blank.Data
                 entity.HasNoKey();
                 entity.ToView("Главная");
             });
-
-            // Настройка связей для Transport
-            modelBuilder.Entity<Transport>()
-                .HasOne(t => t.Тип_Транспорта)
-                .WithMany()
-                .HasForeignKey(t => t.ид_типа_транспорта);
-
-            modelBuilder.Entity<Transport>()
-                .HasOne(t => t.Марка_Транспорта)
-                .WithMany()
-                .HasForeignKey(t => t.ид_марки);
         }
 
         public DbSet<MainPage> Главная { get; set; }

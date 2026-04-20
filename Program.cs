@@ -8,9 +8,6 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseMySQL(builder.Configuration.GetConnectionString("RemoteConnection"))
 );
 
-// Добавляем страницу с подробными ошибками для базы данных
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
