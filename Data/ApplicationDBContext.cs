@@ -15,19 +15,31 @@ namespace Blank.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Настройка для представления
             modelBuilder.Entity<MainPage>(entity =>
             {
-                entity.HasNoKey();        
-                entity.ToView("Главная"); 
+                entity.HasNoKey();
+                entity.ToView("Главная");
             });
+
+            // Настройка связей для Transport
+            modelBuilder.Entity<Transport>()
+                .HasOne(t => t.ТипТранспорта)
+                .WithMany()
+                .HasForeignKey(t => t.ид_типа_транспорта);
+
+            modelBuilder.Entity<Transport>()
+                .HasOne(t => t.МаркаТранспорта)
+                .WithMany()
+                .HasForeignKey(t => t.ид_марки);
         }
 
         public DbSet<MainPage> Главная { get; set; }
         public DbSet<Organization> Организации { get; set; }
         public DbSet<Drivers> Водители { get; set; }
         public DbSet<Transport> Транспорт { get; set; }
-        public DbSet<Transport_Type> Тип_Транспорта { get; set; }
-        public DbSet<Transport_Mark> Марки_Транспорта { get; set; }
+        public DbSet<Transport_Type> ТипТранспорта { get; set; }
+        public DbSet<Transport_Mark> МаркиТранспорта { get; set; }
         public DbSet<Goods> Товары { get; set; }
         public DbSet<Document_Type> Типы_Документов { get; set; }
         public DbSet<Documents> Документы { get; set; }
