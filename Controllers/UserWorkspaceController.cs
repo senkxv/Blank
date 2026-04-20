@@ -31,44 +31,13 @@ namespace Blank.Controllers
             ViewBag.Organizations = _context.Организации.ToList();
             ViewBag.Drivers = _context.Водители.ToList();
 
-            // Используем навигационные свойства, а не ID
-            ViewBag.Transport = _context.Транспорт
-                .Include(t => t.Тип_Транспорта)
-                .Include(t => t.Марка_Транспорта)
-                .ToList();
+            // Убираем Include — грузим только транспорт
+            ViewBag.Transport = _context.Транспорт.ToList();
 
             ViewBag.LoadingPoints = _context.Пункт_Погрузки.ToList();
             ViewBag.UnloadingPoints = _context.Пункт_Разгрузки.ToList();
 
             return View();
-        }
-
-        // POST: /UserWorkspace/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(Documents document)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Документы.Add(document);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            // Если ошибка — перезагружаем списки
-            ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
-            ViewBag.Organizations = _context.Организации.ToList();
-            ViewBag.Drivers = _context.Водители.ToList();
-
-            ViewBag.Transport = _context.Транспорт
-                .Include(t => t.Тип_Транспорта)
-                .Include(t => t.Марка_Транспорта)
-                .ToList();
-
-            ViewBag.LoadingPoints = _context.Пункт_Погрузки.ToList();
-            ViewBag.UnloadingPoints = _context.Пункт_Разгрузки.ToList();
-
-            return View(document);
         }
     }
 }
