@@ -7,7 +7,9 @@
         public string номер_документа { get; set; }
         public DateTime дата_создания { get; set; }
         public string грузоотправитель { get; set; }
+        public string перевозчик { get; set; }
         public string грузополучатель { get; set; }
-        public int ид_пользователя { get; set; }
+        public string пункт_погрузки { get; set; }
+        public string пункт_разгрузки { get; set; }
     }
 }

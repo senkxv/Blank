@@ -15,11 +15,10 @@ namespace Blank.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Настройка для представления
             modelBuilder.Entity<MainPage>(entity =>
             {
-                entity.HasNoKey();        // говорит EF, что это представление
-                entity.ToView("Главная"); // имя представления в БД
+                entity.HasNoKey();        
+                entity.ToView("Главная"); 
             });
         }
 
