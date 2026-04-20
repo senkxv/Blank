@@ -1,0 +1,109 @@
+﻿.form-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+    .form-container h2 {
+        margin-bottom: 25px;
+        color: #333;
+        font-family: Comfortaa;
+    }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 30px;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 14px;
+    }
+
+.form-control {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    background: white;
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: #990000;
+        box-shadow: 0 0 0 2px rgba(153, 0, 0, 0.1);
+    }
+
+select.form-control {
+    cursor: pointer;
+}
+
+.text-danger {
+    color: #990000;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.btn-save, .btn-cancel {
+    padding: 10px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.btn-save {
+    background-color: #990000;
+    color: white;
+    border: none;
+}
+
+    .btn-save:hover {
+        background-color: #660000;
+    }
+
+.btn-cancel {
+    background-color: #666;
+    color: white;
+    border: none;
+}
+
+    .btn-cancel:hover {
+        background-color: #444;
+    }
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .form-container {
+        margin: 20px auto;
+    }
+}

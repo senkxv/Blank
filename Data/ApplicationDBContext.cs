@@ -26,7 +26,7 @@ namespace Blank.Data
         public DbSet<Organization> Организации { get; set; }
         public DbSet<Drivers> Водители { get; set; }
         public DbSet<Transport> Транспорт { get; set; }
-        public DbSet<Transport_Type> Типыранспорта { get; set; }
+        public DbSet<Transport_Type> Тип_Транспорта { get; set; }
         public DbSet<Transport_Mark> Марки_Транспорта { get; set; }
         public DbSet<Goods> Товары { get; set; }
         public DbSet<Document_Type> Типы_Документов { get; set; }

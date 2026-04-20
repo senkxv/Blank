@@ -46,5 +46,13 @@ namespace Blank.Models.Tables
         [Column("ид_пользователя")]
         [Required]
         public int ид_пользователя { get; set; }
+
+        [Column("ид_пункта_погрузки")]
+        [Required]
+        public int ид_пункта_погрузки { get; set; }
+
+        [Column("ид_пункта_разгрузки")]
+        [Required]
+        public int ид_пункта_разгрузки { get; set; }
     }
 }
