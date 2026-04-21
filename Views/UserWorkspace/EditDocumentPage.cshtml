@@ -1,0 +1,152 @@
+﻿@model Blank.Models.Tables.Documents
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Редактирование документа";
+}
+
+<link rel="stylesheet" href="~/css/UserWorkspace/EditDocumentPage.css" />
+
+<div class="form-container">
+    <h2>Редактирование документа</h2>
+
+    <form method="post" asp-action="EditDocumentPage" class="document-form">
+        <!-- Скрытое поле для ID обязательно! -->
+        <input type="hidden" asp-for="ид_документа" />
+
+        <div class="form-grid">
+            <!-- Тип документа -->
+            <div class="form-group">
+                <label asp-for="ид_типа">Тип документа</label>
+                <select asp-for="ид_типа" class="form-control" required>
+                    <option value="">-- Выберите тип --</option>
+                    @foreach (var type in ViewBag.DocumentTypes)
+                    {
+                        <option value="@type.ид_типа">@type.краткое_наименование</option>
+                    }
+                </select>
+                <span asp-validation-for="ид_типа" class="text-danger"></span>
+            </div>
+
+            <!-- Номер документа -->
+            <div class="form-group">
+                <label asp-for="номер_документа">Номер документа</label>
+                <input asp-for="номер_документа" class="form-control" required />
+                <span asp-validation-for="номер_документа" class="text-danger"></span>
+            </div>
+
+            <!-- Дата создания -->
+            <div class="form-group">
+                <label asp-for="дата_создания">Дата создания</label>
+                <input asp-for="дата_создания" type="date" class="form-control" required />
+                <span asp-validation-for="дата_создания" class="text-danger"></span>
+            </div>
+
+            <!-- Грузоотправитель -->
+            <div class="form-group">
+                <label asp-for="ид_грузоотправителя">Грузоотправитель</label>
+                <select asp-for="ид_грузоотправителя" class="form-control" required>
+                    <option value="">-- Выберите организацию --</option>
+                    @foreach (var org in ViewBag.Organizations)
+                    {
+                        <option value="@org.ид_организации">@org.название</option>
+                    }
+                </select>
+                <span asp-validation-for="ид_грузоотправителя" class="text-danger"></span>
+            </div>
+
+            <!-- Перевозчик -->
+            <div class="form-group">
+                <label asp-for="ид_перевозчика">Перевозчик</label>
+                <select asp-for="ид_перевозчика" class="form-control" required>
+                    <option value="">-- Выберите организацию --</option>
+                    @foreach (var org in ViewBag.Organizations)
+                    {
+                        <option value="@org.ид_организации">@org.название</option>
+                    }
+                </select>
+                <span asp-validation-for="ид_перевозчика" class="text-danger"></span>
+            </div>
+
+            <!-- Грузополучатель -->
+            <div class="form-group">
+                <label asp-for="ид_получателя">Грузополучатель</label>
+                <select asp-for="ид_получателя" class="form-control" required>
+                    <option value="">-- Выберите организацию --</option>
+                    @foreach (var org in ViewBag.Organizations)
+                    {
+                        <option value="@org.ид_организации">@org.название</option>
+                    }
+                </select>
+                <span asp-validation-for="ид_получателя" class="text-danger"></span>
+            </div>
+
+            <!-- Водитель -->
+            <div class="form-group">
+                <label asp-for="ид_водителя">Водитель</label>
+                <select asp-for="ид_водителя" class="form-control" required>
+                    <option value="">-- Выберите водителя --</option>
+                    @foreach (var driver in ViewBag.Drivers)
+                    {
+                        <option value="@driver.ид_водителя">
+                            @driver.фамилия @driver.имя @driver.отчество
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="ид_водителя" class="text-danger"></span>
+            </div>
+
+            <!-- Транспорт -->
+            <div class="form-group">
+                <label asp-for="ид_транспорта">Транспорт</label>
+                <select asp-for="ид_транспорта" class="form-control" required>
+                    <option value="">-- Выберите транспорт --</option>
+                    @foreach (var t in ViewBag.Transport)
+                    {
+                        <option value="@t.ид_транспорта">
+                            @t.регистрационный_номер
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="ид_транспорта" class="text-danger"></span>
+            </div>
+
+            <!-- Пункт погрузки -->
+            <div class="form-group">
+                <label asp-for="ид_пункта_погрузки">Пункт погрузки</label>
+                <select asp-for="ид_пункта_погрузки" class="form-control">
+                    <option value="">-- Выберите пункт погрузки --</option>
+                    @foreach (var point in ViewBag.LoadingPoints)
+                    {
+                        <option value="@point.ид_пункта_погрузки">@point.наименование</option>
+                    }
+                </select>
+                <span asp-validation-for="ид_пункта_погрузки" class="text-danger"></span>
+            </div>
+
+            <!-- Пункт разгрузки -->
+            <div class="form-group">
+                <label asp-for="ид_пункта_разгрузки">Пункт разгрузки</label>
+                <select asp-for="ид_пункта_разгрузки" class="form-control">
+                    <option value="">-- Выберите пункт разгрузки --</option>
+                    @foreach (var point in ViewBag.UnloadingPoints)
+                    {
+                        <option value="@point.ид_пункта_разгрузки">@point.наименование</option>
+                    }
+                </select>
+                <span asp-validation-for="ид_пункта_разгрузки" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Сохранить</button>
+            <a href="@Url.Action("Index", "UserWorkspace")" class="btn-cancel">Отмена</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

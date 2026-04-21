@@ -1,41 +1,56 @@
 ﻿@model List<Blank.Models.Views.MainPage>
 
-
-<header>
-    <link rel="stylesheet" href="~/css/site.css" />
-</header>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Главная";
+}
 
 <div class="table-container">
+    <h2>Список документов</h2>
 
-    <table class="rounded-table">
-        <thead>
-            <tr>
-                <td>Порядковый номер</td>
-                <td>Тип</td>
-                <td>Номер документа</td>
-                <td>Дата создания</td>
-                <td>Грузоотправитель</td>
-                <td>Перевозчик</td>
-                <td>Грузополучатель</td>
-                <td>Пункт погрузки</td>
-                <td>Пункт разгрузки</td>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var doc in Model)
-            {
+    <div class="table-wrapper">
+        <table class="rounded-table">
+            <thead>
                 <tr>
-                    <td>@doc.ид_документа</td>
-                    <td>@doc.тип</td>
-                    <td>@doc.номер_документа</td>
-                    <td>@doc.дата_создания.ToShortDateString()</td>
-                    <td>@doc.грузоотправитель</td>
-                    <td>@doc.перевозчик</td>
-                    <td>@doc.грузополучатель</td>
-                    <td>@doc.пункт_погрузки</td>
-                    <td>@doc.пункт_разгрузки</td>
+                    <th>Выбрать</th>
+                    <th>Порядковый номер</th>
+                    <th>Тип</th>
+                    <th>Номер документа</th>
+                    <th>Дата создания</th>
+                    <th>Грузоотправитель</th>
+                    <th>Перевозчик</th>
+                    <th>Грузополучатель</th>
+                    <th>Пункт погрузки</th>
+                    <th>Пункт разгрузки</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var doc in Model)
+                {
+                    <tr onclick="selectDocument(@doc.ид_документа)">
+                        <td>
+                            <input type="radio" name="selectedId" value="@doc.ид_документа" />
+                        </td>
+                        <td>@doc.ид_документа</td>
+                        <td>@doc.тип</td>
+                        <td>@doc.номер_документа</td>
+                        <td>@doc.дата_создания.ToShortDateString()</td>
+                        <td>@doc.грузоотправитель</td>
+                        <td>@doc.перевозчик</td>
+                        <td>@doc.грузополучатель</td>
+                        <td>@doc.пункт_погрузки</td>
+                        <td>@doc.пункт_разгрузки</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<script>
+    function selectDocument(id) {
+        sessionStorage.setItem('selectedDocumentId', id);
+        const radio = document.querySelector(`input[type="radio"][value="${id}"]`);
+        if (radio) radio.checked = true;
+    }
+</script>
