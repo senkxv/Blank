@@ -15,16 +15,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
 </head>
-<script>
-    function editSelectedDocument() {
-        const id = sessionStorage.getItem('selectedDocumentId');
-        if (id) {
-            window.location.href = '/UserWorkspace/EditDocumentPage?id=' + id;
-        } else {
-            alert('Сначала выберите документ в таблице');
-        }
-    }
-</script>
 <body>
     <header>
         <div class="header-container">
@@ -33,8 +23,8 @@
                     <li><a href="/">Главная</a></li>
                     <li><a href="/UserWorkspace/CreateDocumentPage">Добавить</a></li>
                     <li><a href="#" onclick="editSelectedDocument()">Изменить</a></li>
-                    <li><a href="/Documents/Delete">Удалить</a></li>
-                    <li><a href="/Documents/Export">Экспорт</a></li>
+                    <li><a href="#" onclick="deleteSelectedDocument()">Удалить</a></li>
+                    <li><a href="/UserWorkspace/ExportAllToExcel">Экспорт</a></li>
                     <li><a href="UserWorkspace/Index">Обновить</a></li>
                     <li><a href="/Documents/Print">Печать</a></li>
                     <li><a href="/Search">Поиск</a></li>
@@ -64,3 +54,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+<script src="~/js/Index.js"></script>

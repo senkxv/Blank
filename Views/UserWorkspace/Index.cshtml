@@ -5,6 +5,13 @@
     ViewData["Title"] = "Главная";
 }
 
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+
+<input type="hidden" name="__RequestVerificationToken" value="@token" />
+
 <div class="table-container">
     <h2>Список документов</h2>
 
@@ -47,10 +54,4 @@
     </div>
 </div>
 
-<script>
-    function selectDocument(id) {
-        sessionStorage.setItem('selectedDocumentId', id);
-        const radio = document.querySelector(`input[type="radio"][value="${id}"]`);
-        if (radio) radio.checked = true;
-    }
-</script>
+<script src="~/js/Index.js"></script>

@@ -52,5 +52,6 @@ namespace Blank.Models.Tables
 
         [Column("ид_пункта_разгрузки")]
         public int? ид_пункта_разгрузки { get; set; }
+
     }
 }
