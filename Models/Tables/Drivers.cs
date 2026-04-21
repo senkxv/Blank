@@ -8,31 +8,31 @@ namespace Blank.Models.Tables
     {
         [Key]
         [Column("ид_водителя")]
-        public int Id { get; set; }
+        public int ид_водителя { get; set; }
 
         [Column("фамилия")]
         [Required]
         [MaxLength(100)]
-        public string LastName { get; set; }
+        public string фамилия { get; set; }
 
         [Column("имя")]
         [Required]
         [MaxLength(100)]
-        public string FirstName { get; set; }
+        public string имя { get; set; }
 
         [Column("отчество")]
         [Required]
         [MaxLength(100)]
-        public string Patronymic { get; set; }
+        public string отчество { get; set; }
 
         [Column("номер_лицензии")]
         [Required]
         [MaxLength(255)]
-        public string LicenseNumber { get; set; }
+        public string номер_лицензии { get; set; }
 
         [Column("номер_телефона")]
         [Required]
         [MaxLength(45)]
-        public string PhoneNumber { get; set; }
+        public string номер_телефона { get; set; }
     }
 }

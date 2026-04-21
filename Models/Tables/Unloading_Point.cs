@@ -9,7 +9,7 @@ namespace Blank.Models.Tables
         [Key]
         [Column("ид_пункта_разгрузки")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int IdПунктаПогрузки { get; set; }
+        public int ид_пункта_разгрузки { get; set; }
 
         [Column("наименование")]
         [Required]

@@ -85,7 +85,9 @@
                     <option value="">-- Выберите водителя --</option>
                     @foreach (var driver in ViewBag.Drivers)
                     {
-                        <option value="@driver.ид_водителя">@driver.фамилия @driver.имя @driver.отчество</option>
+                        <option value="@driver.ид_водителя">
+                            @driver.фамилия @driver.имя @driver.отчество
+                        </option>
                     }
                 </select>
                 <span asp-validation-for="ид_водителя" class="text-danger"></span>
@@ -109,7 +111,7 @@
             <!-- Пункт погрузки -->
             <div class="form-group">
                 <label asp-for="ид_пункта_погрузки">Пункт погрузки</label>
-                <select asp-for="ид_пункта_погрузки" class="form-control">
+                <select asp-for="ид_пункта_погрузки" class="form-control" required>
                     <option value="">-- Выберите пункт погрузки --</option>
                     @foreach (var point in ViewBag.LoadingPoints)
                     {
@@ -122,7 +124,7 @@
             <!-- Пункт разгрузки -->
             <div class="form-group">
                 <label asp-for="ид_пункта_разгрузки">Пункт разгрузки</label>
-                <select asp-for="ид_пункта_разгрузки" class="form-control">
+                <select asp-for="ид_пункта_разгрузки" class="form-control" required>
                     <option value="">-- Выберите пункт разгрузки --</option>
                     @foreach (var point in ViewBag.UnloadingPoints)
                     {
