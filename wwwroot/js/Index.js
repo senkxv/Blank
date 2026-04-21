@@ -31,3 +31,22 @@ document.querySelectorAll('.rounded-table tbody tr').forEach(row => {
         if (id) selectDocument(id);
     });
 });
+
+function selectDocument(id) {
+    sessionStorage.setItem('selectedDocumentId', id);
+    const radio = document.querySelector(`input[type="radio"][value="${id}"]`);
+    if (radio) radio.checked = true;
+}
+
+// Автоматический поиск при вводе (после 2 символов)
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+    let timeoutId;
+    searchInput.addEventListener('input', function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            const searchValue = this.value;
+            window.location.href = '/UserWorkspace/Search?searchString=' + encodeURIComponent(searchValue);
+        }, 300); // задержка 300 мс после остановки печати
+    });
+}

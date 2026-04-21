@@ -173,6 +173,29 @@ namespace Blank.Controllers
                 return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Полный_экспорт_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
             }
         }
+
+            // GET: /UserWorkspace/Search?searchString=...
+        public IActionResult Search(string searchString)
+        {
+            var данные = _context.Главная.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.ToLower();
+                данные = данные.Where(d =>
+                    d.ид_документа.ToString().Contains(searchString) ||
+                    (d.тип != null && d.тип.ToLower().Contains(searchString)) ||
+                    (d.номер_документа != null && d.номер_документа.ToLower().Contains(searchString)) ||
+                    (d.грузоотправитель != null && d.грузоотправитель.ToLower().Contains(searchString)) ||
+                    (d.перевозчик != null && d.перевозчик.ToLower().Contains(searchString)) ||
+                    (d.грузополучатель != null && d.грузополучатель.ToLower().Contains(searchString)) ||
+                    (d.пункт_погрузки != null && d.пункт_погрузки.ToLower().Contains(searchString)) ||
+                    (d.пункт_разгрузки != null && d.пункт_разгрузки.ToLower().Contains(searchString))
+                );
+            }
+
+            ViewBag.SearchString = searchString;
+            return View("Index", данные.ToList());
+        }
     }
-    
 }

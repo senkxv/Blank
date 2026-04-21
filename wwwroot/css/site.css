@@ -429,3 +429,125 @@ footer {
     .rounded-table tbody tr:hover {
         background-color: #f0f0f0;
     }
+
+.search-container {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+    .search-container form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .search-container input {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 250px;
+        font-size: 14px;
+    }
+
+    .search-container button,
+    .btn-reset {
+        padding: 8px 16px;
+        background-color: #990000;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+        .search-container button:hover,
+        .btn-reset:hover {
+            background-color: #660000;
+        }
+
+.btn-search {
+    background-color: #990000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+    .btn-search:hover {
+        background-color: #660000;
+    }
+
+.search-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+    .search-form input {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 300px;
+        font-size: 14px;
+    }
+
+    .search-form button {
+        padding: 8px 16px;
+        background-color: #990000;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+        .search-form button:hover {
+            background-color: #660000;
+        }
+
+/* Модальное окно поиска */
+#searchModal {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+
+    #searchModal .search-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 0;
+    }
+
+    #searchModal input {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 250px;
+    }
+
+    #searchModal button {
+        padding: 8px 16px;
+        background-color: #990000;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+        #searchModal button:hover {
+            background-color: #660000;
+        }
+
+#closeSearchBtn {
+    background-color: #666 !important;
+}
+
+    #closeSearchBtn:hover {
+        background-color: #444 !important;
+    }
