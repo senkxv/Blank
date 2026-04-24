@@ -24,7 +24,9 @@
     <main>
         <section>
             <div class="form">
-                <form method="POST" action="UserWorkspace/Index" class="main-section-form">
+                <form method="post" asp-action="Registration" asp-controller="Login" class="main-section-form">
+                    @Html.AntiForgeryToken()
+                    
                     <div class="admin-row">
                         <label for="switch">Режим администратора</label>
                         <div id="switch" class="common-switch">
@@ -35,17 +37,20 @@
                         </div>
                     </div>
 
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
                     <label for="email">Электронная почта</label>
-                    <input id="email" type="email" />
+                    <input id="email" type="email" name="Email" />
 
                     <label for="FIO">ФИО</label>
-                    <input id="FIO" type="text" />
+                    <input id="FIO" type="text" name="ФИО" />
 
                     <label for="password">Пароль</label>
-                    <input id="password" type="password" />
+                    <input id="password" type="password" name="Password" />
 
                     <label for="password-repeat">Подтвердите пароль</label>
-                    <input id="password-repeat" type="password" />
+                    <input id="password-repeat" type="password" name="ConfirmPassword" />
+
                     <ul class="form-list-password">
                         <li>Используйте 8 и более символов</li>
                         <li>Хотя бы один специальный символ</li>
@@ -57,7 +62,7 @@
                         <input id="checkbox-user-data-computing" type="checkbox" />
                         <label class="checkbox-user-data-computing" for="checkbox-user-data-computing">Соглашение на обработку персональных данных и с условиями использования сервиса.</label>
                     </div>
-
+                    
                     <input type="submit" value="Зарегистрироваться" />
                 </form>
             </div>
@@ -66,7 +71,6 @@
 
     <footer></footer>
 
-    <!-- Подключение JS -->
     <script src="~/js/RegistrationValidation.js"></script>
 </body>
 </html>

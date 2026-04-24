@@ -1,4 +1,6 @@
-﻿@{
+﻿@model Blank.Models.LoginViewModel
+
+@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -24,15 +26,14 @@
     <main>
         <section>
             <div class="form">
-                <form method="POST" class="main-section-form">
-                    <label for="email">Электронная почта</label>
-                    <input id="email" type="email" />
+                <form method="post" asp-action="Authorization" asp-controller="Login" class="main-section-form">
+                    @Html.AntiForgeryToken()
 
-                    <label for="FIO">ФИО</label>
-                    <input id="FIO" type="text" />
+                    <label for="Email">Электронная почта</label>
+                    <input id="Email" type="email" name="Email" />
 
-                    <label for="password">Пароль</label>
-                    <input id="password" type="password" />
+                    <label for="Password">Пароль</label>
+                    <input id="Password" type="password" name="Password" />
 
                     <input type="submit" value="Войти" />
                 </form>
@@ -42,7 +43,6 @@
     
     <footer></footer>
 
-    <!-- Подключение JS -->
     <script src="~/js/AuthorizationValidation.js"></script>
 </body>
 </html>

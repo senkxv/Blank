@@ -10,6 +10,7 @@
 
     function showError(inputId, message) {
         const input = document.getElementById(inputId);
+        if (!input) return;
         input.style.borderColor = 'red';
 
         const oldError = input.parentNode.querySelector(`.error-message[data-for="${inputId}"]`);
@@ -28,16 +29,16 @@
 
         let isValid = true;
 
-        const email = document.getElementById('email');
+        const email = document.getElementById('Email');      // ← исправлено
         const fio = document.getElementById('FIO');
-        const password = document.getElementById('password');
+        const password = document.getElementById('Password'); // ← исправлено
 
         // Email
         if (email.value.trim() === '') {
-            showError('email', 'Введите email');
+            showError('Email', 'Введите email');
             isValid = false;
         } else if (!email.value.includes('@') || !email.value.includes('.')) {
-            showError('email', 'Введите корректный email');
+            showError('Email', 'Введите корректный email');
             isValid = false;
         }
 
@@ -52,7 +53,7 @@
 
         // Пароль
         if (password.value === '') {
-            showError('password', 'Введите пароль');
+            showError('Password', 'Введите пароль');
             isValid = false;
         }
 

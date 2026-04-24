@@ -1,4 +1,5 @@
 using Blank.Data;
+using Blank.Models.Tables;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+// Добавляем сервисы для работы с сессиями
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(7);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddControllersWithViews();
 
@@ -25,11 +35,16 @@ else
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+// Добавляем UseSession перед UseAuthorization
+app.UseSession();
+
 app.UseAuthorization();
+
 app.MapStaticAssets();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=UserWorkspace}/{action=Index}/{id?}")
+    pattern: "{controller=Login}/{action=Registration}/{id?}")
     .WithStaticAssets();
 
 app.Run();
