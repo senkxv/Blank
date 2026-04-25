@@ -123,58 +123,61 @@ namespace Blank.Controllers
         }
 
         // GET: /UserWorkspace/ExportAllToExcel
-        // GET: /UserWorkspace/ExportAllToExcel
         public IActionResult ExportAllToExcel()
         {
             using (var package = new ExcelPackage())
             {
+                // === 1. Лист "Документы" (с расшифровками) ===
                 var sheetDocuments = package.Workbook.Worksheets.Add("Документы");
 
-                sheetDocuments.Cells[1, 1].Value = "Номер документа";
+                // Заголовки (все 14 столбцов)
+                sheetDocuments.Cells[1, 1].Value = "Порядковый номер";
                 sheetDocuments.Cells[1, 2].Value = "Тип документа";
-                sheetDocuments.Cells[1, 3].Value = "Дата создания";
-                sheetDocuments.Cells[1, 4].Value = "Грузоотправитель";
-                sheetDocuments.Cells[1, 5].Value = "Перевозчик";
-                sheetDocuments.Cells[1, 6].Value = "Грузополучатель";
-                sheetDocuments.Cells[1, 7].Value = "Водитель";
-                sheetDocuments.Cells[1, 8].Value = "Транспорт (гос. номер)";
+                sheetDocuments.Cells[1, 3].Value = "Номер документа";
+                sheetDocuments.Cells[1, 4].Value = "Дата создания";
+                sheetDocuments.Cells[1, 5].Value = "Грузоотправитель";
+                sheetDocuments.Cells[1, 6].Value = "Перевозчик";
+                sheetDocuments.Cells[1, 7].Value = "Грузополучатель";
+                sheetDocuments.Cells[1, 8].Value = "Пункт погрузки";
+                sheetDocuments.Cells[1, 9].Value = "Пункт разгрузки";
+                sheetDocuments.Cells[1, 10].Value = "ФИО водителя";
+                sheetDocuments.Cells[1, 11].Value = "Марка машины";
+                sheetDocuments.Cells[1, 12].Value = "Регистрационный номер";
+                sheetDocuments.Cells[1, 13].Value = "Тип ТС";
 
-                var документы = _context.Документы.ToList();
+                var документы = _context.Главная.ToList();
+
                 int row = 2;
-
                 foreach (var doc in документы)
                 {
-                    var грузоотправитель = _context.Организации.Find(doc.ид_грузоотправителя);
-                    var перевозчик = _context.Организации.Find(doc.ид_перевозчика);
-                    var грузополучатель = _context.Организации.Find(doc.ид_получателя);
-                    var типДокумента = _context.Типы_Документов.Find(doc.ид_типа);
-                    var водитель = _context.Водители.Find(doc.ид_водителя);
-                    var транспорт = _context.Транспорт.Find(doc.ид_транспорта);
-
-                    sheetDocuments.Cells[row, 1].Value = doc.номер_документа;
-                    sheetDocuments.Cells[row, 2].Value = типДокумента?.краткое_наименование;
-                    sheetDocuments.Cells[row, 3].Value = doc.дата_создания.ToString("yyyy-MM-dd");
-                    sheetDocuments.Cells[row, 4].Value = грузоотправитель?.название;
-                    sheetDocuments.Cells[row, 5].Value = перевозчик?.название;
-                    sheetDocuments.Cells[row, 6].Value = грузополучатель?.название;
-                    sheetDocuments.Cells[row, 7].Value = водитель != null ? $"{водитель.фамилия} {водитель.имя} {водитель.отчество}" : "";
-                    sheetDocuments.Cells[row, 8].Value = транспорт?.регистрационный_номер;
+                    sheetDocuments.Cells[row, 1].Value = doc.ид_документа;
+                    sheetDocuments.Cells[row, 2].Value = doc.тип;
+                    sheetDocuments.Cells[row, 3].Value = doc.номер_документа;
+                    sheetDocuments.Cells[row, 4].Value = doc.дата_создания.ToString("yyyy-MM-dd");
+                    sheetDocuments.Cells[row, 5].Value = doc.грузоотправитель;
+                    sheetDocuments.Cells[row, 6].Value = doc.перевозчик;
+                    sheetDocuments.Cells[row, 7].Value = doc.грузополучатель;
+                    sheetDocuments.Cells[row, 8].Value = doc.пункт_погрузки;
+                    sheetDocuments.Cells[row, 9].Value = doc.пункт_разгрузки;
+                    sheetDocuments.Cells[row, 10].Value = doc.ФИО_Водителя;
+                    sheetDocuments.Cells[row, 11].Value = doc.Марка_Машины;
+                    sheetDocuments.Cells[row, 12].Value = doc.Регистрационный_Номер;
+                    sheetDocuments.Cells[row, 13].Value = doc.Тип_ТС;
                     row++;
                 }
-                sheetDocuments.Cells.AutoFitColumns();
 
-                // Остальные листы (Водители, Организации, Транспорт, Товары, Типы документов, Пункты погрузки/разгрузки)
-                // ... (оставь как было, но убери все Include)
+                // Автоширина столбцов
+                sheetDocuments.Cells.AutoFitColumns();
 
                 var stream = new MemoryStream();
                 package.SaveAs(stream);
                 stream.Position = 0;
 
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Полный_экспорт_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Документы_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
             }
         }
 
-            // GET: /UserWorkspace/Search?searchString=...
+        // GET: /UserWorkspace/Search?searchString=...
         public IActionResult Search(string searchString)
         {
             var данные = _context.Главная.AsQueryable();

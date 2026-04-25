@@ -122,7 +122,6 @@ svg * {
     }
 }
 
-
 html {
     display: flex;
     flex-direction: column;
@@ -135,6 +134,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 .content-wrapper {
@@ -148,7 +149,6 @@ body {
 main {
     flex: 1;
 }
-
 
 header {
     display: flex;
@@ -194,7 +194,6 @@ a {
         color: #666666 !important;
     }
 
-
 footer {
     border-top: 2px solid black;
     background: #1c1c1c;
@@ -223,6 +222,7 @@ footer {
     color: white;
 }
 
+/* ========== АДАПТИВ МЕНЮ ========== */
 @media (max-width: 768px) {
     .header-container ul {
         gap: 20px;
@@ -253,7 +253,6 @@ footer {
         padding-inline: 2vw;
     }
 }
-
 
 @media (max-width: 480px) {
     .header-container ul {
@@ -290,7 +289,6 @@ footer {
     }
 }
 
-
 @media (max-width: 350px) {
     .header-container ul {
         gap: 8px;
@@ -325,7 +323,7 @@ footer {
     }
 }
 
-/* Таблица на главной странице */
+/* ========== ТАБЛИЦА ========== */
 .table-container {
     max-width: 100%;
     margin: 20px 0;
@@ -337,11 +335,17 @@ footer {
         font-family: Comfortaa;
     }
 
+/* Обёртка для горизонтального скролла */
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    border-radius: 16px;
+}
+
 .rounded-table {
     width: 100%;
+    min-width: 1300px;
     border-collapse: collapse;
-    border-radius: 16px;
-    overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
@@ -356,6 +360,7 @@ footer {
         padding: 10px 12px;
         text-align: left;
         border-bottom: 1px solid #e0e0e0;
+        white-space: nowrap;
     }
 
     .rounded-table tbody tr {
@@ -366,6 +371,34 @@ footer {
             background-color: #f5f5f5;
         }
 
+    /* Липкие колонки (первые две) */
+    .rounded-table td:first-child,
+    .rounded-table th:first-child {
+        position: sticky;
+        left: 0;
+        background-color: white;
+        z-index: 2;
+    }
+
+    .rounded-table td:nth-child(2),
+    .rounded-table th:nth-child(2) {
+        position: sticky;
+        left: 70px;
+        background-color: white;
+        z-index: 2;
+    }
+
+    .rounded-table th:first-child,
+    .rounded-table th:nth-child(2) {
+        background-color: gray;
+    }
+
+    .rounded-table tbody tr:hover td:first-child,
+    .rounded-table tbody tr:hover td:nth-child(2) {
+        background-color: #f5f5f5;
+    }
+
+    /* Скругление углов таблицы */
     .rounded-table th:first-child {
         border-top-left-radius: 16px;
     }
@@ -389,35 +422,38 @@ footer {
         padding: 8px 10px;
         font-size: 13px;
     }
+
+        .rounded-table td:nth-child(2),
+        .rounded-table th:nth-child(2) {
+            left: 60px;
+        }
 }
 
-/* Адаптив для телефонов — таблица с горизонтальным скроллом */
+/* Адаптив для телефонов */
 @media (max-width: 768px) {
-    .table-container {
-        overflow-x: auto;
+    .rounded-table th,
+    .rounded-table td {
+        padding: 8px 10px;
+        font-size: 12px;
     }
 
-    .rounded-table {
-        min-width: 700px;
-    }
-
-        .rounded-table th,
-        .rounded-table td {
-            padding: 8px 10px;
-            font-size: 12px;
+        .rounded-table td:nth-child(2),
+        .rounded-table th:nth-child(2) {
+            left: 55px;
         }
 }
 
 /* Очень маленькие телефоны */
 @media (max-width: 480px) {
-    .rounded-table {
-        min-width: 600px;
+    .rounded-table th,
+    .rounded-table td {
+        padding: 6px 8px;
+        font-size: 11px;
     }
 
-        .rounded-table th,
-        .rounded-table td {
-            padding: 6px 8px;
-            font-size: 11px;
+        .rounded-table td:nth-child(2),
+        .rounded-table th:nth-child(2) {
+            left: 45px;
         }
 }
 
@@ -430,85 +466,7 @@ footer {
         background-color: #f0f0f0;
     }
 
-.search-container {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: flex-start;
-}
-
-    .search-container form {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .search-container input {
-        padding: 8px 12px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        width: 250px;
-        font-size: 14px;
-    }
-
-    .search-container button,
-    .btn-reset {
-        padding: 8px 16px;
-        background-color: #990000;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        text-decoration: none;
-        font-size: 14px;
-    }
-
-        .search-container button:hover,
-        .btn-reset:hover {
-            background-color: #660000;
-        }
-
-.btn-search {
-    background-color: #990000;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-    .btn-search:hover {
-        background-color: #660000;
-    }
-
-.search-form {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-    .search-form input {
-        padding: 8px 12px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        width: 300px;
-        font-size: 14px;
-    }
-
-    .search-form button {
-        padding: 8px 16px;
-        background-color: #990000;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-    }
-
-        .search-form button:hover {
-            background-color: #660000;
-        }
-
-/* Модальное окно поиска */
+/* ========== МОДАЛЬНЫЕ ОКНА ========== */
 #searchModal {
     background: white;
     padding: 20px;
@@ -550,4 +508,81 @@ footer {
 
     #closeSearchBtn:hover {
         background-color: #444 !important;
+    }
+
+#filterModal {
+    display: none;
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    z-index: 1000;
+    min-width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+    #filterModal h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+
+    #filterModal h4 {
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    #filterModal select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    #filterModal label {
+        display: block;
+        margin-bottom: 5px;
+        cursor: pointer;
+    }
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 15px;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding-top: 10px;
+}
+
+#applyFilterBtn {
+    padding: 8px 16px;
+    background-color: #990000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    #applyFilterBtn:hover {
+        background-color: #660000;
+    }
+
+#closeFilterBtn {
+    padding: 8px 16px;
+    background-color: #666;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    #closeFilterBtn:hover {
+        background-color: #444;
     }

@@ -7,39 +7,44 @@
 
 <div class="table-container">
     <h2>Список документов</h2>
-
     <div class="table-wrapper">
-        <table class="rounded-table">
+        <table class="rounded-table" id="mainTable">
             <thead>
                 <tr>
                     <th>Выбрать</th>
-                    <th>Порядковый номер</th>
-                    <th>Тип</th>
-                    <th>Номер документа</th>
-                    <th>Дата создания</th>
-                    <th>Грузоотправитель</th>
-                    <th>Перевозчик</th>
-                    <th>Грузополучатель</th>
-                    <th>Пункт погрузки</th>
-                    <th>Пункт разгрузки</th>
+                    <th class="col-ид_документа">№ п/п</th>
+                    <th class="col-тип">Тип документа</th>
+                    <th class="col-номер_документа">Номер документа</th>
+                    <th class="col-дата_создания">Дата создания</th>
+                    <th class="col-грузоотправитель">Грузоотправитель</th>
+                    <th class="col-перевозчик">Перевозчик</th>
+                    <th class="col-грузополучатель">Грузополучатель</th>
+                    <th class="col-пункт_погрузки">Пункт отгрузки</th>
+                    <th class="col-пункт_разгрузки">Пункт загрузки</th>
+                    <th class="col-ФИО_Водителя">ФИО водителя</th>
+                    <th class="col-Марка_Машины">Марка машины</th>
+                    <th class="col-Регистрационный_Номер">Рег. номер</th>
+                    <th class="col-Тип_ТС">Тип ТС</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var doc in Model)
                 {
                     <tr onclick="selectDocument(@doc.ид_документа)">
-                        <td style="text-align: center;">
-                            <input type="radio" name="selectedId" value="@doc.ид_документа" />
-                        </td>
-                        <td>@doc.ид_документа</td>
-                        <td>@doc.тип</td>
-                        <td>@doc.номер_документа</td>
-                        <td>@doc.дата_создания.ToShortDateString()</td>
-                        <td>@doc.грузоотправитель</td>
-                        <td>@doc.перевозчик</td>
-                        <td>@doc.грузополучатель</td>
-                        <td>@doc.пункт_погрузки</td>
-                        <td>@doc.пункт_разгрузки</td>
+                        <td style="text-align: center;"><input type="radio" name="selectedId" value="@doc.ид_документа"></td>
+                        <td class="col-ид_документа">@doc.ид_документа</td>
+                        <td class="col-тип">@doc.тип</td>
+                        <td class="col-номер_документа">@doc.номер_документа</td>
+                        <td class="col-дата_создания">@doc.дата_создания.ToShortDateString()</td>
+                        <td class="col-грузоотправитель">@doc.грузоотправитель</td>
+                        <td class="col-перевозчик">@doc.перевозчик</td>
+                        <td class="col-грузополучатель">@doc.грузополучатель</td>
+                        <td class="col-пункт_погрузки">@doc.пункт_погрузки</td>
+                        <td class="col-пункт_разгрузки">@doc.пункт_разгрузки</td>
+                        <td class="col-ФИО_Водителя">@doc.ФИО_Водителя</td>
+                        <td class="col-Марка_Машины">@doc.Марка_Машины</td>
+                        <td class="col-Регистрационный_Номер">@doc.Регистрационный_Номер</td>
+                        <td class="col-Тип_ТС">@doc.Тип_ТС</td>
                     </tr>
                 }
             </tbody>
