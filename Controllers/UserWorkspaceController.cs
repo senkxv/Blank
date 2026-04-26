@@ -533,128 +533,63 @@ namespace Blank.Controllers
         }
 
         // GET: /UserWorkspace/PreviewDocument/5
+        // GET: /UserWorkspace/PreviewDocument/5
         public async Task<IActionResult> PreviewDocument(int id)
         {
-            var документ = await _context.Документы
-                .FirstOrDefaultAsync(d => d.ид_документа == id);
+            var sb = new StringBuilder();
 
-            if (документ == null)
+            try
             {
-                return NotFound();
+                sb.AppendLine("<h2>Диагностика PreviewDocument</h2>");
+                sb.AppendLine($"<p>ID запрошен: {id}</p>");
+
+                // 1. Проверяем подключение к БД
+                sb.AppendLine("<h3>1. Проверка подключения к БД:</h3>");
+                try
+                {
+                    var canConnect = await _context.Database.CanConnectAsync();
+                    sb.AppendLine($"<p>Подключение к БД: {(canConnect ? "✅ УСПЕШНО" : "❌ НЕТ")}</p>");
+                }
+                catch (Exception ex)
+                {
+                    sb.AppendLine($"<p style='color:red'>❌ Ошибка подключения: {ex.Message}</p>");
+                    return Content(sb.ToString(), "text/html");
+                }
+
+                // 2. Ищем документ
+                sb.AppendLine("<h3>2. Поиск документа:</h3>");
+                var документ = await _context.Документы.FirstOrDefaultAsync(d => d.ид_документа == id);
+
+                if (документ == null)
+                {
+                    sb.AppendLine($"<p style='color:red'>❌ Документ с ID {id} не найден!</p>");
+                    return Content(sb.ToString(), "text/html");
+                }
+
+                sb.AppendLine($"<p>✅ Документ найден: №{документ.номер_документа}, дата: {документ.дата_создания:dd.MM.yyyy}</p>");
+
+                // 3. Проверяем позиции
+                sb.AppendLine("<h3>3. Поиск позиций:</h3>");
+                var позиции = await _context.Позиции.Where(p => p.ид_документа == id).ToListAsync();
+                sb.AppendLine($"<p>Найдено позиций: {позиции.Count}</p>");
+
+                // 4. Простой HTML вывод
+                sb.AppendLine("<h3>4. Предпросмотр:</h3>");
+                sb.AppendLine($"<p>Номер документа: {документ.номер_документа}</p>");
+                sb.AppendLine($"<p>Дата создания: {документ.дата_создания:dd.MM.yyyy}</p>");
+
+                sb.AppendLine("<button onclick='window.print()'>Печать</button>");
+                sb.AppendLine("<button onclick='window.close()'>Закрыть</button>");
+
+                return Content(sb.ToString(), "text/html");
             }
-
-            var позиции = await _context.Позиции
-                .Include(p => p.Товар)
-                .Where(p => p.ид_документа == id)
-                .ToListAsync();
-
-            // Загружаем организации
-            var грузоотправитель = await _context.Организации
-                .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_грузоотправителя);
-            var грузополучатель = await _context.Организации
-                .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_получателя);
-            var перевозчик = await _context.Организации
-                .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_перевозчика);
-
-            // Загружаем водителя
-            var водитель = await _context.Водители
-                .FirstOrDefaultAsync(d => d.ид_водителя == документ.ид_водителя);
-
-            // Загружаем транспорт
-            var транспорт = await _context.Транспорт
-                .FirstOrDefaultAsync(t => t.ид_транспорта == документ.ид_транспорта);
-
-            
-
-            // Загружаем пункты погрузки/разгрузки
-            var пунктПогрузки = await _context.Пункт_Погрузки
-                .FirstOrDefaultAsync(p => p.ид_пункта_погрузки == документ.ид_пункта_погрузки);
-            var пунктРазгрузки = await _context.Пункт_Разгрузки
-                .FirstOrDefaultAsync(p => p.ид_пункта_разгрузки == документ.ид_пункта_разгрузки);
-
-            // Загружаем тип документа
-            var типДокумента = await _context.Типы_Документов
-                .FirstOrDefaultAsync(t => t.ид_типа == документ.ид_типа);
-
-            var goodsHtml = new StringBuilder();
-            decimal totalQuantity = 0, totalCost = 0, totalVat = 0, totalWeight = 0;
-            int totalPackages = 0;
-
-            foreach (var pos in позиции)
+            catch (Exception ex)
             {
-                decimal quantityDecimal = (decimal)pos.количество;
-                decimal cost = pos.цена_за_единицу * quantityDecimal;
-                decimal vatAmount = cost * ((pos.ставка_ндс ?? 0) / 100);
-
-                totalQuantity += quantityDecimal;
-                totalCost += cost;
-                totalVat += vatAmount;
-                totalWeight += pos.масса_груза ?? 0;
-                totalPackages += pos.грузовых_мест ?? 0;
-
-                goodsHtml.AppendLine($@"
-            <tr class=""goods-row"">
-                <td>{pos.Товар?.наименование ?? ""}</td>
-                <td class=""center"">{pos.Товар?.единицы_измерения ?? ""}</td>
-                <td class=""right"">{pos.количество:F3}</td>
-                <td class=""right"">{pos.цена_за_единицу:F2}</td>
-                <td class=""right"">{cost:F2}</td>
-                <td class=""center"">{pos.ставка_ндс ?? 0}</td>
-                <td class=""right"">{vatAmount:F2}</td>
-                <td class=""right"">{cost + vatAmount:F2}</td>
-                <td class=""right"">{pos.грузовых_мест ?? 0}</td>
-                <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
-                <td class=""right"">{pos.примечание ?? ""}</td>
-            </tr>");
+                sb.AppendLine($"<h3 style='color:red'>ОШИБКА:</h3>");
+                sb.AppendLine($"<p>{ex.Message}</p>");
+                sb.AppendLine($"<pre>{ex.StackTrace}</pre>");
+                return Content(sb.ToString(), "text/html");
             }
-
-            // Заполняем ViewBag
-            ViewBag.НомерДокумента = документ.номер_документа;
-            ViewBag.ДатаСоздания = документ.дата_создания.ToString("dd.MM.yyyy");
-            ViewBag.Тип = типДокумента?.краткое_наименование ?? "";
-            ViewBag.Грузоотправитель = грузоотправитель?.название ?? "";
-            ViewBag.УНП_Грузоотправитель = грузоотправитель?.унн ?? "";
-            ViewBag.Адрес_Грузоотправитель = грузоотправитель?.адрес ?? "";
-            ViewBag.Грузополучатель = грузополучатель?.название ?? "";
-            ViewBag.УНП_Грузополучатель = грузополучатель?.унн ?? "";
-            ViewBag.Адрес_Грузополучатель = грузополучатель?.адрес ?? "";
-            ViewBag.Перевозчик = перевозчик?.название ?? "";
-            ViewBag.УНП_Перевозчик = перевозчик?.унн ?? "";
-            ViewBag.Адрес_Перевозчик = перевозчик?.адрес ?? "";
-            ViewBag.МаркаМашины = 0;
-            ViewBag.РегистрационныйНомер = транспорт?.регистрационный_номер ?? "";
-            ViewBag.Прицеп = 0;
-            ViewBag.ФИОВодителя = водитель != null ? $"{водитель.фамилия} {водитель.имя} {водитель.отчество}" : "";
-            ViewBag.Лицензия = водитель?.номер_лицензии ?? "";
-            ViewBag.ПутевойЛист = "";
-            ViewBag.ПунктПогрузки = пунктПогрузки?.наименование ?? "";
-            ViewBag.ПунктРазгрузки = пунктРазгрузки?.наименование ?? "";
-            ViewBag.АдресПогрузки = пунктПогрузки?.наименование ?? "";
-            ViewBag.АдресРазгрузки = пунктРазгрузки?.наименование ?? "";
-            ViewBag.Позиции = goodsHtml.ToString();
-            ViewBag.ВсегоКоличество = totalQuantity.ToString("F3");
-            ViewBag.ВсегоСтоимость = totalCost.ToString("F2");
-            ViewBag.ВсегоСуммаНДС = totalVat.ToString("F2");
-            ViewBag.ВсегоСтоимостьСНДС = (totalCost + totalVat).ToString("F2");
-            ViewBag.ВсегоМест = totalPackages.ToString();
-            ViewBag.ВсегоМасса = totalWeight.ToString("F3");
-            ViewBag.ВсегоСуммаНДСПрописью = NumToTextHelper.SumInWords(totalVat);
-            ViewBag.ВсегоСтоимостьСНДСПрописью = NumToTextHelper.SumInWords(totalCost + totalVat);
-            ViewBag.ВсегоМассаПрописью = NumToTextHelper.WeightInWords(totalWeight);
-            ViewBag.ВсегоМестПрописью = NumToTextHelper.PackagesInWords(totalPackages);
-            ViewBag.ОтпускРазрешил = "";
-            ViewBag.ТоварПринял = "";
-            ViewBag.СдалГрузоотправитель = "";
-            ViewBag.НомерПломбы = "";
-            ViewBag.Доверенность = "";
-            ViewBag.ДатаДоверенности = "";
-            ViewBag.Расстояние = "";
-            ViewBag.ОсновнойТариф = "";
-            ViewBag.КОплате = "";
-            ViewBag.ВодительПодпись = "";
-            ViewBag.ПредставительПодпись = "";
-
-            return View("~/Views/Shared/ttn.cshtml");
         }
     }
 }
