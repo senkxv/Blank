@@ -533,7 +533,6 @@ namespace Blank.Controllers
         }
 
         // GET: /UserWorkspace/PreviewDocument/5
-        // GET: /UserWorkspace/PreviewDocument/5
         public async Task<IActionResult> PreviewDocument(int id)
         {
             try
@@ -547,8 +546,7 @@ namespace Blank.Controllers
                     return Content($"Документ с ID {id} не найден", "text/html");
                 }
 
-                // 2. Загружаем позиции БЕЗ Include и БЕЗ возможных NULL ошибок
-                // Используем raw SQL для полного контроля
+                // 2. Загружаем позиции через RAW SQL
                 var позиции = new List<dynamic>();
 
                 using (var command = _context.Database.GetDbConnection().CreateCommand())
@@ -615,9 +613,8 @@ namespace Blank.Controllers
                 var типДокумента = await _context.Типы_Документов
                     .FirstOrDefaultAsync(t => t.ид_типа == документ.ид_типа);
 
-                
 
-                // 5. Вычисляем итоги и генерируем HTML
+                // 5. Вычисляем итоги и генерируем HTML для товаров
                 var goodsHtml = new StringBuilder();
                 decimal totalQuantity = 0, totalCost = 0, totalVat = 0, totalWeight = 0;
                 int totalPackages = 0;
@@ -654,75 +651,151 @@ namespace Blank.Controllers
 
                 // 6. Генерируем финальный HTML
                 var html = $@"
-        <!DOCTYPE html>
-        <html lang='ru'>
-        <head>
-            <meta charset='UTF-8'>
-            <title>ТТН {документ.номер_документа}</title>
-            <style>
-                body {{ font-family: 'Times New Roman', Times, serif; font-size: 9pt; margin: 15mm auto; width: 210mm; }}
-                table {{ width: 100%; border-collapse: collapse; margin-bottom: 10px; }}
-                td, th {{ border: 1px solid black; padding: 5px; vertical-align: top; }}
-                .right {{ text-align: right; }}
-                .center {{ text-align: center; }}
-                .bold {{ font-weight: bold; }}
-                @@media print {{ body {{ margin: 0; }} .no-print {{ display: none; }} }}
-            </style>
-        </head>
-        <body>
-            <h2 style='text-align:center'>ТОВАРНО-ТРАНСПОРТНАЯ НАКЛАДНАЯ</h2>
-            <p style='text-align:center'>(ТТН-1) от «{документ.дата_создания:dd.MM.yyyy}» № {документ.номер_документа}</p>
-            
-            <table>
-                <tr><td style='width:33%'><strong>Грузоотправитель:</strong> {грузоотправитель?.название ?? "Не указан"}</td>
-                    <td style='width:33%'><strong>Грузополучатель:</strong> {грузополучатель?.название ?? "Не указан"}</td>
-                    <td style='width:34%'><strong>Перевозчик:</strong> {перевозчик?.название ?? "Не указан"}</td></tr>
-                <tr><td>УНП: {грузоотправитель?.унн ?? ""}</td>
-                    <td>УНП: {грузополучатель?.унн ?? ""}</td>
-                    <td>УНП: {перевозчик?.унн ?? ""}</td></tr>
-                <tr><td>Адрес: {грузоотправитель?.адрес ?? ""}</td>
-                    <td>Адрес: {грузополучатель?.адрес ?? ""}</td>
-                    <td>Адрес: {перевозчик?.адрес ?? ""}</td></tr>
-            </table>
+<!DOCTYPE html>
+<html lang='ru'>
+<head>
+    <meta charset='UTF-8'>
+    <title>ТТН {документ.номер_документа}</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ font-family: 'Times New Roman', Times, serif; font-size: 9pt; margin: 10mm auto; width: 210mm; background: white; }}
+        .main-table {{ width: 100%; border-collapse: collapse; margin-bottom: 5px; }}
+        .main-table td, .main-table th {{ border: none; padding: 3px 5px; vertical-align: top; }}
+        .goods-table {{ width: 100%; border-collapse: collapse; font-size: 8pt; margin: 5px 0; }}
+        .goods-table th, .goods-table td {{ border: 1px solid black; padding: 4px 3px; vertical-align: top; }}
+        .goods-table th {{ background-color: #f5f5f5; font-weight: bold; text-align: center; }}
+        .right {{ text-align: right; }}
+        .center {{ text-align: center; }}
+        .bold {{ font-weight: bold; }}
+        .section-title {{ font-weight: bold; margin: 8px 0 4px; font-size: 10pt; }}
+        @@media print {{ body {{ margin: 0; }} .no-print {{ display: none; }} }}
+    </style>
+</head>
+<body>
+    <div style='text-align: center; margin-bottom: 10px;'>
+        <div style='font-size: 14pt; font-weight: bold;'>ТОВАРНО-ТРАНСПОРТНАЯ НАКЛАДНАЯ</div>
+        <div>(ТТН-1) от «{документ.дата_создания:dd.MM.yyyy}» № {документ.номер_документа}</div>
+    </div>
 
-            <table>
-                <tr><td><strong>Автомобиль:</strong>  {транспорт?.регистрационный_номер ?? ""}</td>
-                    <td><strong>Прицеп:</strong> {0}</td></tr>
-                <tr><td><strong>Водитель:</strong> {водитель?.фамилия} {водитель?.имя} {водитель?.отчество}</td>
-                    <td><strong>Лицензия:</strong> {водитель?.номер_лицензии ?? ""}</td></tr>
-                <tr><td><strong>Пункт погрузки:</strong> {пунктПогрузки?.наименование ?? ""}</td>
-                    <td><strong>Пункт разгрузки:</strong> {пунктРазгрузки?.наименование ?? ""}</td></tr>
-            </table>
+    <table class='main-table'>
+        <tr>
+            <td style='width:33%; font-weight:bold;'>Грузоотправитель</td>
+            <td style='width:33%; font-weight:bold;'>Грузополучатель</td>
+            <td style='width:34%; font-weight:bold;'>Заказчик (плательщик)</td>
+        </tr>
+        <tr>
+            <td>{грузоотправитель?.название ?? "Не указан"}</td>
+            <td>{грузополучатель?.название ?? "Не указан"}</td>
+            <td>{перевозчик?.название ?? "Не указан"}</td>
+        </tr>
+        <tr>
+            <td>УНП: {грузоотправитель?.унн ?? ""}</td>
+            <td>УНП: {грузополучатель?.унн ?? ""}</td>
+            <td>УНП: {перевозчик?.унн ?? ""}</td>
+        </tr>
+        <tr>
+            <td>Адрес: {грузоотправитель?.адрес ?? ""}</td>
+            <td>Адрес: {грузополучатель?.адрес ?? ""}</td>
+            <td>Адрес: {перевозчик?.адрес ?? ""}</td>
+        </tr>
+    </table>
 
-            <h3>I. ТОВАРНЫЙ РАЗДЕЛ</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Наименование товара</th><th>Ед. изм.</th><th>Кол-во</th><th>Цена, руб.</th>
-                        <th>Стоимость, руб.</th><th>НДС, %</th><th>Сумма НДС, руб.</th>
-                        <th>Стоимость с НДС, руб.</th><th>Груз. мест</th><th>Масса, кг</th><th>Примечание</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {goodsHtml.ToString()}
-                    <tr style='border-top: double black; font-weight: bold;'>
-                        <td colspan='2'>ИТОГО</td>
-                        <td class='right'>{totalQuantity:F3}</td><td class='right'>x</td>
-                        <td class='right'>{totalCost:F2}</td><td class='center'>x</td>
-                        <td class='right'>{totalVat:F2}</td>
-                        <td class='right'>{(totalCost + totalVat):F2}</td>
-                        <td class='right'>{totalPackages}</td>
-                        <td class='right'>{totalWeight:F3}</td><td class='right'>x</td>
-                    </tr>
-                </tbody>
-            </table>
+    <table class='main-table'>
+        <tr>
+            <td><strong>Автомобиль:</strong>  {транспорт?.регистрационный_номер ?? ""}</td>
+            <td><strong>Прицеп:</strong> {0}</td>
+        </tr>
+        <tr>
+            <td><strong>Водитель:</strong> {водитель?.фамилия} {водитель?.имя} {водитель?.отчество}</td>
+            <td><strong>Лицензия:</strong> {водитель?.номер_лицензии ?? ""}</td>
+        </tr>
+    </table>
 
-            <div style='margin-top: 20px; text-align: center;' class='no-print'>
-                <button onclick='window.print()'>Печать</button>
-                <button onclick='window.close()'>Закрыть</button>
-            </div>
-        </body>
-        </html>";
+    <table class='main-table'>
+        <tr>
+            <td><strong>Пункт погрузки:</strong> {пунктПогрузки?.наименование ?? ""}</td>
+            <td><strong>Пункт разгрузки:</strong> {пунктРазгрузки?.наименование ?? ""}</td>
+        </tr>
+        <tr>
+            <td><strong>Адрес погрузки:</strong> </td>
+            <td><strong>Адрес разгрузки:</strong> </td>
+        </tr>
+    </table>
+
+    <div class='section-title'>I. ТОВАРНЫЙ РАЗДЕЛ</div>
+    
+    <table class='goods-table'>
+        <thead>
+            <tr>
+                <th style='width:22%'>Наименование товара</th>
+                <th style='width:8%'>Ед. изм.</th>
+                <th style='width:8%'>Кол-во</th>
+                <th style='width:9%'>Цена, руб.</th>
+                <th style='width:10%'>Стоимость, руб.</th>
+                <th style='width:7%'>НДС, %</th>
+                <th style='width:10%'>Сумма НДС, руб.</th>
+                <th style='width:10%'>Стоимость с НДС, руб.</th>
+                <th style='width:6%'>Груз. мест</th>
+                <th style='width:5%'>Масса, кг</th>
+                <th style='width:5%'>Примечание</th>
+            </tr>
+        </thead>
+        <tbody>
+            {goodsHtml.ToString()}
+            <tr style='border-top: double black; font-weight: bold;'>
+                <td colspan='2'>ИТОГО</td>
+                <td class='right'>{totalQuantity:F3}</td>
+                <td class='right'>x</td>
+                <td class='right'>{totalCost:F2}</td>
+                <td class='center'>x</td>
+                <td class='right'>{totalVat:F2}</td>
+                <td class='right'>{(totalCost + totalVat):F2}</td>
+                <td class='right'>{totalPackages}</td>
+                <td class='right'>{totalWeight:F3}</td>
+                <td class='right'>x</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class='main-table'>
+        <tr>
+            <td style='width:50%'>Всего сумма НДС: {NumToTextHelper.SumInWords(totalVat)}</td>
+            <td style='width:50%'>Всего стоимость с НДС: {NumToTextHelper.SumInWords(totalCost + totalVat)}</td>
+        </tr>
+        <tr>
+            <td>Всего масса груза: {NumToTextHelper.WeightInWords(totalWeight)}</td>
+            <td>Всего грузовых мест: {NumToTextHelper.PackagesInWords(totalPackages)}</td>
+        </tr>
+    </table>
+
+    <table class='main-table' style='margin-top: 12px;'>
+        <tr>
+            <td style='width:33%'>Отпуск разрешил:<br><br><br></td>
+            <td style='width:33%'>Товар к перевозке принял:<br><br><br></td>
+            <td style='width:34%'>Сдал грузоотправитель:<br><br><br></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>№ пломбы:</td>
+            <td>по доверенности № от</td>
+        </tr>
+    </table>
+
+    <div class='section-title'>III. ПРОЧИЕ СВЕДЕНИЯ (заполняются перевозчиком)</div>
+    <table class='main-table'>
+        <tr>
+            <td style='width:33%'>Расстояние перевозки: км</td>
+            <td style='width:33%'>Основной тариф: руб.</td>
+            <td style='width:34%'>К оплате: руб.</td>
+        </tr>
+    </table>
+
+    <div style='margin-top: 20px; text-align: center;' class='no-print'>
+        <button onclick='window.print()'>Печать</button>
+        <button onclick='window.close()'>Закрыть</button>
+    </div>
+</body>
+</html>";
 
                 return Content(html, "text/html");
             }
