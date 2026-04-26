@@ -24,7 +24,7 @@
                     <li><a href="#" onclick="deleteSelectedDocument()">Удалить</a></li>
                     <li><a href="/UserWorkspace/ExportAllToExcel">Экспорт</a></li>
                     <li><a href="/UserWorkspace/Index">Обновить</a></li>
-                    <li><a href="/Documents/Print">Печать</a></li>
+                    <li><a href="#" onclick="previewSelectedDocument()">Предпросмотр</a></li>
                     <li><a href="#" id="searchLink">Поиск</a></li>
                     <li><a href="#" id="filterLink">Фильтр</a></li>
                 </ul>
@@ -237,6 +237,15 @@
                     filterModal.style.display = 'none';
                 }
             });
+
+                        function previewSelectedDocument() {
+                const id = sessionStorage.getItem('selectedDocumentId');
+                if (id) {
+                    window.open('/UserWorkspace/PreviewDocument/' + id, '_blank');
+                } else {
+                    alert('Сначала выберите документ в таблице');
+                }
+            }
     </script>
 </body>
 </html>

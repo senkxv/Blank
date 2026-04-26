@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Helpers\NumToTextHelper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\css\Authorization.css" />
   </ItemGroup>
 
@@ -27,6 +31,8 @@
     </PackageReference>
     <PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.1" />
     <PackageReference Include="OfficeOpenXml.Core.ExcelPackage" Version="1.0.0" />
+    <PackageReference Include="PuppeteerSharp" Version="24.40.0" />
+    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="26.1.0" />
   </ItemGroup>
 
   <ItemGroup>

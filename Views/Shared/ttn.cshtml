@@ -1,0 +1,239 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ТТН @ViewBag.НомерДокумента</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 9pt;
+            margin: 15mm auto;
+            width: 210mm;
+            background: white;
+            color: black;
+        }
+        .document {
+            width: 100%;
+        }
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            border: none;
+        }
+        .doc-table td, .doc-table th {
+            border: none;
+            padding: 3px 5px;
+            vertical-align: top;
+            font-weight: normal;
+        }
+        .goods-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin: 5px 0;
+        }
+        .goods-table th, .goods-table td {
+            border: 1px solid black;
+            padding: 3px 2px;
+            vertical-align: top;
+        }
+        .goods-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            text-align: center;
+        }
+        .signature {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+        .right {
+            text-align: right;
+        }
+        .center {
+            text-align: center;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        @@media print {
+            body {
+                margin: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none;
+            }
+            .goods-table {
+                page-break-inside: avoid;
+            }
+        }
+        @@media screen and (max-width: 700px) {
+            body {
+                margin: 5px;
+                width: auto;
+                zoom: 0.7;
+            }
+        }
+        .section-title {
+            font-weight: bold;
+            margin: 8px 0 4px;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+<body>
+<div class="document">
+    <!-- ЗАГОЛОВКИ И РЕКВИЗИТЫ -->
+    <table class="doc-table">
+        <tr>
+            <td colspan="3" style="font-size: 14pt; text-align: center; font-weight: bold; padding-bottom: 5px;">ТОВАРНО-ТРАНСПОРТНАЯ НАКЛАДНАЯ</td>
+        </tr>
+        <tr>
+            <td colspan="3" style="text-align: center;">(ТТН-1) от «@ViewBag.ДатаСоздания» № @ViewBag.НомерДокумента</td>
+        </tr>
+    </table>
+
+    <!-- БЛОК ГРУЗООТПРАВИТЕЛЬ / ГРУЗОПОЛУЧАТЕЛЬ -->
+    <table class="doc-table" style="margin-top: 8px;">
+        <tr>
+            <td style="width: 33%; font-weight: bold;">Грузоотправитель</td>
+            <td style="width: 33%; font-weight: bold;">Грузополучатель</td>
+            <td style="width: 34%; font-weight: bold;">Заказчик (плательщик)</td>
+        </tr>
+        <tr>
+            <td>@ViewBag.Грузоотправитель</td>
+            <td>@ViewBag.Грузополучатель</td>
+            <td>@ViewBag.Перевозчик</td>
+        </tr>
+        <tr>
+            <td>УНП: @ViewBag.УНП_Грузоотправитель</td>
+            <td>УНП: @ViewBag.УНП_Грузополучатель</td>
+            <td>УНП: @ViewBag.УНП_Перевозчик</td>
+        </tr>
+        <tr>
+            <td>Адрес: @ViewBag.Адрес_Грузоотправитель</td>
+            <td>Адрес: @ViewBag.Адрес_Грузополучатель</td>
+            <td>Адрес: @ViewBag.Адрес_Перевозчик</td>
+        </tr>
+    </table>
+
+    <!-- АВТОМОБИЛЬ И ВОДИТЕЛЬ -->
+    <table class="doc-table" style="margin-top: 8px;">
+        <tr>
+            <td style="width: 50%;">Автомобиль: @ViewBag.МаркаМашины, рег. знак @ViewBag.РегистрационныйНомер</td>
+            <td style="width: 50%;">Прицеп: @ViewBag.Прицеп</td>
+        </tr>
+        <tr>
+            <td>Водитель: @ViewBag.ФИОВодителя, лицензия: @ViewBag.Лицензия</td>
+            <td>К путевому листу № @ViewBag.ПутевойЛист</td>
+        </tr>
+    </table>
+
+    <!-- ПУНКТЫ ПОГРУЗКИ / РАЗГРУЗКИ -->
+    <table class="doc-table" style="margin-top: 8px;">
+        <tr>
+            <td style="width: 50%;">Пункт погрузки: @ViewBag.ПунктПогрузки</td>
+            <td style="width: 50%;">Пункт разгрузки: @ViewBag.ПунктРазгрузки</td>
+        </tr>
+        <tr>
+            <td>Адрес погрузки: @ViewBag.АдресПогрузки</td>
+            <td>Адрес разгрузки: @ViewBag.АдресРазгрузки</td>
+        </tr>
+    </table>
+
+    <!-- ТОВАРНЫЙ РАЗДЕЛ -->
+    <div class="section-title">I. ТОВАРНЫЙ РАЗДЕЛ</div>
+    <table class="goods-table">
+        <thead>
+            <tr>
+                <th style="width: 22%;">Наименование товара</th>
+                <th style="width: 8%;">Ед. изм.</th>
+                <th style="width: 8%;">Кол-во</th>
+                <th style="width: 9%;">Цена, руб.</th>
+                <th style="width: 10%;">Стоимость, руб.</th>
+                <th style="width: 7%;">НДС, %</th>
+                <th style="width: 10%;">Сумма НДС, руб.</th>
+                <th style="width: 10%;">Стоимость с НДС, руб.</th>
+                <th style="width: 6%;">Груз. мест</th>
+                <th style="width: 5%;">Масса, кг</th>
+                <th style="width: 10%;">Примечание</th>
+            </tr>
+        </thead>
+        <tbody>
+            @Html.Raw(ViewBag.Позиции)
+            <tr style="border-top: double black; font-weight: bold;">
+                <td colspan="2">ИТОГО</td>
+                <td class="right">@ViewBag.ВсегоКоличество</td>
+                <td class="right">x</td>
+                <td class="right">@ViewBag.ВсегоСтоимость</td>
+                <td class="center">x</td>
+                <td class="right">@ViewBag.ВсегоСуммаНДС</td>
+                <td class="right">@ViewBag.ВсегоСтоимостьСНДС</td>
+                <td class="right">@ViewBag.ВсегоМест</td>
+                <td class="right">@ViewBag.ВсегоМасса</td>
+                <td class="right">x</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Всего сумма НДС и масса -->
+    <table class="doc-table" style="margin-top: 8px;">
+        <tr>
+            <td style="width: 50%;">Всего сумма НДС: @ViewBag.ВсегоСуммаНДСПрописью</td>
+            <td style="width: 50%;">Всего стоимость с НДС: @ViewBag.ВсегоСтоимостьСНДСПрописью</td>
+        </tr>
+        <tr>
+            <td style="width: 50%;">Всего масса груза: @ViewBag.ВсегоМассаПрописью</td>
+            <td style="width: 50%;">Всего грузовых мест: @ViewBag.ВсегоМестПрописью</td>
+        </tr>
+    </table>
+
+    <!-- ПОДПИСИ -->
+    <table class="doc-table" style="margin-top: 12px;">
+        <tr>
+            <td style="width: 33%;">Отпуск разрешил:<br><br>@ViewBag.ОтпускРазрешил</td>
+            <td style="width: 33%;">Товар к перевозке принял:<br><br>@ViewBag.ТоварПринял</td>
+            <td style="width: 34%;">Сдал грузоотправитель:<br><br>@ViewBag.СдалГрузоотправитель</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>№ пломбы: @ViewBag.НомерПломбы</td>
+            <td>по доверенности № @ViewBag.Доверенность от @ViewBag.ДатаДоверенности</td>
+        </tr>
+    </table>
+
+    <!-- ДОПОЛНИТЕЛЬНЫЕ СВЕДЕНИЯ ПЕРЕВОЗЧИКА -->
+    <table class="doc-table" style="margin-top: 12px;">
+        <tr>
+            <td style="width: 33%;">Расстояние перевозки: @ViewBag.Расстояние км</td>
+            <td style="width: 33%;">Основной тариф: @ViewBag.ОсновнойТариф руб.</td>
+            <td style="width: 34%;">К оплате: @ViewBag.КОплате руб.</td>
+        </tr>
+    </table>
+
+    <!-- ПОДПИСИ ВОДИТЕЛЯ И ЗАКАЗЧИКА -->
+    <table class="doc-table" style="margin-top: 12px;">
+        <tr>
+            <td style="width: 50%;">Груз сдал водитель (экспедитор):<br><br>@ViewBag.ВодительПодпись</td>
+            <td style="width: 50%;">Груз принял представитель:<br><br>@ViewBag.ПредставительПодпись</td>
+        </tr>
+    </table>
+
+    <div class="signature no-print" style="margin-top: 20px;">
+        <button onclick="window.print()">Печать</button>
+        <button onclick="window.close()">Закрыть</button>
+    </div>
+</div>
+</body>
+</html>
