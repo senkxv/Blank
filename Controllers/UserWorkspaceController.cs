@@ -533,77 +533,71 @@ namespace Blank.Controllers
         }
 
         // GET: /UserWorkspace/PreviewDocument/5
+        // GET: /UserWorkspace/PreviewDocument/5
         public async Task<IActionResult> PreviewDocument(int id)
         {
             try
             {
+                // 1. Загружаем документ
                 var документ = await _context.Документы
                     .FirstOrDefaultAsync(d => d.ид_документа == id);
 
                 if (документ == null)
                 {
-                    return NotFound($"Документ с ID {id} не найден");
+                    return Content($"Документ с ID {id} не найден", "text/html");
                 }
 
-                // БЕЗОПАСНАЯ ЗАГРУЗКА ПОЗИЦИЙ - обрабатываем NULL
-                var позиции = await _context.Позиции
-                    .Where(p => p.ид_документа == id)
-                    .Select(p => new
-                    {
-                        p.ид_позиции,
-                        p.ид_товара,
-                        p.количество,
-                        p.цена_за_единицу,
-                        p.ставка_ндс,
-                        p.масса_груза,
-                        p.грузовых_мест,
-                        p.примечание,
-                        // Безопасно загружаем товар отдельно
-                        ид_товара_value = p.ид_товара
-                    })
-                    .ToListAsync();
+                // 2. Загружаем позиции БЕЗ Include и БЕЗ возможных NULL ошибок
+                // Используем raw SQL для полного контроля
+                var позиции = new List<dynamic>();
 
-                // Отдельно загружаем товары для каждой позиции
-                var positionsWithGoods = new List<dynamic>();
-                decimal totalQuantity = 0, totalCost = 0, totalVat = 0, totalWeight = 0;
-                int totalPackages = 0;
-
-                foreach (var pos in позиции)
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
                 {
-                    // Безопасно загружаем товар
-                    var товар = null as Goods;
-                    if (pos.ид_товара > 0)
+                    command.CommandText = @"
+                SELECT 
+                    p.ид_позиции,
+                    p.ид_товара,
+                    IFNULL(p.количество, 0) as количество,
+                    IFNULL(p.цена_за_единицу, 0) as цена_за_единицу,
+                    p.ставка_ндс,
+                    p.масса_груза,
+                    p.грузовых_мест,
+                    p.примечание,
+                    g.наименование as товар_наименование,
+                    g.единицы_измерения
+                FROM Позиции p
+                LEFT JOIN Товары g ON p.ид_товара = g.ид_товара
+                WHERE p.ид_документа = @id";
+
+                    var param = command.CreateParameter();
+                    param.ParameterName = "@id";
+                    param.Value = id;
+                    command.Parameters.Add(param);
+
+                    await _context.Database.OpenConnectionAsync();
+
+                    using (var reader = await command.ExecuteReaderAsync())
                     {
-                        товар = await _context.Товары
-                            .FirstOrDefaultAsync(g => g.ид_товара == pos.ид_товара);
+                        while (await reader.ReadAsync())
+                        {
+                            позиции.Add(new
+                            {
+                                ид_позиции = reader.GetInt32(0),
+                                ид_товара = reader.IsDBNull(1) ? 0 : reader.GetInt32(1),
+                                количество = reader.GetDouble(2),
+                                цена_за_единицу = reader.GetDecimal(3),
+                                ставка_ндс = reader.IsDBNull(4) ? (decimal?)null : reader.GetDecimal(4),
+                                масса_груза = reader.IsDBNull(5) ? (decimal?)null : reader.GetDecimal(5),
+                                грузовых_мест = reader.IsDBNull(6) ? (int?)null : reader.GetInt32(6),
+                                примечание = reader.IsDBNull(7) ? null : reader.GetString(7),
+                                товар_наименование = reader.IsDBNull(8) ? "Товар не найден" : reader.GetString(8),
+                                единицы_измерения = reader.IsDBNull(9) ? "" : reader.GetString(9)
+                            });
+                        }
                     }
-
-                    decimal quantityDecimal = (decimal)pos.количество;
-                    decimal cost = pos.цена_за_единицу * quantityDecimal;
-                    decimal vatAmount = cost * ((pos.ставка_ндс ?? 0) / 100);
-
-                    totalQuantity += quantityDecimal;
-                    totalCost += cost;
-                    totalVat += vatAmount;
-                    totalWeight += pos.масса_груза ?? 0;
-                    totalPackages += pos.грузовых_мест ?? 0;
-
-                    positionsWithGoods.Add(new
-                    {
-                        Товар = товар,
-                        pos.количество,
-                        pos.цена_за_единицу,
-                        pos.ставка_ндс,
-                        pos.масса_груза,
-                        pos.грузовых_мест,
-                        pos.примечание,
-                        cost,
-                        vatAmount,
-                        totalWithVat = cost + vatAmount
-                    });
                 }
 
-                // Загружаем связанные данные
+                // 3. Загружаем связанные данные
                 var грузоотправитель = await _context.Организации
                     .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_грузоотправителя);
                 var грузополучатель = await _context.Организации
@@ -621,77 +615,116 @@ namespace Blank.Controllers
                 var типДокумента = await _context.Типы_Документов
                     .FirstOrDefaultAsync(t => t.ид_типа == документ.ид_типа);
 
+                
 
-
-                // Генерируем HTML таблицы товаров
+                // 5. Вычисляем итоги и генерируем HTML
                 var goodsHtml = new StringBuilder();
-                foreach (var pos in positionsWithGoods)
+                decimal totalQuantity = 0, totalCost = 0, totalVat = 0, totalWeight = 0;
+                int totalPackages = 0;
+
+                foreach (var pos in позиции)
                 {
+                    decimal quantityDecimal = (decimal)pos.количество;
+                    decimal cost = pos.цена_за_единицу * quantityDecimal;
+                    decimal vatRate = pos.ставка_ндс ?? 0;
+                    decimal vatAmount = cost * (vatRate / 100);
+                    decimal totalWithVat = cost + vatAmount;
+
+                    totalQuantity += quantityDecimal;
+                    totalCost += cost;
+                    totalVat += vatAmount;
+                    totalWeight += pos.масса_груза ?? 0;
+                    totalPackages += pos.грузовых_мест ?? 0;
+
                     goodsHtml.AppendLine($@"
                 <tr class=""goods-row"">
-                    <td>{pos.Товар?.наименование ?? "<span style='color:red'>Товар не найден</span>"}</td>
-                    <td class=""center"">{pos.Товар?.единицы_измерения ?? ""}</td>
+                    <td>{pos.товар_наименование}</td>
+                    <td class=""center"">{pos.единицы_измерения}</td>
                     <td class=""right"">{pos.количество:F3}</td>
                     <td class=""right"">{pos.цена_за_единицу:F2}</td>
-                    <td class=""right"">{pos.cost:F2}</td>
-                    <td class=""center"">{pos.ставка_ндс ?? 0}</td>
-                    <td class=""right"">{pos.vatAmount:F2}</td>
-                    <td class=""right"">{pos.totalWithVat:F2}</td>
+                    <td class=""right"">{cost:F2}</td>
+                    <td class=""center"">{vatRate}</td>
+                    <td class=""right"">{vatAmount:F2}</td>
+                    <td class=""right"">{totalWithVat:F2}</td>
                     <td class=""right"">{pos.грузовых_мест ?? 0}</td>
                     <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
                     <td class=""right"">{pos.примечание ?? ""}</td>
                 </tr>");
                 }
 
-                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Shared", "ttn.cshtml");
-                var htmlTemplate = await System.IO.File.ReadAllTextAsync(templatePath);
+                // 6. Генерируем финальный HTML
+                var html = $@"
+        <!DOCTYPE html>
+        <html lang='ru'>
+        <head>
+            <meta charset='UTF-8'>
+            <title>ТТН {документ.номер_документа}</title>
+            <style>
+                body {{ font-family: 'Times New Roman', Times, serif; font-size: 9pt; margin: 15mm auto; width: 210mm; }}
+                table {{ width: 100%; border-collapse: collapse; margin-bottom: 10px; }}
+                td, th {{ border: 1px solid black; padding: 5px; vertical-align: top; }}
+                .right {{ text-align: right; }}
+                .center {{ text-align: center; }}
+                .bold {{ font-weight: bold; }}
+                @@media print {{ body {{ margin: 0; }} .no-print {{ display: none; }} }}
+            </style>
+        </head>
+        <body>
+            <h2 style='text-align:center'>ТОВАРНО-ТРАНСПОРТНАЯ НАКЛАДНАЯ</h2>
+            <p style='text-align:center'>(ТТН-1) от «{документ.дата_создания:dd.MM.yyyy}» № {документ.номер_документа}</p>
+            
+            <table>
+                <tr><td style='width:33%'><strong>Грузоотправитель:</strong> {грузоотправитель?.название ?? "Не указан"}</td>
+                    <td style='width:33%'><strong>Грузополучатель:</strong> {грузополучатель?.название ?? "Не указан"}</td>
+                    <td style='width:34%'><strong>Перевозчик:</strong> {перевозчик?.название ?? "Не указан"}</td></tr>
+                <tr><td>УНП: {грузоотправитель?.унн ?? ""}</td>
+                    <td>УНП: {грузополучатель?.унн ?? ""}</td>
+                    <td>УНП: {перевозчик?.унн ?? ""}</td></tr>
+                <tr><td>Адрес: {грузоотправитель?.адрес ?? ""}</td>
+                    <td>Адрес: {грузополучатель?.адрес ?? ""}</td>
+                    <td>Адрес: {перевозчик?.адрес ?? ""}</td></tr>
+            </table>
 
-                var html = htmlTemplate
-                    .Replace("{{НомерДокумента}}", документ.номер_документа ?? "")
-                    .Replace("{{Тип}}", типДокумента?.краткое_наименование ?? "")
-                    .Replace("{{ДатаСоздания}}", документ.дата_создания.ToString("dd.MM.yyyy"))
-                    .Replace("{{Грузоотправитель}}", грузоотправитель?.название ?? "")
-                    .Replace("{{УНП_Грузоотправитель}}", грузоотправитель?.унн ?? "")
-                    .Replace("{{Адрес_Грузоотправитель}}", грузоотправитель?.адрес ?? "")
-                    .Replace("{{Грузополучатель}}", грузополучатель?.название ?? "")
-                    .Replace("{{УНП_Грузополучатель}}", грузополучатель?.унн ?? "")
-                    .Replace("{{Адрес_Грузополучатель}}", грузополучатель?.адрес ?? "")
-                    .Replace("{{Перевозчик}}", перевозчик?.название ?? "")
-                    .Replace("{{УНП_Перевозчик}}", перевозчик?.унн ?? "")
-                    .Replace("{{Адрес_Перевозчик}}", перевозчик?.адрес ?? "")
-                   
-                    .Replace("{{РегистрационныйНомер}}", транспорт?.регистрационный_номер ?? "")
-                    
-                    .Replace("{{ФИОВодителя}}", водитель != null ? $"{водитель.фамилия} {водитель.имя} {водитель.отчество}" : "")
-                    .Replace("{{Лицензия}}", водитель?.номер_лицензии ?? "")
-                    .Replace("{{ПутевойЛист}}", "")
-                    .Replace("{{ПунктПогрузки}}", пунктПогрузки?.наименование ?? "")
-                    .Replace("{{ПунктРазгрузки}}", пунктРазгрузки?.наименование ?? "")
-                    
-                    .Replace("{{Позиции}}", goodsHtml.ToString())
-                    .Replace("{{ВсегоКоличество}}", totalQuantity.ToString("F3"))
-                    .Replace("{{ВсегоСтоимость}}", totalCost.ToString("F2"))
-                    .Replace("{{ВсегоСуммаНДС}}", totalVat.ToString("F2"))
-                    .Replace("{{ВсегоСтоимостьСНДС}}", (totalCost + totalVat).ToString("F2"))
-                    .Replace("{{ВсегоМест}}", totalPackages.ToString())
-                    .Replace("{{ВсегоМасса}}", totalWeight.ToString("F3"))
-                    .Replace("{{ВсегоСуммаНДСПрописью}}", NumToTextHelper.SumInWords(totalVat))
-                    .Replace("{{ВсегоСтоимостьСНДСПрописью}}", NumToTextHelper.SumInWords(totalCost + totalVat))
-                    .Replace("{{ВсегоМассаПрописью}}", NumToTextHelper.WeightInWords(totalWeight))
-                    .Replace("{{ВсегоМестПрописью}}", NumToTextHelper.PackagesInWords(totalPackages))
-                    .Replace("{{ОтпускРазрешил}}", "")
-                    .Replace("{{ТоварПринял}}", "")
-                    .Replace("{{СдалГрузоотправитель}}", "")
-                    .Replace("{{НомерПломбы}}", "")
-                    .Replace("{{Доверенность}}", "")
-                    .Replace("{{ДатаДоверенности}}", "")
-                    .Replace("{{Расстояние}}", "")
-                    .Replace("{{ОсновнойТариф}}", "")
-                    .Replace("{{КОплате}}", "")
-                    .Replace("{{ВодительПодпись}}", "")
-                    .Replace("{{ПредставительПодпись}}", "");
+            <table>
+                <tr><td><strong>Автомобиль:</strong>  {транспорт?.регистрационный_номер ?? ""}</td>
+                    <td><strong>Прицеп:</strong> {0}</td></tr>
+                <tr><td><strong>Водитель:</strong> {водитель?.фамилия} {водитель?.имя} {водитель?.отчество}</td>
+                    <td><strong>Лицензия:</strong> {водитель?.номер_лицензии ?? ""}</td></tr>
+                <tr><td><strong>Пункт погрузки:</strong> {пунктПогрузки?.наименование ?? ""}</td>
+                    <td><strong>Пункт разгрузки:</strong> {пунктРазгрузки?.наименование ?? ""}</td></tr>
+            </table>
 
-                return View("~/Views/Shared/ttn.cshtml");
+            <h3>I. ТОВАРНЫЙ РАЗДЕЛ</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Наименование товара</th><th>Ед. изм.</th><th>Кол-во</th><th>Цена, руб.</th>
+                        <th>Стоимость, руб.</th><th>НДС, %</th><th>Сумма НДС, руб.</th>
+                        <th>Стоимость с НДС, руб.</th><th>Груз. мест</th><th>Масса, кг</th><th>Примечание</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {goodsHtml.ToString()}
+                    <tr style='border-top: double black; font-weight: bold;'>
+                        <td colspan='2'>ИТОГО</td>
+                        <td class='right'>{totalQuantity:F3}</td><td class='right'>x</td>
+                        <td class='right'>{totalCost:F2}</td><td class='center'>x</td>
+                        <td class='right'>{totalVat:F2}</td>
+                        <td class='right'>{(totalCost + totalVat):F2}</td>
+                        <td class='right'>{totalPackages}</td>
+                        <td class='right'>{totalWeight:F3}</td><td class='right'>x</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style='margin-top: 20px; text-align: center;' class='no-print'>
+                <button onclick='window.print()'>Печать</button>
+                <button onclick='window.close()'>Закрыть</button>
+            </div>
+        </body>
+        </html>";
+
+                return Content(html, "text/html");
             }
             catch (Exception ex)
             {
