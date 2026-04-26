@@ -7,7 +7,7 @@
 function editSelectedDocument() {
     const id = sessionStorage.getItem('selectedDocumentId');
     if (id) {
-        window.location.href = '/UserWorkspace/EditDocumentPage?id=' + id;
+        window.location.href = '/UserWorkspace/EditDocumentPage/' + id; // ← без знака вопроса
     } else {
         alert('Сначала выберите документ в таблице');
     }

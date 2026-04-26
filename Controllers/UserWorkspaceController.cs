@@ -94,7 +94,7 @@ namespace Blank.Controllers
             {
                 _context.Update(document);
                 _context.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "UserWorkspace");
             }
 
             ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
@@ -104,7 +104,7 @@ namespace Blank.Controllers
             ViewBag.LoadingPoints = _context.Пункт_Погрузки.ToList();
             ViewBag.UnloadingPoints = _context.Пункт_Разгрузки.ToList();
 
-            return View(document);
+            return RedirectToAction("Index", "UserWorkspace");
         }
 
         // GET: /UserWorkspace/DeleteDocument?id=5
