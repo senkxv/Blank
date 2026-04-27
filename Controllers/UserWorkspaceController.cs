@@ -141,48 +141,97 @@ namespace Blank.Controllers
             return View(document);
         }
 
-        // GET: /UserWorkspace/EditDocumentPage/5
+        // GET: /UserWorkspace/EditDocumentPage/5 - ИСПРАВЛЕНА
         public IActionResult EditDocumentPage(int id)
         {
-            var document = _context.Документы.Find(id);
-            if (document == null)
+            try
             {
-                return NotFound();
-            }
-
-            ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
-            ViewBag.Organizations = _context.Организации.ToList();
-            ViewBag.Drivers = _context.Водители.ToList();
-            ViewBag.Transport = _context.Транспорт.ToList();
-            ViewBag.LoadingPoints = _context.Пункт_Погрузки.ToList();
-            ViewBag.UnloadingPoints = _context.Пункт_Разгрузки.ToList();
-            ViewBag.Goods = _context.Товары.ToList();
-
-            var existingPositions = _context.Позиции
-                .Include(p => p.Товар)
-                .Where(p => p.ид_документа == id)
-                .AsEnumerable()
-                .Select(p => new Positions
+                // Загружаем документ
+                var document = _context.Документы.Find(id);
+                if (document == null)
                 {
-                    ид_позиции = p.ид_позиции,
-                    ид_документа = p.ид_документа,
-                    ид_товара = p.ид_товара,
-                    количество = p.количество,
-                    цена_за_единицу = p.цена_за_единицу,
-                    ставка_ндс = p.ставка_ндс ?? 0,
-                    масса_груза = p.масса_груза ?? 0,
-                    грузовых_мест = p.грузовых_мест ?? 0,
-                    скидка = p.скидка ?? 0,
-                    примечание = p.примечание ?? "",
-                    сумма_ндс = p.сумма_ндс ?? 0,
-                    стоимость_с_ндс = p.стоимость_с_ндс ?? 0,
-                    Товар = p.Товар
-                })
-                .ToList();
+                    return NotFound();
+                }
 
-            ViewBag.ExistingPositions = existingPositions;
+                // --- БЕЗОПАСНАЯ ЗАГРУЗКА ПОЗИЦИЙ, УСТОЙЧИВАЯ К NULL ---
+                var existingPositions = new List<Positions>();
 
-            return View(document);
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = @"
+                        SELECT 
+                            p.ид_позиции,
+                            p.ид_документа,
+                            p.ид_товара,
+                            IFNULL(p.количество, 0) as количество,
+                            IFNULL(p.цена_за_единицу, 0) as цена_за_единицу,
+                            IFNULL(p.ставка_ндс, 0) as ставка_ндс,
+                            IFNULL(p.масса_груза, 0) as масса_груза,
+                            IFNULL(p.грузовых_мест, 0) as грузовых_мест,
+                            IFNULL(p.скидка, 0) as скидка,
+                            IFNULL(p.примечание, '') as примечание,
+                            IFNULL(p.сумма_ндс, 0) as сумма_ндс,
+                            IFNULL(p.стоимость_с_ндс, 0) as стоимость_с_ндс,
+                            g.наименование as товар_наименование,
+                            g.единицы_измерения
+                        FROM Позиции p
+                        LEFT JOIN Товары g ON p.ид_товара = g.ид_товара
+                        WHERE p.ид_документа = @id";
+
+                    var param = command.CreateParameter();
+                    param.ParameterName = "@id";
+                    param.Value = id;
+                    command.Parameters.Add(param);
+
+                    _context.Database.OpenConnection();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var position = new Positions
+                            {
+                                ид_позиции = reader.GetInt32(0),
+                                ид_документа = reader.GetInt32(1),
+                                ид_товара = reader.GetInt32(2),
+                                количество = reader.GetDouble(3),
+                                цена_за_единицу = reader.GetDecimal(4),
+                                ставка_ндс = reader.GetDecimal(5),
+                                масса_груза = reader.GetDecimal(6),
+                                грузовых_мест = reader.GetInt32(7),
+                                скидка = reader.GetDecimal(8),
+                                примечание = reader.GetString(9),
+                                сумма_ндс = reader.GetDecimal(10),
+                                стоимость_с_ндс = reader.GetDecimal(11),
+                                Товар = new Goods
+                                {
+                                    наименование = reader.IsDBNull(12) ? "Товар не найден" : reader.GetString(12),
+                                    единицы_измерения = reader.IsDBNull(13) ? "" : reader.GetString(13)
+                                }
+                            };
+                            existingPositions.Add(position);
+                        }
+                    }
+                    _context.Database.CloseConnection();
+                }
+
+                // Заполняем ViewBag для выпадающих списков
+                ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
+                ViewBag.Organizations = _context.Организации.ToList();
+                ViewBag.Drivers = _context.Водители.ToList();
+                ViewBag.Transport = _context.Транспорт.ToList();
+                ViewBag.LoadingPoints = _context.Пункт_Погрузки.ToList();
+                ViewBag.UnloadingPoints = _context.Пункт_Разгрузки.ToList();
+                ViewBag.Goods = _context.Товары.ToList();
+
+                ViewBag.ExistingPositions = existingPositions;
+
+                return View(document);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка в EditDocumentPage: {ex.Message}");
+                return Content($"Ошибка: {ex.Message}");
+            }
         }
 
         // POST: /UserWorkspace/EditDocumentPage
@@ -289,45 +338,42 @@ namespace Blank.Controllers
             ViewBag.UnloadingPoints = _context.Пункт_Разгрузки.ToList();
             ViewBag.Goods = _context.Товары.ToList();
 
-            var existingPositions = _context.Позиции
-                .Include(p => p.Товар)
-                .Where(p => p.ид_документа == id)
-                .AsEnumerable()
-                .Select(p => new Positions
-                {
-                    ид_позиции = p.ид_позиции,
-                    ид_документа = p.ид_документа,
-                    ид_товара = p.ид_товара,
-                    количество = p.количество,
-                    цена_за_единицу = p.цена_за_единицу,
-                    ставка_ндс = p.ставка_ндс ?? 0,
-                    масса_груза = p.масса_груза ?? 0,
-                    грузовых_мест = p.грузовых_мест ?? 0,
-                    скидка = p.скидка ?? 0,
-                    примечание = p.примечание ?? "",
-                    Товар = p.Товар
-                })
-                .ToList();
-            ViewBag.ExistingPositions = existingPositions;
-
             return View(document);
         }
 
-        // GET: /UserWorkspace/DeleteDocument
+        // GET: /UserWorkspace/DeleteDocument - ИСПРАВЛЕН
         public async Task<IActionResult> DeleteDocument(int id)
         {
-            var документ = await _context.Документы.FindAsync(id);
-            if (документ == null)
+            try
             {
-                return NotFound();
+                var документ = await _context.Документы.FindAsync(id);
+                if (документ == null)
+                {
+                    TempData["Error"] = $"Документ с ID {id} не найден";
+                    return RedirectToAction("Index");
+                }
+
+                // Удаляем связанные позиции
+                var позиции = _context.Позиции.Where(p => p.ид_документа == id);
+                if (позиции.Any())
+                {
+                    _context.Позиции.RemoveRange(позиции);
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine($"Удалено позиций: {позиции.Count()}");
+                }
+
+                // Удаляем документ
+                _context.Документы.Remove(документ);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = $"Документ №{документ.номер_документа} успешно удален";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при удалении: {ex.Message}");
+                TempData["Error"] = $"Ошибка при удалении: {ex.Message}";
             }
 
-            var позиции = _context.Позиции.Where(p => p.ид_документа == id);
-            _context.Позиции.RemoveRange(позиции);
-            _context.Документы.Remove(документ);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Документ успешно удален";
             return RedirectToAction("Index");
         }
 
@@ -409,163 +455,35 @@ namespace Blank.Controllers
         // GET: /UserWorkspace/PrintDocument/5
         public async Task<IActionResult> PrintDocument(int id)
         {
-            var документ = await _context.Документы
-                .FirstOrDefaultAsync(d => d.ид_документа == id);
-
-            if (документ == null)
-            {
-                return NotFound();
-            }
-
-            var позиции = await _context.Позиции
-                .Include(p => p.Товар)
-                .Where(p => p.ид_документа == id)
-                .ToListAsync();
-
-            var грузоотправитель = await _context.Организации
-                .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_грузоотправителя);
-            var грузополучатель = await _context.Организации
-                .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_получателя);
-            var перевозчик = await _context.Организации
-                .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_перевозчика);
-            var водитель = await _context.Водители
-                .FirstOrDefaultAsync(d => d.ид_водителя == документ.ид_водителя);
-            var транспорт = await _context.Транспорт
-                .FirstOrDefaultAsync(t => t.ид_транспорта == документ.ид_транспорта);
-            var пунктПогрузки = await _context.Пункт_Погрузки
-                .FirstOrDefaultAsync(p => p.ид_пункта_погрузки == документ.ид_пункта_погрузки);
-            var пунктРазгрузки = await _context.Пункт_Разгрузки
-                .FirstOrDefaultAsync(p => p.ид_пункта_разгрузки == документ.ид_пункта_разгрузки);
-            var типДокумента = await _context.Типы_Документов
-                .FirstOrDefaultAsync(t => t.ид_типа == документ.ид_типа);
-
-            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Shared", "ttn.cshtml");
-            if (!System.IO.File.Exists(templatePath))
-            {
-                return Content("Шаблон не найден: " + templatePath);
-            }
-
-            var htmlTemplate = await System.IO.File.ReadAllTextAsync(templatePath);
-
-            var goodsHtml = new StringBuilder();
-            decimal totalQuantity = 0, totalCost = 0, totalVat = 0, totalWeight = 0;
-            int totalPackages = 0;
-
-            foreach (var pos in позиции)
-            {
-                decimal quantityDecimal = (decimal)pos.количество;
-                decimal cost = pos.цена_за_единицу * quantityDecimal;
-                decimal vatAmount = cost * ((pos.ставка_ндс ?? 0) / 100);
-
-                totalQuantity += quantityDecimal;
-                totalCost += cost;
-                totalVat += vatAmount;
-                totalWeight += pos.масса_груза ?? 0;
-                totalPackages += pos.грузовых_мест ?? 0;
-
-                goodsHtml.AppendLine($@"
-            <tr class=""goods-row"">
-                <td>{pos.Товар?.наименование ?? ""}</td>
-                <td class=""center"">{pos.Товар?.единицы_измерения ?? ""}</td>
-                <td class=""right"">{pos.количество:F3}</td>
-                <td class=""right"">{pos.цена_за_единицу:F2}</td>
-                <td class=""right"">{cost:F2}</td>
-                <td class=""center"">{pos.ставка_ндс ?? 0}</td>
-                <td class=""right"">{vatAmount:F2}</td>
-                <td class=""right"">{cost + vatAmount:F2}</td>
-                <td class=""right"">{pos.грузовых_мест ?? 0}</td>
-                <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
-                <td class=""right"">{pos.примечание ?? ""}</td>
-            </tr>");
-            }
-
-            var html = htmlTemplate
-                .Replace("{{НомерДокумента}}", документ.номер_документа ?? "")
-                .Replace("{{Тип}}", типДокумента?.краткое_наименование ?? "")
-                .Replace("{{ДатаСоздания}}", документ.дата_создания.ToString("dd.MM.yyyy"))
-                .Replace("{{Грузоотправитель}}", грузоотправитель?.название ?? "")
-                .Replace("{{УНП_Грузоотправитель}}", грузоотправитель?.унн ?? "")
-                .Replace("{{Адрес_Грузоотправитель}}", грузоотправитель?.адрес ?? "")
-                .Replace("{{Грузополучатель}}", грузополучатель?.название ?? "")
-                .Replace("{{УНП_Грузополучатель}}", грузополучатель?.унн ?? "")
-                .Replace("{{Адрес_Грузополучатель}}", грузополучатель?.адрес ?? "")
-                .Replace("{{Перевозчик}}", перевозчик?.название ?? "")
-                .Replace("{{УНП_Перевозчик}}", перевозчик?.унн ?? "")
-                .Replace("{{Адрес_Перевозчик}}", перевозчик?.адрес ?? "")
-
-                .Replace("{{РегистрационныйНомер}}", транспорт?.регистрационный_номер ?? "")
-
-                .Replace("{{ФИОВодителя}}", водитель != null ? $"{водитель.фамилия} {водитель.имя} {водитель.отчество}" : "")
-                .Replace("{{Лицензия}}", водитель?.номер_лицензии ?? "")
-                .Replace("{{ПутевойЛист}}", "")
-                .Replace("{{ПунктПогрузки}}", пунктПогрузки?.наименование ?? "")
-                .Replace("{{ПунктРазгрузки}}", пунктРазгрузки?.наименование ?? "")
-                .Replace("{{АдресПогрузки}}", пунктПогрузки?.наименование ?? "")
-                .Replace("{{АдресРазгрузки}}", пунктРазгрузки?.наименование ?? "")
-                .Replace("{{Позиции}}", goodsHtml.ToString())
-                .Replace("{{ВсегоКоличество}}", totalQuantity.ToString("F3"))
-                .Replace("{{ВсегоСтоимость}}", totalCost.ToString("F2"))
-                .Replace("{{ВсегоСуммаНДС}}", totalVat.ToString("F2"))
-                .Replace("{{ВсегоСтоимостьСНДС}}", (totalCost + totalVat).ToString("F2"))
-                .Replace("{{ВсегоМест}}", totalPackages.ToString())
-                .Replace("{{ВсегоМасса}}", totalWeight.ToString("F3"))
-                .Replace("{{ВсегоСуммаНДСПрописью}}", NumToTextHelper.SumInWords(totalVat))
-                .Replace("{{ВсегоСтоимостьСНДСПрописью}}", NumToTextHelper.SumInWords(totalCost + totalVat))
-                .Replace("{{ВсегоМассаПрописью}}", NumToTextHelper.WeightInWords(totalWeight))
-                .Replace("{{ВсегоМестПрописью}}", NumToTextHelper.PackagesInWords(totalPackages))
-                .Replace("{{ОтпускРазрешил}}", "")
-                .Replace("{{ТоварПринял}}", "")
-                .Replace("{{СдалГрузоотправитель}}", "")
-                .Replace("{{НомерПломбы}}", "")
-                .Replace("{{Доверенность}}", "")
-                .Replace("{{ДатаДоверенности}}", "")
-                .Replace("{{Расстояние}}", "")
-                .Replace("{{ОсновнойТариф}}", "")
-                .Replace("{{КОплате}}", "")
-                .Replace("{{ВодительПодпись}}", "")
-                .Replace("{{ПредставительПодпись}}", "");
-
-            var converter = new HtmlToPdf();
-            var pdf = converter.ConvertHtmlString(html);
-            var pdfBytes = pdf.Save();
-
-            return File(pdfBytes, "application/pdf", $"ТТН_{документ.номер_документа}.pdf");
-        }
-
-        // GET: /UserWorkspace/PreviewDocument/5
-        public async Task<IActionResult> PreviewDocument(int id)
-        {
             try
             {
-                // 1. Загружаем документ
                 var документ = await _context.Документы
                     .FirstOrDefaultAsync(d => d.ид_документа == id);
 
                 if (документ == null)
                 {
-                    return Content($"Документ с ID {id} не найден", "text/html");
+                    return NotFound();
                 }
 
-                // 2. Загружаем позиции через RAW SQL
                 var позиции = new List<dynamic>();
 
                 using (var command = _context.Database.GetDbConnection().CreateCommand())
                 {
                     command.CommandText = @"
-                SELECT 
-                    p.ид_позиции,
-                    p.ид_товара,
-                    IFNULL(p.количество, 0) as количество,
-                    IFNULL(p.цена_за_единицу, 0) as цена_за_единицу,
-                    p.ставка_ндс,
-                    p.масса_груза,
-                    p.грузовых_мест,
-                    p.примечание,
-                    g.наименование as товар_наименование,
-                    g.единицы_измерения
-                FROM Позиции p
-                LEFT JOIN Товары g ON p.ид_товара = g.ид_товара
-                WHERE p.ид_документа = @id";
+                        SELECT 
+                            p.ид_позиции,
+                            p.ид_товара,
+                            IFNULL(p.количество, 0) as количество,
+                            IFNULL(p.цена_за_единицу, 0) as цена_за_единицу,
+                            p.ставка_ндс,
+                            p.масса_груза,
+                            p.грузовых_мест,
+                            p.примечание,
+                            g.наименование as товар_наименование,
+                            g.единицы_измерения
+                        FROM Позиции p
+                        LEFT JOIN Товары g ON p.ид_товара = g.ид_товара
+                        WHERE p.ид_документа = @id";
 
                     var param = command.CreateParameter();
                     param.ParameterName = "@id";
@@ -580,8 +498,6 @@ namespace Blank.Controllers
                         {
                             позиции.Add(new
                             {
-                                ид_позиции = reader.GetInt32(0),
-                                ид_товара = reader.IsDBNull(1) ? 0 : reader.GetInt32(1),
                                 количество = reader.GetDouble(2),
                                 цена_за_единицу = reader.GetDecimal(3),
                                 ставка_ндс = reader.IsDBNull(4) ? (decimal?)null : reader.GetDecimal(4),
@@ -595,7 +511,6 @@ namespace Blank.Controllers
                     }
                 }
 
-                // 3. Загружаем связанные данные
                 var грузоотправитель = await _context.Организации
                     .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_грузоотправителя);
                 var грузополучатель = await _context.Организации
@@ -613,8 +528,22 @@ namespace Blank.Controllers
                 var типДокумента = await _context.Типы_Документов
                     .FirstOrDefaultAsync(t => t.ид_типа == документ.ид_типа);
 
+                string маркаТранспорта = "";
+                if (транспорт != null && транспорт.ид_марки > 0)
+                {
+                    var марка = await _context.Марка_Транспорта
+                        .FirstOrDefaultAsync(m => m.ид_марки == транспорт.ид_марки);
+                    маркаТранспорта = марка?.наименование_марки ?? "";
+                }
 
-                // 5. Вычисляем итоги и генерируем HTML для товаров
+                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "Shared", "ttn.cshtml");
+                if (!System.IO.File.Exists(templatePath))
+                {
+                    return Content("Шаблон не найден: " + templatePath);
+                }
+
+                var htmlTemplate = await System.IO.File.ReadAllTextAsync(templatePath);
+
                 var goodsHtml = new StringBuilder();
                 decimal totalQuantity = 0, totalCost = 0, totalVat = 0, totalWeight = 0;
                 int totalPackages = 0;
@@ -634,22 +563,188 @@ namespace Blank.Controllers
                     totalPackages += pos.грузовых_мест ?? 0;
 
                     goodsHtml.AppendLine($@"
-                <tr class=""goods-row"">
-                    <td>{pos.товар_наименование}</td>
-                    <td class=""center"">{pos.единицы_измерения}</td>
-                    <td class=""right"">{pos.количество:F3}</td>
-                    <td class=""right"">{pos.цена_за_единицу:F2}</td>
-                    <td class=""right"">{cost:F2}</td>
-                    <td class=""center"">{vatRate}</td>
-                    <td class=""right"">{vatAmount:F2}</td>
-                    <td class=""right"">{totalWithVat:F2}</td>
-                    <td class=""right"">{pos.грузовых_мест ?? 0}</td>
-                    <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
-                    <td class=""right"">{pos.примечание ?? ""}</td>
-                </tr>");
+                        <tr class=""goods-row"">
+                            <td>{pos.товар_наименование}</td>
+                            <td class=""center"">{pos.единицы_измерения}</td>
+                            <td class=""right"">{pos.количество:F3}</td>
+                            <td class=""right"">{pos.цена_за_единицу:F2}</td>
+                            <td class=""right"">{cost:F2}</td>
+                            <td class=""center"">{vatRate}</td>
+                            <td class=""right"">{vatAmount:F2}</td>
+                            <td class=""right"">{totalWithVat:F2}</td>
+                            <td class=""right"">{pos.грузовых_мест ?? 0}</td>
+                            <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
+                            <td class=""right"">{pos.примечание ?? ""}</td>
+                        </tr>");
                 }
 
-                // 6. Генерируем финальный HTML
+                var html = htmlTemplate
+                    .Replace("{{НомерДокумента}}", документ.номер_документа ?? "")
+                    .Replace("{{Тип}}", типДокумента?.краткое_наименование ?? "")
+                    .Replace("{{ДатаСоздания}}", документ.дата_создания.ToString("dd.MM.yyyy"))
+                    .Replace("{{Грузоотправитель}}", грузоотправитель?.название ?? "")
+                    .Replace("{{УНП_Грузоотправитель}}", грузоотправитель?.унн ?? "")
+                    .Replace("{{Адрес_Грузоотправитель}}", грузоотправитель?.адрес ?? "")
+                    .Replace("{{Грузополучатель}}", грузополучатель?.название ?? "")
+                    .Replace("{{УНП_Грузополучатель}}", грузополучатель?.унн ?? "")
+                    .Replace("{{Адрес_Грузополучатель}}", грузополучатель?.адрес ?? "")
+                    .Replace("{{Перевозчик}}", перевозчик?.название ?? "")
+                    .Replace("{{УНП_Перевозчик}}", перевозчик?.унн ?? "")
+                    .Replace("{{Адрес_Перевозчик}}", перевозчик?.адрес ?? "")
+                    .Replace("{{МаркаМашины}}", маркаТранспорта)
+                    .Replace("{{РегистрационныйНомер}}", транспорт?.регистрационный_номер ?? "")
+                    
+                    .Replace("{{ФИОВодителя}}", водитель != null ? $"{водитель.фамилия} {водитель.имя} {водитель.отчество}" : "")
+                    .Replace("{{Лицензия}}", водитель?.номер_лицензии ?? "")
+                    .Replace("{{ПутевойЛист}}", "")
+                    .Replace("{{ПунктПогрузки}}", пунктПогрузки?.наименование ?? "")
+                    .Replace("{{ПунктРазгрузки}}", пунктРазгрузки?.наименование ?? "")
+ 
+                    .Replace("{{Позиции}}", goodsHtml.ToString())
+                    .Replace("{{ВсегоКоличество}}", totalQuantity.ToString("F3"))
+                    .Replace("{{ВсегоСтоимость}}", totalCost.ToString("F2"))
+                    .Replace("{{ВсегоСуммаНДС}}", totalVat.ToString("F2"))
+                    .Replace("{{ВсегоСтоимостьСНДС}}", (totalCost + totalVat).ToString("F2"))
+                    .Replace("{{ВсегоМест}}", totalPackages.ToString())
+                    .Replace("{{ВсегоМасса}}", totalWeight.ToString("F3"))
+                    .Replace("{{ВсегоСуммаНДСПрописью}}", NumToTextHelper.SumInWords(totalVat))
+                    .Replace("{{ВсегоСтоимостьСНДСПрописью}}", NumToTextHelper.SumInWords(totalCost + totalVat))
+                    .Replace("{{ВсегоМассаПрописью}}", NumToTextHelper.WeightInWords(totalWeight))
+                    .Replace("{{ВсегоМестПрописью}}", NumToTextHelper.PackagesInWords(totalPackages))
+                    .Replace("{{ОтпускРазрешил}}", "")
+                    .Replace("{{ТоварПринял}}", "")
+                    .Replace("{{СдалГрузоотправитель}}", "")
+                    .Replace("{{НомерПломбы}}", "")
+                    .Replace("{{Доверенность}}", "")
+                    .Replace("{{ДатаДоверенности}}", "")
+                    .Replace("{{Расстояние}}", "")
+                    .Replace("{{ОсновнойТариф}}", "")
+                    .Replace("{{КОплате}}", "")
+                    .Replace("{{ВодительПодпись}}", "")
+                    .Replace("{{ПредставительПодпись}}", "");
+
+                var converter = new HtmlToPdf();
+                var pdf = converter.ConvertHtmlString(html);
+                var pdfBytes = pdf.Save();
+
+                return File(pdfBytes, "application/pdf", $"ТТН_{документ.номер_документа}.pdf");
+            }
+            catch (Exception ex)
+            {
+                return Content($"Ошибка при печати: {ex.Message}");
+            }
+        }
+
+        // GET: /UserWorkspace/PreviewDocument/5
+        public async Task<IActionResult> PreviewDocument(int id)
+        {
+            try
+            {
+                var документ = await _context.Документы
+                    .FirstOrDefaultAsync(d => d.ид_документа == id);
+
+                if (документ == null)
+                {
+                    return Content($"Документ с ID {id} не найден", "text/html");
+                }
+
+                var позиции = new List<dynamic>();
+
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = @"
+                        SELECT 
+                            p.ид_позиции,
+                            p.ид_товара,
+                            IFNULL(p.количество, 0) as количество,
+                            IFNULL(p.цена_за_единицу, 0) as цена_за_единицу,
+                            p.ставка_ндс,
+                            p.масса_груза,
+                            p.грузовых_мест,
+                            p.примечание,
+                            g.наименование as товар_наименование,
+                            g.единицы_измерения
+                        FROM Позиции p
+                        LEFT JOIN Товары g ON p.ид_товара = g.ид_товара
+                        WHERE p.ид_документа = @id";
+
+                    var param = command.CreateParameter();
+                    param.ParameterName = "@id";
+                    param.Value = id;
+                    command.Parameters.Add(param);
+
+                    await _context.Database.OpenConnectionAsync();
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            позиции.Add(new
+                            {
+                                количество = reader.GetDouble(2),
+                                цена_за_единицу = reader.GetDecimal(3),
+                                ставка_ндс = reader.IsDBNull(4) ? (decimal?)null : reader.GetDecimal(4),
+                                масса_груза = reader.IsDBNull(5) ? (decimal?)null : reader.GetDecimal(5),
+                                грузовых_мест = reader.IsDBNull(6) ? (int?)null : reader.GetInt32(6),
+                                примечание = reader.IsDBNull(7) ? null : reader.GetString(7),
+                                товар_наименование = reader.IsDBNull(8) ? "Товар не найден" : reader.GetString(8),
+                                единицы_измерения = reader.IsDBNull(9) ? "" : reader.GetString(9)
+                            });
+                        }
+                    }
+                }
+
+                var грузоотправитель = await _context.Организации
+                    .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_грузоотправителя);
+                var грузополучатель = await _context.Организации
+                    .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_получателя);
+                var перевозчик = await _context.Организации
+                    .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_перевозчика);
+                var водитель = await _context.Водители
+                    .FirstOrDefaultAsync(d => d.ид_водителя == документ.ид_водителя);
+                var транспорт = await _context.Транспорт
+                    .FirstOrDefaultAsync(t => t.ид_транспорта == документ.ид_транспорта);
+                var пунктПогрузки = await _context.Пункт_Погрузки
+                    .FirstOrDefaultAsync(p => p.ид_пункта_погрузки == документ.ид_пункта_погрузки);
+                var пунктРазгрузки = await _context.Пункт_Разгрузки
+                    .FirstOrDefaultAsync(p => p.ид_пункта_разгрузки == документ.ид_пункта_разгрузки);
+                var типДокумента = await _context.Типы_Документов
+                    .FirstOrDefaultAsync(t => t.ид_типа == документ.ид_типа);
+
+                var goodsHtml = new StringBuilder();
+                decimal totalQuantity = 0, totalCost = 0, totalVat = 0, totalWeight = 0;
+                int totalPackages = 0;
+
+                foreach (var pos in позиции)
+                {
+                    decimal quantityDecimal = (decimal)pos.количество;
+                    decimal cost = pos.цена_за_единицу * quantityDecimal;
+                    decimal vatRate = pos.ставка_ндс ?? 0;
+                    decimal vatAmount = cost * (vatRate / 100);
+                    decimal totalWithVat = cost + vatAmount;
+
+                    totalQuantity += quantityDecimal;
+                    totalCost += cost;
+                    totalVat += vatAmount;
+                    totalWeight += pos.масса_груза ?? 0;
+                    totalPackages += pos.грузовых_мест ?? 0;
+
+                    goodsHtml.AppendLine($@"
+                        <tr class=""goods-row"">
+                            <td>{pos.товар_наименование}</td>
+                            <td class=""center"">{pos.единицы_измерения}</td>
+                            <td class=""right"">{pos.количество:F3}</td>
+                            <td class=""right"">{pos.цена_за_единицу:F2}</td>
+                            <td class=""right"">{cost:F2}</td>
+                            <td class=""center"">{vatRate}</td>
+                            <td class=""right"">{vatAmount:F2}</td>
+                            <td class=""right"">{totalWithVat:F2}</td>
+                            <td class=""right"">{pos.грузовых_мест ?? 0}</td>
+                            <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
+                            <td class=""right"">{pos.примечание ?? ""}</td>
+                        </tr>");
+                }
+
                 var html = $@"
 <!DOCTYPE html>
 <html lang='ru'>
@@ -702,23 +797,20 @@ namespace Blank.Controllers
 
     <table class='main-table'>
         <tr>
-            <td><strong>Автомобиль:</strong>  {транспорт?.регистрационный_номер ?? ""}</td>
-            <td><strong>Прицеп:</strong> {0}</td>
+            <td style='width:50%'><strong>Автомобиль:</strong> {транспорт?.регистрационный_номер ?? ""}</td>
+            <td style='width:50%'><strong>Прицеп:</strong> </td>
         </tr>
         <tr>
             <td><strong>Водитель:</strong> {водитель?.фамилия} {водитель?.имя} {водитель?.отчество}</td>
             <td><strong>Лицензия:</strong> {водитель?.номер_лицензии ?? ""}</td>
         </tr>
-    </table>
-
-    <table class='main-table'>
         <tr>
             <td><strong>Пункт погрузки:</strong> {пунктПогрузки?.наименование ?? ""}</td>
             <td><strong>Пункт разгрузки:</strong> {пунктРазгрузки?.наименование ?? ""}</td>
         </tr>
         <tr>
             <td><strong>Адрес погрузки:</strong> </td>
-            <td><strong>Адрес разгрузки:</strong> </td>
+            <td><strong>Адрес разгрузки:</strong></td>
         </tr>
     </table>
 
