@@ -392,3 +392,13 @@ input:checked + .slider {
         font-size: 10px;
     }
 }
+
+.text-danger {
+    color: #990000;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #ffe6e6;
+    border-radius: 5px;
+}
