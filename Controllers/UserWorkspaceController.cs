@@ -474,7 +474,7 @@ namespace Blank.Controllers
                 totalQuantity += quantityDecimal;
                 totalCost += cost;
                 totalVat += vatAmount;
-                totalWeight += pos.масса_груза ?? 0;
+                totalWeight += pos.масса_груза ?? 0;    
                 totalPackages += pos.грузовых_мест ?? 0;
 
                 goodsHtml.AppendLine($@"

@@ -11,25 +11,23 @@ namespace Blank.Models.Tables
         public int ид_позиции { get; set; }
 
         [Column("ид_документа")]
-        [Required]
-        public int ид_документа { get; set; }  // ← исправлено: int, не string
+        public int ид_документа { get; set; }
 
         [Column("ид_товара")]
-        [Required]
-        public int ид_товара { get; set; }     // ← исправлено: int, не string
+        public int ид_товара { get; set; }
 
         [Column("количество")]
-        [Required]
-        public double количество { get; set; }
+        public double количество { get; set; }  // не nullable
 
         [Column("цена_за_единицу")]
-        [Required]
-        public decimal цена_за_единицу { get; set; }
+        public decimal цена_за_единицу { get; set; }  // не nullable
+
+        [Column("ставка_ндс")]
+        public decimal? ставка_ндс { get; set; }
 
         [Column("скидка")]
-        public decimal? скидка { get; set; }    // ← nullable
+        public decimal? скидка { get; set; }
 
-        // Новые поля для ТТН
         [Column("сумма_ндс")]
         public decimal? сумма_ндс { get; set; }
 
@@ -42,18 +40,10 @@ namespace Blank.Models.Tables
         [Column("масса_груза")]
         public decimal? масса_груза { get; set; }
 
-        [Column("ставка_ндс")]
-        public decimal? ставка_ндс { get; set; }
-
         [Column("примечание")]
-        [MaxLength(500)]
-        public string примечание { get; set; }
-
-        // Навигационные свойства
-        [ForeignKey("ид_документа")]
-        public virtual Documents Документ { get; set; }
+        public string? примечание { get; set; }
 
         [ForeignKey("ид_товара")]
-        public virtual Goods Товар { get; set; }
+        public virtual Goods? Товар { get; set; }
     }
 }
