@@ -381,3 +381,22 @@ input:checked + .slider {
         font-size: 10px;
     }
 }
+
+/* Стили для сообщений об ошибках */
+.error-message {
+    color: #990000;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+.checkbox-error {
+    color: #990000;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Стиль для красной рамки */
+input.error-border {
+    border-color: red !important;
+}
