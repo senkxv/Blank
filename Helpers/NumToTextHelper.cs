@@ -5,9 +5,6 @@ namespace Blank.Helpers
 {
     public static class NumToTextHelper
     {
-        /// <summary>
-        /// Преобразует сумму в рубли и копейки прописью
-        /// </summary>
         public static string SumInWords(decimal sum)
         {
             if (sum == 0) return "Ноль рублей ноль копеек";
@@ -26,9 +23,6 @@ namespace Blank.Helpers
             return $"{rublesStr} рубль {kopeksStr}";
         }
 
-        /// <summary>
-        /// Преобразует копейки в пропись
-        /// </summary>
         private static string GetKopeksInWords(int kopeks)
         {
             if (kopeks == 0) return "ноль копеек";
@@ -37,9 +31,6 @@ namespace Blank.Helpers
             return $"{kopeksWord} {GetKopeksEnding(kopeks)}";
         }
 
-        /// <summary>
-        /// Преобразует рубли в пропись
-        /// </summary>
         private static string RublesInWords(long number)
         {
             if (number == 0) return "ноль";
@@ -53,7 +44,6 @@ namespace Blank.Helpers
             var result = new StringBuilder();
             long num = number;
 
-            // Миллиарды
             if (num >= 1000000000)
             {
                 long billions = num / 1000000000;
@@ -61,7 +51,6 @@ namespace Blank.Helpers
                 num %= 1000000000;
             }
 
-            // Миллионы
             if (num >= 1000000)
             {
                 long millions = num / 1000000;
@@ -69,7 +58,6 @@ namespace Blank.Helpers
                 num %= 1000000;
             }
 
-            // Тысячи
             if (num >= 1000)
             {
                 long thousands = num / 1000;
@@ -77,7 +65,6 @@ namespace Blank.Helpers
                 num %= 1000;
             }
 
-            // Единицы (рубли)
             if (num > 0)
             {
                 result.Append(GetHundredsTensUnits(num, false));
@@ -86,9 +73,6 @@ namespace Blank.Helpers
             return result.ToString().Trim();
         }
 
-        /// <summary>
-        /// Преобразует число в пропись (для копеек, граммов)
-        /// </summary>
         private static string NumberToWords(long number)
         {
             if (number == 0) return "ноль";
@@ -140,9 +124,6 @@ namespace Blank.Helpers
             return result.ToString().Trim();
         }
 
-        /// <summary>
-        /// Получает слово "тысяча" с правильным окончанием
-        /// </summary>
         private static string GetThousandsWord(long number)
         {
             long lastDigit = number % 10;
@@ -161,9 +142,6 @@ namespace Blank.Helpers
             }
         }
 
-        /// <summary>
-        /// Получает сотни, десятки и единицы числа
-        /// </summary>
         private static string GetHundredsTensUnits(long number, bool isFemale)
         {
             if (number == 0) return "";
@@ -215,9 +193,6 @@ namespace Blank.Helpers
             return result.ToString().Trim();
         }
 
-        /// <summary>
-        /// Возвращает окончание для слова "рубль"
-        /// </summary>
         private static string GetRublesEnding(long number)
         {
             if (number == 0) return " рублей";
@@ -238,9 +213,6 @@ namespace Blank.Helpers
             }
         }
 
-        /// <summary>
-        /// Возвращает окончание для слова "копейка"
-        /// </summary>
         private static string GetKopeksEnding(int number)
         {
             int lastDigit = number % 10;
@@ -259,9 +231,6 @@ namespace Blank.Helpers
             }
         }
 
-        /// <summary>
-        /// Возвращает окончание для существительных (миллион, миллиард и т.д.)
-        /// </summary>
         private static string GetPluralEnding(long number, string singular, string dual, string plural)
         {
             long lastDigit = number % 10;
@@ -280,9 +249,6 @@ namespace Blank.Helpers
             }
         }
 
-        /// <summary>
-        /// Преобразует вес в килограммы и граммы прописью
-        /// </summary>
         public static string WeightInWords(decimal weight)
         {
             if (weight == 0) return "ноль килограммов ноль граммов";
@@ -319,9 +285,6 @@ namespace Blank.Helpers
             return result.Trim();
         }
 
-        /// <summary>
-        /// Возвращает окончание для слова "килограмм"
-        /// </summary>
         private static string GetKilogramsEnding(long number)
         {
             if (number == 0) return " килограммов";
@@ -342,9 +305,6 @@ namespace Blank.Helpers
             }
         }
 
-        /// <summary>
-        /// Возвращает окончание для слова "грамм"
-        /// </summary>
         private static string GetGramsEnding(int number)
         {
             if (number == 0) return "граммов";
@@ -365,9 +325,6 @@ namespace Blank.Helpers
             }
         }
 
-        /// <summary>
-        /// Преобразует количество мест прописью
-        /// </summary>
         public static string PackagesInWords(int packages)
         {
             if (packages == 0) return "ноль мест";
@@ -382,9 +339,6 @@ namespace Blank.Helpers
             return result;
         }
 
-        /// <summary>
-        /// Возвращает окончание для слова "место"
-        /// </summary>
         private static string GetPackagesEnding(long number)
         {
             long lastDigit = number % 10;
