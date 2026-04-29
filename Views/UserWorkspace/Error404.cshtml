@@ -26,22 +26,12 @@
             </div>
 
             <h1 class="error-code">404</h1>
-            <h2 class="error-title">Упс... Что-то пошло не так...</h2>
+            <h2 class="error-title">Упс... Вы попали не туда...</h2>
             
             <p class="error-message">
-                Извините, на сервере произошла непредвиденная ошибка.
-                Наша команда уже работает над её устранением.
+                Данной страницы не существует.
+                Вам следует вернуться на главную.
             </p>
-
-            <div class="error-details" id="errorDetails" style="display: none;">
-                <p><strong>Код ошибки:</strong> @ViewBag.ErrorCode</p>
-                <p><strong>Сообщение:</strong> @ViewBag.ErrorMessage</p>
-                <p><strong>Path:</strong> @ViewBag.RequestPath</p>
-                @if (!string.IsNullOrEmpty(ViewBag.StackTrace))
-                {
-                    <pre>@ViewBag.StackTrace</pre>
-                }
-            </div>
 
             <div class="error-actions">
                 <a href="/UserWorkspace/Index" class="btn btn-primary">
