@@ -371,13 +371,14 @@ namespace Blank.Controllers
         }
 
         [HttpGet]
-        public IActionResult Search(string searchString)
+        public async Task<IActionResult> SearchAjax(string searchString)
         {
             var данные = _context.Главная.AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                searchString = searchString.ToLower();
+                searchString = searchString.ToLower().Trim();
+
                 данные = данные.Where(d =>
                     d.ид_документа.ToString().Contains(searchString) ||
                     (d.тип != null && d.тип.ToLower().Contains(searchString)) ||
@@ -386,12 +387,15 @@ namespace Blank.Controllers
                     (d.перевозчик != null && d.перевозчик.ToLower().Contains(searchString)) ||
                     (d.грузополучатель != null && d.грузополучатель.ToLower().Contains(searchString)) ||
                     (d.пункт_погрузки != null && d.пункт_погрузки.ToLower().Contains(searchString)) ||
-                    (d.пункт_разгрузки != null && d.пункт_разгрузки.ToLower().Contains(searchString))
+                    (d.пункт_разгрузки != null && d.пункт_разгрузки.ToLower().Contains(searchString)) ||
+                    (d.ФИО_Водителя != null && d.ФИО_Водителя.ToLower().Contains(searchString)) ||
+                    (d.Марка_Машины != null && d.Марка_Машины.ToLower().Contains(searchString)) ||
+                    (d.Регистрационный_Номер != null && d.Регистрационный_Номер.ToLower().Contains(searchString)) ||
+                    (d.Тип_ТС != null && d.Тип_ТС.ToLower().Contains(searchString))
                 );
             }
 
-            ViewBag.SearchString = searchString;
-            return View("Index", данные.ToList());
+            return PartialView("_DocumentTableRows", await данные.ToListAsync());
         }
 
         [HttpGet]
