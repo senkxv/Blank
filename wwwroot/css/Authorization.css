@@ -136,7 +136,7 @@ label {
 
 @media (max-width: 1024px) {
     .form {
-        max-width: 300px;
+        max-width: 400px;
         width: 400px;
         padding: 15px 20px;
         margin-top: 3vh;
@@ -154,10 +154,10 @@ label {
     }
 
     .form {
-        padding: 20px 25px;
-        max-width: 98%;
+        max-width: 300px;
+        width: 400px;
+        padding: 15px 20px;
         margin-top: 3vh;
-        width: 300px;
     }
 
     .main-section-form > label,
@@ -186,11 +186,10 @@ label {
 
 @media (max-width: 550px) {
     .form {
+        max-width: 300px;
+        width: 400px;
         padding: 15px 20px;
-        width: calc(100% - 20px);
-        max-width: none;
         margin-top: 3vh;
-        width: 300px;
     }
 
     [type="password"],
