@@ -44,7 +44,7 @@ namespace Blank.Controllers
                 if (user != null && HashPassword(model.Password ?? "") == user.хэш_пароль)
                 {
                     HttpContext.Session.SetString("UserId", user.ид_пользователя.ToString());
-                    HttpContext.Session.SetString("UserEmail", user.почта);
+                    HttpContext.Session.SetString("UserEmail", user.почта ?? "");
                     HttpContext.Session.SetString("UserName", $"{user.фамилия} {user.имя}");
 
                     return RedirectToAction("Index", "UserWorkspace");
