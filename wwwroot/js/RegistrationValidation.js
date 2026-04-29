@@ -14,11 +14,9 @@
         const input = document.getElementById(inputId);
         input.style.borderColor = 'red';
 
-        // Удаляем старую ошибку для этого поля, если есть
         const oldError = input.parentNode.querySelector(`.error-message[data-for="${inputId}"]`);
         if (oldError) oldError.remove();
 
-        // Создаём новую ошибку
         const error = document.createElement('div');
         error.className = 'error-message';
         error.setAttribute('data-for', inputId);
@@ -38,7 +36,6 @@
         const passwordRepeat = document.getElementById('password-repeat');
         const checkbox = document.getElementById('checkbox-user-data-computing');
 
-        // === Проверка EMAIL ===
         if (email.value.trim() === '') {
             showError('email', 'Введите email');
             isValid = false;
@@ -47,7 +44,6 @@
             isValid = false;
         }
 
-        // === Проверка ФИО ===
         if (fio.value.trim() === '') {
             showError('FIO', 'Введите ФИО');
             isValid = false;
@@ -56,7 +52,6 @@
             isValid = false;
         }
 
-        // === Проверка ПАРОЛЯ ===
         if (password.value === '') {
             showError('password', 'Введите пароль');
             isValid = false;
@@ -64,8 +59,8 @@
             if (password.value.length < 8) {
                 showError('password', 'Пароль должен быть не менее 8 символов');
                 isValid = false;
-            } else if (!/[!@#$%^&*]/.test(password.value)) {
-                showError('password', 'Пароль должен содержать спецсимвол (!@#$%^&*)');
+            } else if (!/[!@#$%^&*?_]/.test(password.value)) {
+                showError('password', 'Пароль должен содержать спецсимвол (!@#$%^&*?_)');
                 isValid = false;
             } else if (!/[A-Z]/.test(password.value)) {
                 showError('password', 'Пароль должен содержать заглавную букву');
@@ -76,13 +71,11 @@
             }
         }
 
-        // === Проверка ПОДТВЕРЖДЕНИЯ ПАРОЛЯ ===
         if (passwordRepeat.value !== password.value) {
             showError('password-repeat', 'Пароли не совпадают');
             isValid = false;
         }
 
-        // === Проверка ЧЕКБОКСА ===
         if (!checkbox.checked) {
             const wrapper = document.querySelector('.checkbox-wrapper');
             let error = wrapper.querySelector('.checkbox-error');
