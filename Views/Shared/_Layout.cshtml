@@ -6,10 +6,13 @@
 
     <link rel="stylesheet" href="/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="/css/Modal/Filter.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="/css/Modal/Search.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/Modal/Search.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="/css/Modal/Notification.css" asp-append-version="true"/>
 
+    <script src="/js/Modal/Notification.js"></script>
     <script src="/js/Index.js"></script>
-    <script src="/js/Shared/Filter.js"></script>
+    <script src="/js/Modal/Filter.js"></script>
+    <script src="/js/Modal/Search.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,6 +49,13 @@
                     <button type="submit">Найти</button>
                     <button type="button" id="closeSearchBtn">Отмена</button>
                 </form>
+            </div>
+
+            <div id="notificationModal">
+                <div class="notification-content">
+                    <p id="notificationMessage"></p>
+                    <button id="closeNotificationBtn">Закрыть</button>
+                </div>
             </div>
 
             <div id="filterModal">
@@ -113,144 +123,5 @@
 
     @await RenderSectionAsync("Scripts", required: false)
 
-    <script>
-            function editSelectedDocument() {
-                const id = sessionStorage.getItem('selectedDocumentId');
-                if (id) {
-                    window.location.href = '/UserWorkspace/EditDocumentPage?id=' + id;
-                } else {
-                    alert('Сначала выберите документ в таблице');
-                }
-            }
-
-            function deleteSelectedDocument() {
-                const id = sessionStorage.getItem('selectedDocumentId');
-                if (id) {
-                    if (confirm('Вы уверены, что хотите удалить документ?')) {
-                        window.location.href = '/UserWorkspace/DeleteDocument?id=' + id;
-                    }
-                } else {
-                    alert('Сначала выберите документ в таблице');
-                }
-            }
-
-            // === ПОИСК ===
-            const searchModal = document.getElementById('searchModal');
-            const searchLink = document.getElementById('searchLink');
-
-            if (searchLink && searchModal) {
-                searchLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    searchModal.style.display = 'block';
-                });
-            }
-
-            const closeSearchBtn = document.getElementById('closeSearchBtn');
-            if (closeSearchBtn && searchModal) {
-                closeSearchBtn.addEventListener('click', function() {
-                    searchModal.style.display = 'none';
-                });
-            }
-
-            // === ФИЛЬТР ===
-            const filterModal = document.getElementById('filterModal');
-            const filterLink = document.getElementById('filterLink');
-            const closeFilterBtn = document.getElementById('closeFilterBtn');
-            const applyFilterBtn = document.getElementById('applyFilterBtn');
-
-            if (filterLink && filterModal) {
-                filterLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    filterModal.style.display = 'block';
-                });
-            }
-
-            if (closeFilterBtn && filterModal) {
-                closeFilterBtn.addEventListener('click', function() {
-                    filterModal.style.display = 'none';
-                });
-            }
-
-            if (applyFilterBtn) {
-                applyFilterBtn.addEventListener('click', function() {
-                    const sortField = document.getElementById('sortField').value;
-                    const sortOrder = document.getElementById('sortOrder').value;
-                
-                    // === 1. Скрываем/показываем столбцы ===
-                    const checkboxes = document.querySelectorAll('#filterModal input[type="checkbox"]');
-                    checkboxes.forEach(cb => {
-                        const columnClass = 'col-' + cb.value;
-                        const elements = document.querySelectorAll('.' + columnClass);
-                        elements.forEach(el => {
-                            el.style.display = cb.checked ? '' : 'none';
-                        });
-                    
-                        // Также скрываем заголовки столбцов
-                        const headerElements = document.querySelectorAll('th.' + columnClass);
-                        headerElements.forEach(el => {
-                            el.style.display = cb.checked ? '' : 'none';
-                        });
-                    });
-
-                    // === 2. Сортировка строк ===
-                    const tbody = document.querySelector('#mainTable tbody');
-                    if (tbody) {
-                        const rows = Array.from(tbody.querySelectorAll('tr'));
-                    
-                        const getValue = (row, field) => {
-                            if (field === 'ид_документа') {
-                                const cell = row.cells[1];
-                                return cell ? parseInt(cell.innerText) : 0;
-                            }
-                            if (field === 'дата_создания') {
-                                const cell = row.querySelector('.col-' + field);
-                                return cell ? new Date(cell.innerText) : new Date(0);
-                            }
-                            const cell = row.querySelector('.col-' + field);
-                            return cell ? cell.innerText : '';
-                        };
-
-                        rows.sort((a, b) => {
-                            let valA = getValue(a, sortField);
-                            let valB = getValue(b, sortField);
-                        
-                            if (typeof valA === 'string') {
-                                valA = valA.toLowerCase();
-                                valB = valB.toLowerCase();
-                            }
-                        
-                            if (sortOrder === 'asc') {
-                                return valA > valB ? 1 : -1;
-                            } else {
-                                return valA < valB ? 1 : -1;
-                            }
-                        });
-
-                        rows.forEach(row => tbody.appendChild(row));
-                    }
-                
-                    filterModal.style.display = 'none';
-                });
-            }
-
-            // === Закрытие модальных окон при клике вне их ===
-            window.addEventListener('click', function(e) {
-                if (searchModal && e.target === searchModal) {
-                    searchModal.style.display = 'none';
-                }
-                if (filterModal && e.target === filterModal) {
-                    filterModal.style.display = 'none';
-                }
-            });
-
-                        function previewSelectedDocument() {
-                const id = sessionStorage.getItem('selectedDocumentId');
-                if (id) {
-                    window.open('/UserWorkspace/PreviewDocument/' + id, '_blank');
-                } else {
-                    alert('Сначала выберите документ в таблице');
-                }
-            }
-    </script>
 </body>
 </html>

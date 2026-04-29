@@ -1,0 +1,57 @@
+﻿/* Модальное окно уведомлений */
+#notificationModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1100;
+    min-width: 300px;
+    max-width: 400px;
+    text-align: center;
+}
+
+.notification-content {
+    padding: 25px 30px;
+}
+
+#notificationMessage {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+#closeNotificationBtn {
+    padding: 8px 20px;
+    background-color: #990000;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+    #closeNotificationBtn:hover {
+        background-color: #660000;
+    }
+
+/* Адаптив */
+@media (max-width: 480px) {
+    #notificationModal {
+        min-width: 280px;
+        max-width: 90vw;
+    }
+
+    .notification-content {
+        padding: 20px;
+    }
+
+    #notificationMessage {
+        font-size: 14px;
+    }
+}
