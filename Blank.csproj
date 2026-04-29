@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\css\Authorization.css" />
+    <None Include="wwwroot\css\Login\Authorization.css" />
   </ItemGroup>
 
   <ItemGroup>
