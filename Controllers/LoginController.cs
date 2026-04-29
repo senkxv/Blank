@@ -17,7 +17,6 @@ namespace Blank.Controllers
             _context = context;
         }
 
-        // Хэширование пароля (SHA256)
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -27,13 +26,12 @@ namespace Blank.Controllers
             }
         }
 
-        // GET: /Login/Authorization
+        [HttpGet]
         public IActionResult Authorization()
         {
             return View();
         }
 
-        // POST: /Login/Authorization
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Authorization(LoginViewModel model)
@@ -57,13 +55,12 @@ namespace Blank.Controllers
             return View(model);
         }
 
-        // GET: /Login/Registration
+        [HttpGet]
         public IActionResult Registration()
         {
             return View();
         }
 
-        // POST: /Login/Registration
         [HttpPost]
         [ValidateAntiForgeryToken]
 
@@ -71,7 +68,6 @@ namespace Blank.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Разбираем ФИО
                 var fioParts = model.ФИО?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 var фамилия = fioParts?.Length > 0 ? fioParts[0] : "";
                 var имя = fioParts?.Length > 1 ? fioParts[1] : "";
@@ -110,7 +106,7 @@ namespace Blank.Controllers
             return View(model);
         }
 
-        // GET: /Login/Logout
+        [HttpGet]
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
