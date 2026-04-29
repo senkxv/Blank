@@ -1,13 +1,16 @@
 ﻿@{
     Layout = null;
 }
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Регистрация</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="~/css/Registration.css" />
+
+    <link rel="stylesheet" href="/css/Registration.css"/>
+    <script src="/js/RegistrationValidation.js" defer></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,16 +43,16 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <label for="email">Электронная почта</label>
-                    <input id="email" type="email" name="Email" />
+                    <input id="email" type="email" name="Email"/>
 
                     <label for="FIO">ФИО</label>
-                    <input id="FIO" type="text" name="ФИО" />
+                    <input id="FIO" type="text" name="ФИО"/>
 
                     <label for="password">Пароль</label>
-                    <input id="password" type="password" name="Password" />
+                    <input id="password" type="password" name="Password"/>
 
                     <label for="password-repeat">Подтвердите пароль</label>
-                    <input id="password-repeat" type="password" name="ConfirmPassword" />
+                    <input id="password-repeat" type="password" name="ConfirmPassword"/>
 
                     <ul class="form-list-password">
                         <li>Используйте 8 и более символов</li>
@@ -59,18 +62,16 @@
                     </ul>
 
                     <div class="checkbox-wrapper">
-                        <input id="checkbox-user-data-computing" type="checkbox" />
+                        <input id="checkbox-user-data-computing" type="checkbox"/>
                         <label class="checkbox-user-data-computing" for="checkbox-user-data-computing">Соглашение на обработку персональных данных и с условиями использования сервиса.</label>
                     </div>
                     
-                    <input type="submit" value="Зарегистрироваться" />
+                    <input type="submit" value="Зарегистрироваться"/>
                 </form>
             </div>
         </section>
     </main>
 
     <footer></footer>
-
-    <script src="~/js/RegistrationValidation.js"></script>
 </body>
 </html>
