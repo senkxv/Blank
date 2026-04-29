@@ -371,14 +371,16 @@ namespace Blank.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchAjax(string searchString)
+        public async Task<IActionResult> Search(string searchString)
         {
-            var данные = _context.Главная.AsQueryable();
+            // Сначала получаем все данные из БД
+            var данные = await _context.Главная.ToListAsync();
 
             if (!string.IsNullOrEmpty(searchString))
             {
                 searchString = searchString.ToLower().Trim();
 
+                // Фильтруем в памяти (LINQ to Objects)
                 данные = данные.Where(d =>
                     d.ид_документа.ToString().Contains(searchString) ||
                     (d.тип != null && d.тип.ToLower().Contains(searchString)) ||
@@ -391,11 +393,13 @@ namespace Blank.Controllers
                     (d.ФИО_Водителя != null && d.ФИО_Водителя.ToLower().Contains(searchString)) ||
                     (d.Марка_Машины != null && d.Марка_Машины.ToLower().Contains(searchString)) ||
                     (d.Регистрационный_Номер != null && d.Регистрационный_Номер.ToLower().Contains(searchString)) ||
-                    (d.Тип_ТС != null && d.Тип_ТС.ToLower().Contains(searchString))
-                );
+                    (d.Тип_ТС != null && d.Тип_ТС.ToLower().Contains(searchString)) ||
+                    d.дата_создания.ToString("dd.MM.yyyy").Contains(searchString)
+                ).ToList();
             }
 
-            return PartialView("_DocumentTableRows", await данные.ToListAsync());
+            ViewBag.SearchString = searchString;
+            return View("Index", данные);
         }
 
         [HttpGet]

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
-    options.UseMySQL(builder.Configuration.GetConnectionString("RemoteConnection") ?? "")
+    options.UseMySQL(builder.Configuration.GetConnectionString("LocalConnection") ?? "")
 );
 
 builder.Services.AddDistributedMemoryCache();
