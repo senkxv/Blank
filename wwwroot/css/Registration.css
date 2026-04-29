@@ -381,3 +381,16 @@ input:checked + .slider:before {
 input.error-border {
     border-color: red !important;
 }
+
+.error-summary {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgba(153, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.error-summary p {
+    color: #990000;
+    font-size: 12px;
+    margin: 5px 0;
+}
