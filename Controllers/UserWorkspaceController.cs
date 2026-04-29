@@ -20,6 +20,11 @@ namespace Blank.Controllers
             _context = context;
         }
 
+        public IActionResult Error()
+        {
+            return View();
+        }
+
         public IActionResult Index()
         {
             var данные = _context.Главная.ToList();

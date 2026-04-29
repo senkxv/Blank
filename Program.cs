@@ -25,7 +25,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/UserWorkspace/Index");
+    app.UseExceptionHandler("/UserWorkspace/Error");
     app.UseHsts();
 }
 
