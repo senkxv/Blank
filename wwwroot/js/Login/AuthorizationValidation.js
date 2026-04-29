@@ -1,30 +1,30 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('.main-section-form');
 
     document.querySelectorAll('.toggle-password').forEach(button => {
-        button.addEventListener('click', function () {
+        button.addEventListener('click', function() {
             const targetId = this.getAttribute('data-target');
             const input = document.getElementById(targetId);
             const svg = this.querySelector('svg');
 
-            if (input) {
+            if (input && svg) {
                 const isPassword = input.type === 'password';
 
                 if (isPassword) {
                     input.type = 'text';
                     svg.innerHTML = `
-                    <path d="M12 5C6 5 2.5 9.5 1 12C2.5 14.5 6 19 12 19C18 19 21.5 14.5 23 12C21.5 9.5 18 5 12 5Z" 
-                          stroke="#666" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                    <circle cx="12" cy="12" r="2.5" stroke="#666" stroke-width="1.5" fill="none"/>
-                    <line x1="3" y1="3" x2="21" y2="21" stroke="#990000" stroke-width="1.5" stroke-linecap="round"/>
-                `;
+                        <path d="M12 5C6 5 2.5 9.5 1 12C2.5 14.5 6 19 12 19C18 19 21.5 14.5 23 12C21.5 9.5 18 5 12 5Z" 
+                              stroke="#666" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                        <circle cx="12" cy="12" r="2.5" stroke="#666" stroke-width="1.5" fill="none"/>
+                    `;
                 } else {
                     input.type = 'password';
                     svg.innerHTML = `
-                    <path d="M12 5C6 5 2.5 9.5 1 12C2.5 14.5 6 19 12 19C18 19 21.5 14.5 23 12C21.5 9.5 18 5 12 5Z" 
-                          stroke="#666" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                    <circle cx="12" cy="12" r="2.5" stroke="#666" stroke-width="1.5" fill="none"/>
-                `;
+                        <path d="M12 5C6 5 2.5 9.5 1 12C2.5 14.5 6 19 12 19C18 19 21.5 14.5 23 12C21.5 9.5 18 5 12 5Z" 
+                              stroke="#666" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                        <circle cx="12" cy="12" r="2.5" stroke="#666" stroke-width="1.5" fill="none"/>
+                        <line x1="3" y1="3" x2="21" y2="21" stroke="#990000" stroke-width="1.5" stroke-linecap="round"/>
+                    `;
                 }
             }
         });
@@ -33,9 +33,9 @@
     function clearErrors() {
         document.querySelectorAll('.error-message').forEach(el => el.remove());
         document.querySelectorAll('input').forEach(input => {
-            input.classList.remove('error-border');
-            input.style.borderColor = '';
-        });
+        input.classList.remove('error-border');
+        input.style.borderColor = '';
+    });
     }
 
     function showError(inputId, message) {
@@ -54,7 +54,7 @@
         input.parentNode.insertBefore(error, input.nextSibling);
     }
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', function(e) {
         clearErrors();
 
         let isValid = true;
@@ -73,9 +73,9 @@
         if (password.value === '') {
             showError('Password', 'Введите пароль');
             isValid = false;
-        }
-        if (password.value < 8) {
-            showError('Password', 'Введите корректный пароль');
+        } else if (password.value.length < 8) {
+            showError('Password', 'Пароль должен быть не менее 8 символов');
+            isValid = false;
         }
 
         if (!isValid) {
