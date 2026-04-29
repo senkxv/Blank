@@ -5,7 +5,6 @@
     font-display: swap;
 }
 
-
 * {
     box-sizing: border-box;
 }
@@ -32,7 +31,6 @@ body {
     align-items: center;
 }
 
-/* Центрирование заголовка */
 header {
     text-align: center;
     width: 100%;
@@ -47,18 +45,18 @@ a {
     color: var(--dark-gray-color);
 }
 
-    a:hover {
-        color: var(--light-gray-color);
-    }
+a:hover {
+    color: var(--light-gray-color);
+}
 
 #registration-link {
     color: black;
     font-weight: bold;
 }
 
-    #registration-link:hover {
-        color: var(--dark-gray-color);
-    }
+#registration-link:hover {
+    color: var(--dark-gray-color);
+}
 
 .header-welcome-text {
     font-family: 'SN Pro', 'Comfortaa', sans-serif;
@@ -72,7 +70,6 @@ a {
     margin-top: 3vh;
 }
 
-/* Центрирование формы — такой же размер как у Registration */
 .form {
     border: 1px solid black;
     border-radius: 10px;
@@ -86,7 +83,6 @@ a {
     overflow: hidden;
 }
 
-/* Центрирование содержимого формы */
 .main-section-form {
     display: flex;
     flex-direction: column;
@@ -94,20 +90,19 @@ a {
     width: 100%;
 }
 
-    .main-section-form > label,
-    .main-section-form > input,
-    .main-section-form > div,
-    .main-section-form > ul {
-        width: 100%;
-        max-width: 600px;
-    }
+.main-section-form > label,
+.main-section-form > input,
+.main-section-form > div,
+.main-section-form > ul {
+    width: 100%;
+    max-width: 600px;
+}
 
 label {
     color: var(--dark-gray-color);
     align-self: flex-start;
 }
 
-/* Поля ввода — как в Registration */
 [type="password"], [type="text"], [type="email"] {
     max-width: 100%;
     min-width: 0;
@@ -121,7 +116,6 @@ label {
     font-size: 16px;
 }
 
-/* Кнопка — как в Registration */
 [type="submit"] {
     margin-top: 30px;
     border-radius: 10px;
@@ -137,9 +131,9 @@ label {
     padding: 0 30px;
 }
 
-    [type="submit"]:hover {
-        box-shadow: 0 0 0 2px white, 0 0 0 4px black;
-    }
+[type="submit"]:hover {
+    box-shadow: 0 0 0 2px white, 0 0 0 4px black;
+}
 
 .form-list-password {
     position: relative;
@@ -162,68 +156,6 @@ label {
     transform: scale(1.1);
 }
 
-/* ===== СВИТЧ (переключатель) ===== */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 28px;
-}
-
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
-}
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 20px;
-        width: 20px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
-
-input:checked + .slider {
-    background-color: black;
-}
-
-    input:checked + .slider:before {
-        transform: translateX(32px);
-    }
-
-.common-switch, [for="switch"] {
-    float: right;
-    margin-top: -40px;
-}
-
-[for="switch"] {
-    margin-right: 70px;
-    color: var(--dark-color);
-}
-/* =============================== */
-
-/*
-    АДАПТИВ
-*/
-
-/* 1024px - ноутбуки */
 @media (max-width: 1024px) {
     .form {
         max-width: 300px;
@@ -233,7 +165,6 @@ input:checked + .slider {
     }
 }
 
-/* 768px - планшеты */
 @media (max-width: 768px) {
     .header-welcome-text {
         font-size: 32px;
@@ -275,7 +206,6 @@ input:checked + .slider {
     }
 }
 
-/* 550px - исправление выезжания полей */
 @media (max-width: 550px) {
     .form {
         padding: 15px 20px;
@@ -323,7 +253,6 @@ input:checked + .slider {
     }
 }
 
-/* 480px - телефоны */
 @media (max-width: 480px) {
     .header-welcome-text {
         font-size: 24px;
@@ -359,7 +288,6 @@ input:checked + .slider {
     }
 }
 
-/* 375px - маленькие телефоны */
 @media (max-width: 375px) {
     .header-welcome-text {
         font-size: 20px;
