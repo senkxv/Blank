@@ -3,6 +3,7 @@
 @{
     Layout = null;
 }
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -29,7 +30,6 @@
                 <form method="post" asp-action="Authorization" asp-controller="Login" class="main-section-form">
                     @Html.AntiForgeryToken()
 
-                    <!-- Блок для вывода общих ошибок -->
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <label for="Email">Электронная почта</label>
