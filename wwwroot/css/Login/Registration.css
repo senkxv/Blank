@@ -36,7 +36,8 @@ header {
 
 .has-account {
     text-align: center;
-    margin-top: 0px;
+    margin-top: -20px;
+    padding-bottom: 10px;
 }
 
 a {
@@ -238,6 +239,7 @@ input:checked + .slider:before {
 
     .has-account {
         font-size: 14px;
+        
     }
 
     .form {
