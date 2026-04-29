@@ -15,7 +15,6 @@ namespace Blank.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Настройка для представления
             modelBuilder.Entity<MainPage>(entity =>
             {
                 entity.HasNoKey();

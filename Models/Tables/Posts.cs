@@ -13,6 +13,6 @@ namespace Blank.Models.Tables
 
         [Column("наименование")]
         [MaxLength(100)]
-        public string наименование { get; set; }
+        public string? наименование { get; set; }
     }
 }

@@ -17,10 +17,10 @@ namespace Blank.Models.Tables
         public int ид_товара { get; set; }
 
         [Column("количество")]
-        public double количество { get; set; }  // не nullable
+        public double количество { get; set; } 
 
         [Column("цена_за_единицу")]
-        public decimal цена_за_единицу { get; set; }  // не nullable
+        public decimal цена_за_единицу { get; set; }
 
         [Column("ставка_ндс")]
         public decimal? ставка_ндс { get; set; }

@@ -14,16 +14,16 @@ namespace Blank.Models.Tables
         [Column("код_товара")]
         [Required]
         [MaxLength(45)]
-        public string код_товара { get; set; }
+        public string? код_товара { get; set; }
 
         [Column("наименование")]
         [Required]
         [MaxLength(255)]
-        public string наименование { get; set; }
+        public string? наименование { get; set; }
 
         [Column("единицы_измерения")]
         [Required]
         [MaxLength(45)]
-        public string единицы_измерения { get; set; }
+        public string? единицы_измерения { get; set; }
     }
 }

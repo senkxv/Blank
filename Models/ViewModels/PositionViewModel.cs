@@ -30,6 +30,6 @@ namespace Blank.Models.ViewModels
         public int packages { get; set; }
 
         [MaxLength(500, ErrorMessage = "Примечание не более 500 символов")]
-        public string note { get; set; }
+        public string? note { get; set; }
     }
 }

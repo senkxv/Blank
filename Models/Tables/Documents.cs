@@ -17,7 +17,7 @@ namespace Blank.Models.Tables
         [Column("номер_документа")]
         [Required]
         [MaxLength(255)]
-        public string номер_документа { get; set; }
+        public string? номер_документа { get; set; }
 
         [Column("дата_создания")]
         [Required]

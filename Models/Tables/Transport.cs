@@ -14,7 +14,7 @@ namespace Blank.Models.Tables
         [Column("регистрационный_номер")]
         [Required]
         [MaxLength(100)]
-        public string регистрационный_номер { get; set; }
+        public string? регистрационный_номер { get; set; }
 
         [Column("ид_типа_транспорта")]
         [Required]
@@ -25,9 +25,9 @@ namespace Blank.Models.Tables
         public int ид_марки { get; set; }
 
         [ForeignKey("ид_типа_транспорта")]
-        public virtual Transport_Type Тип_Транспорта { get; set; }
+        public virtual Transport_Type? Тип_Транспорта { get; set; }
 
         [ForeignKey("ид_марки")]
-        public virtual Transport_Mark Марка_Транспорта { get; set; }
+        public virtual Transport_Mark? Марка_Транспорта { get; set; }
     }
 }
