@@ -20,14 +20,13 @@ namespace Blank.Controllers
             _context = context;
         }
 
-        // Главная страница с таблицей документов
         public IActionResult Index()
         {
             var данные = _context.Главная.ToList();
             return View(данные);
         }
 
-        // GET: /UserWorkspace/CreateDocumentPage
+        [HttpGet]
         public IActionResult CreateDocumentPage()
         {
             ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
@@ -41,7 +40,6 @@ namespace Blank.Controllers
             return View();
         }
 
-        // POST: /UserWorkspace/CreateDocumentPage
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateDocumentPage(Documents document, string positionsData)
@@ -57,7 +55,6 @@ namespace Blank.Controllers
                 await _context.SaveChangesAsync();
 
                 int documentId = document.ид_документа;
-                Console.WriteLine($"Документ сохранен с ID: {documentId}");
 
                 int positionsSavedCount = 0;
 
@@ -73,7 +70,6 @@ namespace Blank.Controllers
                             {
                                 if (pos.goodsId <= 0 || pos.quantity <= 0 || pos.price <= 0)
                                 {
-                                    Console.WriteLine($"Пропущена позиция: goodsId={pos.goodsId}, quantity={pos.quantity}, price={pos.price}");
                                     continue;
                                 }
 
@@ -99,23 +95,16 @@ namespace Blank.Controllers
 
                                 _context.Позиции.Add(position);
                                 positionsSavedCount++;
-                                Console.WriteLine($"Добавлена позиция: товар={pos.goodsId}, кол-во={pos.quantity}, цена={pos.price}, НДС={pos.vatRate}%");
                             }
 
                             if (positionsSavedCount > 0)
                             {
                                 await _context.SaveChangesAsync();
-                                Console.WriteLine($"Сохранено позиций: {positionsSavedCount}");
-                            }
-                            else
-                            {
-                                Console.WriteLine("Нет валидных позиций для сохранения");
                             }
                         }
                     }
                     catch (JsonException ex)
                     {
-                        Console.WriteLine($"Ошибка десериализации JSON: {ex.Message}");
                         ModelState.AddModelError("", "Ошибка при обработке данных товаров");
                     }
                 }
@@ -125,8 +114,6 @@ namespace Blank.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Критическая ошибка: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 ModelState.AddModelError("", $"Ошибка при сохранении: {ex.Message}");
             }
 
@@ -141,7 +128,7 @@ namespace Blank.Controllers
             return View(document);
         }
 
-        // GET: /UserWorkspace/EditDocumentPage/5
+        [HttpGet]
         public IActionResult EditDocumentPage(int id)
         {
             var document = _context.Документы.Find(id);
@@ -185,7 +172,6 @@ namespace Blank.Controllers
             return View(document);
         }
 
-        // POST: /UserWorkspace/EditDocumentPage
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditDocumentPage(int id, Documents document, string positionsData, string deletedPositions)
@@ -197,21 +183,17 @@ namespace Blank.Controllers
 
             try
             {
-                // Обновляем основной документ
                 _context.Update(document);
                 await _context.SaveChangesAsync();
 
-                // Удаляем отмеченные позиции
                 if (!string.IsNullOrEmpty(deletedPositions))
                 {
                     var deletedIds = deletedPositions.Split(',').Select(int.Parse).ToList();
                     var toDelete = _context.Позиции.Where(p => deletedIds.Contains(p.ид_позиции));
                     _context.Позиции.RemoveRange(toDelete);
                     await _context.SaveChangesAsync();
-                    Console.WriteLine($"Удалено позиций: {toDelete.Count()}");
                 }
 
-                // Сохраняем/обновляем позиции
                 if (!string.IsNullOrEmpty(positionsData))
                 {
                     var positions = JsonSerializer.Deserialize<List<PositionViewModel>>(positionsData);
@@ -221,7 +203,6 @@ namespace Blank.Controllers
 
                         foreach (var pos in positions)
                         {
-                            // Пропускаем пустые строки
                             if (pos.goodsId <= 0 || pos.quantity <= 0 || pos.price <= 0)
                             {
                                 continue;
@@ -234,7 +215,6 @@ namespace Blank.Controllers
 
                             if (pos.id > 0)
                             {
-                                // Обновляем существующую позицию
                                 var existing = await _context.Позиции.FindAsync(pos.id);
                                 if (existing != null)
                                 {
@@ -253,7 +233,6 @@ namespace Blank.Controllers
                             }
                             else
                             {
-                                // Добавляем новую позицию
                                 var newPos = new Positions
                                 {
                                     ид_документа = document.ид_документа,
@@ -274,7 +253,6 @@ namespace Blank.Controllers
                         }
 
                         await _context.SaveChangesAsync();
-                        Console.WriteLine($"Сохранено/обновлено позиций: {savedCount}");
                     }
                 }
 
@@ -283,11 +261,9 @@ namespace Blank.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при редактировании: {ex.Message}");
                 ModelState.AddModelError("", $"Ошибка при сохранении: {ex.Message}");
             }
 
-            // Если ошибка - перезагружаем ViewBag
             ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
             ViewBag.Organizations = _context.Организации.ToList();
             ViewBag.Drivers = _context.Водители.ToList();
@@ -298,54 +274,42 @@ namespace Blank.Controllers
 
             return View(document);
         }
-        // GET: /UserWorkspace/DeleteDocument/5
+
+        [HttpGet]
         public async Task<IActionResult> DeleteDocument(int id)
         {
             try
             {
-                Console.WriteLine($"=== УДАЛЕНИЕ ДОКУМЕНТА ID: {id} ===");
-
-                // Находим документ
                 var документ = await _context.Документы.FindAsync(id);
                 if (документ == null)
                 {
-                    Console.WriteLine($"Документ с ID {id} не найден");
                     TempData["Error"] = $"Документ с ID {id} не найден";
                     return RedirectToAction("Index");
                 }
 
-                Console.WriteLine($"Документ найден: №{документ.номер_документа}");
-
-                // Находим и удаляем связанные позиции
                 var позиции = await _context.Позиции.Where(p => p.ид_документа == id).ToListAsync();
                 int позицииCount = позиции.Count;
-                Console.WriteLine($"Найдено позиций для удаления: {позицииCount}");
 
                 if (позиции.Any())
                 {
                     _context.Позиции.RemoveRange(позиции);
                     await _context.SaveChangesAsync();
-                    Console.WriteLine($"Удалено позиций: {позицииCount}");
                 }
 
-                // Удаляем сам документ
                 _context.Документы.Remove(документ);
                 await _context.SaveChangesAsync();
-                Console.WriteLine($"Документ {id} успешно удален");
 
                 TempData["Success"] = $"Документ №{документ.номер_документа} успешно удален вместе с {позицииCount} позициями";
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при удалении: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 TempData["Error"] = $"Ошибка при удалении: {ex.Message}";
             }
 
             return RedirectToAction("Index");
         }
 
-        // GET: /UserWorkspace/ExportAllToExcel
+        [HttpGet]
         public IActionResult ExportAllToExcel()
         {
             using (var package = new ExcelPackage())
@@ -396,7 +360,7 @@ namespace Blank.Controllers
             }
         }
 
-        // GET: /UserWorkspace/Search
+        [HttpGet]
         public IActionResult Search(string searchString)
         {
             var данные = _context.Главная.AsQueryable();
@@ -420,7 +384,7 @@ namespace Blank.Controllers
             return View("Index", данные.ToList());
         }
 
-        // GET: /UserWorkspace/PrintDocument/5
+        [HttpGet]
         public async Task<IActionResult> PrintDocument(int id)
         {
             var документ = await _context.Документы
@@ -478,19 +442,20 @@ namespace Blank.Controllers
                 totalPackages += pos.грузовых_мест ?? 0;
 
                 goodsHtml.AppendLine($@"
-            <tr class=""goods-row"">
-                <td>{pos.Товар?.наименование ?? ""}</td>
-                <td class=""center"">{pos.Товар?.единицы_измерения ?? ""}</td>
-                <td class=""right"">{pos.количество:F3}</td>
-                <td class=""right"">{pos.цена_за_единицу:F2}</td>
-                <td class=""right"">{cost:F2}</td>
-                <td class=""center"">{pos.ставка_ндс ?? 0}</td>
-                <td class=""right"">{vatAmount:F2}</td>
-                <td class=""right"">{cost + vatAmount:F2}</td>
-                <td class=""right"">{pos.грузовых_мест ?? 0}</td>
-                <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
-                <td class=""right"">{pos.примечание ?? ""}</td>
-            </tr>");
+                    <tr class=""goods-row"">
+                        <td>{pos.Товар?.наименование ?? ""}</td>
+                        <td class=""center"">{pos.Товар?.единицы_измерения ?? ""}</td>
+                        <td class=""right"">{pos.количество:F3}</td>
+                        <td class=""right"">{pos.цена_за_единицу:F2}</td>
+                        <td class=""right"">{cost:F2}</td>
+                        <td class=""center"">{pos.ставка_ндс ?? 0}</td>
+                        <td class=""right"">{vatAmount:F2}</td>
+                        <td class=""right"">{cost + vatAmount:F2}</td>
+                        <td class=""right"">{pos.грузовых_мест ?? 0}</td>
+                        <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
+                        <td class=""right"">{pos.примечание ?? ""}</td>
+                    </tr>"
+                );
             }
 
             var html = htmlTemplate
@@ -546,12 +511,11 @@ namespace Blank.Controllers
             return File(pdfBytes, "application/pdf", $"ТТН_{документ.номер_документа}.pdf");
         }
 
-        // GET: /UserWorkspace/PreviewDocument/5
+        [HttpGet]
         public async Task<IActionResult> PreviewDocument(int id)
         {
             try
             {
-                // 1. Загружаем документ
                 var документ = await _context.Документы
                     .FirstOrDefaultAsync(d => d.ид_документа == id);
 
@@ -560,26 +524,26 @@ namespace Blank.Controllers
                     return Content($"Документ с ID {id} не найден", "text/html");
                 }
 
-                // 2. Загружаем позиции через RAW SQL
                 var позиции = new List<dynamic>();
 
                 using (var command = _context.Database.GetDbConnection().CreateCommand())
                 {
                     command.CommandText = @"
-                SELECT 
-                    p.ид_позиции,
-                    p.ид_товара,
-                    IFNULL(p.количество, 0) as количество,
-                    IFNULL(p.цена_за_единицу, 0) as цена_за_единицу,
-                    p.ставка_ндс,
-                    p.масса_груза,
-                    p.грузовых_мест,
-                    p.примечание,
-                    g.наименование as товар_наименование,
-                    g.единицы_измерения
-                FROM Позиции p
-                LEFT JOIN Товары g ON p.ид_товара = g.ид_товара
-                WHERE p.ид_документа = @id";
+                        SELECT 
+                            p.ид_позиции,
+                            p.ид_товара,
+                            IFNULL(p.количество, 0) as количество,
+                            IFNULL(p.цена_за_единицу, 0) as цена_за_единицу,
+                            p.ставка_ндс,
+                            p.масса_груза,
+                            p.грузовых_мест,
+                            p.примечание,
+                            g.наименование as товар_наименование,
+                            g.единицы_измерения
+                        FROM Позиции p
+                        LEFT JOIN Товары g ON p.ид_товара = g.ид_товара
+                        WHERE p.ид_документа = @id"
+                    ;
 
                     var param = command.CreateParameter();
                     param.ParameterName = "@id";
@@ -609,7 +573,6 @@ namespace Blank.Controllers
                     }
                 }
 
-                // 3. Загружаем связанные данные
                 var грузоотправитель = await _context.Организации
                     .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_грузоотправителя);
                 var грузополучатель = await _context.Организации
@@ -627,8 +590,6 @@ namespace Blank.Controllers
                 var типДокумента = await _context.Типы_Документов
                     .FirstOrDefaultAsync(t => t.ид_типа == документ.ид_типа);
 
-
-                // 5. Вычисляем итоги и генерируем HTML для товаров
                 var goodsHtml = new StringBuilder();
                 decimal totalQuantity = 0, totalCost = 0, totalVat = 0, totalWeight = 0;
                 int totalPackages = 0;
@@ -648,168 +609,169 @@ namespace Blank.Controllers
                     totalPackages += pos.грузовых_мест ?? 0;
 
                     goodsHtml.AppendLine($@"
-                <tr class=""goods-row"">
-                    <td>{pos.товар_наименование}</td>
-                    <td class=""center"">{pos.единицы_измерения}</td>
-                    <td class=""right"">{pos.количество:F3}</td>
-                    <td class=""right"">{pos.цена_за_единицу:F2}</td>
-                    <td class=""right"">{cost:F2}</td>
-                    <td class=""center"">{vatRate}</td>
-                    <td class=""right"">{vatAmount:F2}</td>
-                    <td class=""right"">{totalWithVat:F2}</td>
-                    <td class=""right"">{pos.грузовых_мест ?? 0}</td>
-                    <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
-                    <td class=""right"">{pos.примечание ?? ""}</td>
-                </tr>");
+                        <tr class=""goods-row"">
+                            <td>{pos.товар_наименование}</td>
+                            <td class=""center"">{pos.единицы_измерения}</td>
+                            <td class=""right"">{pos.количество:F3}</td>
+                            <td class=""right"">{pos.цена_за_единицу:F2}</td>
+                            <td class=""right"">{cost:F2}</td>
+                            <td class=""center"">{vatRate}</td>
+                            <td class=""right"">{vatAmount:F2}</td>
+                            <td class=""right"">{totalWithVat:F2}</td>
+                            <td class=""right"">{pos.грузовых_мест ?? 0}</td>
+                            <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
+                            <td class=""right"">{pos.примечание ?? ""}</td>
+                        </tr>"
+                    );
                 }
 
-                // 6. Генерируем финальный HTML
                 var html = $@"
-<!DOCTYPE html>
-<html lang='ru'>
-<head>
-    <meta charset='UTF-8'>
-    <title>ТТН {документ.номер_документа}</title>
-    <style>
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        body {{ font-family: 'Times New Roman', Times, serif; font-size: 9pt; margin: 10mm auto; width: 210mm; background: white; }}
-        .main-table {{ width: 100%; border-collapse: collapse; margin-bottom: 5px; }}
-        .main-table td, .main-table th {{ border: none; padding: 3px 5px; vertical-align: top; }}
-        .goods-table {{ width: 100%; border-collapse: collapse; font-size: 8pt; margin: 5px 0; }}
-        .goods-table th, .goods-table td {{ border: 1px solid black; padding: 4px 3px; vertical-align: top; }}
-        .goods-table th {{ background-color: #f5f5f5; font-weight: bold; text-align: center; }}
-        .right {{ text-align: right; }}
-        .center {{ text-align: center; }}
-        .bold {{ font-weight: bold; }}
-        .section-title {{ font-weight: bold; margin: 8px 0 4px; font-size: 10pt; }}
-        @@media print {{ body {{ margin: 0; }} .no-print {{ display: none; }} }}
-    </style>
-</head>
-<body>
-    <div style='text-align: center; margin-bottom: 10px;'>
-        <div style='font-size: 14pt; font-weight: bold;'>ТОВАРНО-ТРАНСПОРТНАЯ НАКЛАДНАЯ</div>
-        <div>(ТТН-1) от «{документ.дата_создания:dd.MM.yyyy}» № {документ.номер_документа}</div>
-    </div>
+                    <!DOCTYPE html>
+                    <html lang='ru'>
+                    <head>
+                        <meta charset='UTF-8'>
+                        <title>ТТН {документ.номер_документа}</title>
+                        <style>
+                            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                            body {{ font-family: 'Times New Roman', Times, serif; font-size: 9pt; margin: 10mm auto; width: 210mm; background: white; }}
+                            .main-table {{ width: 100%; border-collapse: collapse; margin-bottom: 5px; }}
+                            .main-table td, .main-table th {{ border: none; padding: 3px 5px; vertical-align: top; }}
+                            .goods-table {{ width: 100%; border-collapse: collapse; font-size: 8pt; margin: 5px 0; }}
+                            .goods-table th, .goods-table td {{ border: 1px solid black; padding: 4px 3px; vertical-align: top; }}
+                            .goods-table th {{ background-color: #f5f5f5; font-weight: bold; text-align: center; }}
+                            .right {{ text-align: right; }}
+                            .center {{ text-align: center; }}
+                            .bold {{ font-weight: bold; }}
+                            .section-title {{ font-weight: bold; margin: 8px 0 4px; font-size: 10pt; }}
+                            @@media print {{ body {{ margin: 0; }} .no-print {{ display: none; }} }}
+                        </style>
+                    </head>
+                    <body>
+                        <div style='text-align: center; margin-bottom: 10px;'>
+                            <div style='font-size: 14pt; font-weight: bold;'>ТОВАРНО-ТРАНСПОРТНАЯ НАКЛАДНАЯ</div>
+                            <div>(ТТН-1) от «{документ.дата_создания:dd.MM.yyyy}» № {документ.номер_документа}</div>
+                        </div>
 
-    <table class='main-table'>
-        <tr>
-            <td style='width:33%; font-weight:bold;'>Грузоотправитель</td>
-            <td style='width:33%; font-weight:bold;'>Грузополучатель</td>
-            <td style='width:34%; font-weight:bold;'>Заказчик (плательщик)</td>
-        </tr>
-        <tr>
-            <td>{грузоотправитель?.название ?? "Не указан"}</td>
-            <td>{грузополучатель?.название ?? "Не указан"}</td>
-            <td>{перевозчик?.название ?? "Не указан"}</td>
-        </tr>
-        <tr>
-            <td>УНП: {грузоотправитель?.унн ?? ""}</td>
-            <td>УНП: {грузополучатель?.унн ?? ""}</td>
-            <td>УНП: {перевозчик?.унн ?? ""}</td>
-        </tr>
-        <tr>
-            <td>Адрес: {грузоотправитель?.адрес ?? ""}</td>
-            <td>Адрес: {грузополучатель?.адрес ?? ""}</td>
-            <td>Адрес: {перевозчик?.адрес ?? ""}</td>
-        </tr>
-    </table>
+                        <table class='main-table'>
+                            <tr>
+                                <td style='width:33%; font-weight:bold;'>Грузоотправитель</td>
+                                <td style='width:33%; font-weight:bold;'>Грузополучатель</td>
+                                <td style='width:34%; font-weight:bold;'>Заказчик (плательщик)</td>
+                            </tr>
+                            <tr>
+                                <td>{грузоотправитель?.название ?? "Не указан"}</td>
+                                <td>{грузополучатель?.название ?? "Не указан"}</td>
+                                <td>{перевозчик?.название ?? "Не указан"}</td>
+                            </tr>
+                            <tr>
+                                <td>УНП: {грузоотправитель?.унн ?? ""}</td>
+                                <td>УНП: {грузополучатель?.унн ?? ""}</td>
+                                <td>УНП: {перевозчик?.унн ?? ""}</td>
+                            </tr>
+                            <tr>
+                                <td>Адрес: {грузоотправитель?.адрес ?? ""}</td>
+                                <td>Адрес: {грузополучатель?.адрес ?? ""}</td>
+                                <td>Адрес: {перевозчик?.адрес ?? ""}</td>
+                            </tr>
+                        </table>
 
-    <table class='main-table'>
-        <tr>
-            <td><strong>Автомобиль:</strong>  {транспорт?.регистрационный_номер ?? ""}</td>
-            <td><strong>Прицеп:</strong> {0}</td>
-        </tr>
-        <tr>
-            <td><strong>Водитель:</strong> {водитель?.фамилия} {водитель?.имя} {водитель?.отчество}</td>
-            <td><strong>Лицензия:</strong> {водитель?.номер_лицензии ?? ""}</td>
-        </tr>
-    </table>
+                        <table class='main-table'>
+                            <tr>
+                                <td><strong>Автомобиль:</strong>  {транспорт?.регистрационный_номер ?? ""}</td>
+                                <td><strong>Прицеп:</strong> {0}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Водитель:</strong> {водитель?.фамилия} {водитель?.имя} {водитель?.отчество}</td>
+                                <td><strong>Лицензия:</strong> {водитель?.номер_лицензии ?? ""}</td>
+                            </tr>
+                        </table>
 
-    <table class='main-table'>
-        <tr>
-            <td><strong>Пункт погрузки:</strong> {пунктПогрузки?.наименование ?? ""}</td>
-            <td><strong>Пункт разгрузки:</strong> {пунктРазгрузки?.наименование ?? ""}</td>
-        </tr>
-        <tr>
-            <td><strong>Адрес погрузки:</strong> </td>
-            <td><strong>Адрес разгрузки:</strong> </td>
-        </tr>
-    </table>
+                        <table class='main-table'>
+                            <tr>
+                                <td><strong>Пункт погрузки:</strong> {пунктПогрузки?.наименование ?? ""}</td>
+                                <td><strong>Пункт разгрузки:</strong> {пунктРазгрузки?.наименование ?? ""}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Адрес погрузки:</strong> </td>
+                                <td><strong>Адрес разгрузки:</strong> </td>
+                            </tr>
+                        </table>
 
-    <div class='section-title'>I. ТОВАРНЫЙ РАЗДЕЛ</div>
+                        <div class='section-title'>I. ТОВАРНЫЙ РАЗДЕЛ</div>
     
-    <table class='goods-table'>
-        <thead>
-            <tr>
-                <th style='width:22%'>Наименование товара</th>
-                <th style='width:8%'>Ед. изм.</th>
-                <th style='width:8%'>Кол-во</th>
-                <th style='width:9%'>Цена, руб.</th>
-                <th style='width:10%'>Стоимость, руб.</th>
-                <th style='width:7%'>НДС, %</th>
-                <th style='width:10%'>Сумма НДС, руб.</th>
-                <th style='width:10%'>Стоимость с НДС, руб.</th>
-                <th style='width:6%'>Груз. мест</th>
-                <th style='width:5%'>Масса, кг</th>
-                <th style='width:5%'>Примечание</th>
-            </tr>
-        </thead>
-        <tbody>
-            {goodsHtml.ToString()}
-            <tr style='border-top: double black; font-weight: bold;'>
-                <td colspan='2'>ИТОГО</td>
-                <td class='right'>{totalQuantity:F3}</td>
-                <td class='right'>x</td>
-                <td class='right'>{totalCost:F2}</td>
-                <td class='center'>x</td>
-                <td class='right'>{totalVat:F2}</td>
-                <td class='right'>{(totalCost + totalVat):F2}</td>
-                <td class='right'>{totalPackages}</td>
-                <td class='right'>{totalWeight:F3}</td>
-                <td class='right'>x</td>
-            </tr>
-        </tbody>
-    </table>
+                        <table class='goods-table'>
+                            <thead>
+                                <tr>
+                                    <th style='width:22%'>Наименование товара</th>
+                                    <th style='width:8%'>Ед. изм.</th>
+                                    <th style='width:8%'>Кол-во</th>
+                                    <th style='width:9%'>Цена, руб.</th>
+                                    <th style='width:10%'>Стоимость, руб.</th>
+                                    <th style='width:7%'>НДС, %</th>
+                                    <th style='width:10%'>Сумма НДС, руб.</th>
+                                    <th style='width:10%'>Стоимость с НДС, руб.</th>
+                                    <th style='width:6%'>Груз. мест</th>
+                                    <th style='width:5%'>Масса, кг</th>
+                                    <th style='width:5%'>Примечание</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {goodsHtml.ToString()}
+                                <tr style='border-top: double black; font-weight: bold;'>
+                                    <td colspan='2'>ИТОГО</td>
+                                    <td class='right'>{totalQuantity:F3}</td>
+                                    <td class='right'>x</td>
+                                    <td class='right'>{totalCost:F2}</td>
+                                    <td class='center'>x</td>
+                                    <td class='right'>{totalVat:F2}</td>
+                                    <td class='right'>{(totalCost + totalVat):F2}</td>
+                                    <td class='right'>{totalPackages}</td>
+                                    <td class='right'>{totalWeight:F3}</td>
+                                    <td class='right'>x</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-    <table class='main-table'>
-        <tr>
-            <td style='width:50%'>Всего сумма НДС: {NumToTextHelper.SumInWords(totalVat)}</td>
-            <td style='width:50%'>Всего стоимость с НДС: {NumToTextHelper.SumInWords(totalCost + totalVat)}</td>
-        </tr>
-        <tr>
-            <td>Всего масса груза: {NumToTextHelper.WeightInWords(totalWeight)}</td>
-            <td>Всего грузовых мест: {NumToTextHelper.PackagesInWords(totalPackages)}</td>
-        </tr>
-    </table>
+                        <table class='main-table'>
+                            <tr>
+                                <td style='width:50%'>Всего сумма НДС: {NumToTextHelper.SumInWords(totalVat)}</td>
+                                <td style='width:50%'>Всего стоимость с НДС: {NumToTextHelper.SumInWords(totalCost + totalVat)}</td>
+                            </tr>
+                            <tr>
+                                <td>Всего масса груза: {NumToTextHelper.WeightInWords(totalWeight)}</td>
+                                <td>Всего грузовых мест: {NumToTextHelper.PackagesInWords(totalPackages)}</td>
+                            </tr>
+                        </table>
 
-    <table class='main-table' style='margin-top: 12px;'>
-        <tr>
-            <td style='width:33%'>Отпуск разрешил:<br><br><br></td>
-            <td style='width:33%'>Товар к перевозке принял:<br><br><br></td>
-            <td style='width:34%'>Сдал грузоотправитель:<br><br><br></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>№ пломбы:</td>
-            <td>по доверенности № от</td>
-        </tr>
-    </table>
+                        <table class='main-table' style='margin-top: 12px;'>
+                            <tr>
+                                <td style='width:33%'>Отпуск разрешил:<br><br><br></td>
+                                <td style='width:33%'>Товар к перевозке принял:<br><br><br></td>
+                                <td style='width:34%'>Сдал грузоотправитель:<br><br><br></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>№ пломбы:</td>
+                                <td>по доверенности № от</td>
+                            </tr>
+                        </table>
 
-    <div class='section-title'>III. ПРОЧИЕ СВЕДЕНИЯ (заполняются перевозчиком)</div>
-    <table class='main-table'>
-        <tr>
-            <td style='width:33%'>Расстояние перевозки: км</td>
-            <td style='width:33%'>Основной тариф: руб.</td>
-            <td style='width:34%'>К оплате: руб.</td>
-        </tr>
-    </table>
+                        <div class='section-title'>III. ПРОЧИЕ СВЕДЕНИЯ (заполняются перевозчиком)</div>
+                        <table class='main-table'>
+                            <tr>
+                                <td style='width:33%'>Расстояние перевозки: км</td>
+                                <td style='width:33%'>Основной тариф: руб.</td>
+                                <td style='width:34%'>К оплате: руб.</td>
+                            </tr>
+                        </table>
 
-    <div style='margin-top: 20px; text-align: center;' class='no-print'>
-        <button onclick='window.print()'>Печать</button>
-        <button onclick='window.close()'>Закрыть</button>
-    </div>
-</body>
-</html>";
+                        <div style='margin-top: 20px; text-align: center;' class='no-print'>
+                            <button onclick='window.print()'>Печать</button>
+                            <button onclick='window.close()'>Закрыть</button>
+                        </div>
+                    </body>
+                    </html>"
+                ;
 
                 return Content(html, "text/html");
             }
