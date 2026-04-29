@@ -25,9 +25,23 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/UserWorkspace/Error");
+    app.UseExceptionHandler("/UserWorkspace/Error500");
     app.UseHsts();
 }
+
+app.UseStatusCodePages(async context =>
+{
+    var response = context.HttpContext.Response;
+
+    if (response.StatusCode == 404)
+    {
+        response.Redirect("/UserWorkspace/Error404");
+    }
+    else if (response.StatusCode == 500)
+    {
+        response.Redirect("/UserWorkspace/Error500");
+    }
+});
 
 app.UseHttpsRedirection();
 app.UseRouting();

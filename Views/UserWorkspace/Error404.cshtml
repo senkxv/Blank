@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>@ViewData["Title"] - Ошибка сервера</title>
-    <link rel="stylesheet" href="/css/UserWorkspace/Error.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/UserWorkspace/Error404.css" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@
                 </svg>
             </div>
 
-            <h1 class="error-code">500</h1>
+            <h1 class="error-code">404</h1>
             <h2 class="error-title">Упс... Что-то пошло не так...</h2>
             
             <p class="error-message">
@@ -65,19 +65,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-            function toggleDetails() {
-                const details = document.getElementById('errorDetails');
-                const btn = event.target;
-                if (details.style.display === 'none') {
-                    details.style.display = 'block';
-                    btn.textContent = 'Скрыть детали';
-                } else {
-                    details.style.display = 'none';
-                    btn.textContent = 'Показать детали';
-                }
-            }
-    </script>
 </body>
 </html>
