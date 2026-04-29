@@ -22,7 +22,6 @@
 <body>
     <header>
         <p class="header-welcome-text">Добро пожаловать! Регистрация</p>
-        <p class="has-account">У вас уже есть аккаунт? <a id="registration-link" href="/Login/Authorization">Войти</a></p>
     </header>
 
     <main>
@@ -31,6 +30,8 @@
                 <form method="post" asp-action="Registration" asp-controller="Login" class="main-section-form">
                     @Html.AntiForgeryToken()
                     
+                    <p class="has-account">У вас уже есть аккаунт? <a id="registration-link" href="/Login/Authorization">Войти</a></p>
+
                     <div class="admin-row">
                         <label for="switch">Режим администратора</label>
                         <div id="switch" class="common-switch">

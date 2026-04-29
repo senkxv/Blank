@@ -23,7 +23,6 @@
 <body>
     <header>
         <p class="header-welcome-text">Авторизация пользователя</p>
-        <p>Хотите создать аккаунт? <a id="registration-link" href="/Login/Registration">Зарегистрироваться</a></p>
     </header>
     
     <main>
@@ -31,6 +30,8 @@
             <div class="form">
                 <form method="post" asp-controller="Login" asp-action="Authorization" class="main-section-form">
                     @Html.AntiForgeryToken()
+
+                    <p class="has-account">Хотите создать аккаунт? <a id="registration-link" href="/Login/Registration">Зарегистрироваться</a></p>
 
                     @if (!ViewData.ModelState.IsValid)
                     {
