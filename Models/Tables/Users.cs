@@ -37,7 +37,7 @@ namespace Blank.Models.Tables
 
         [Column("активность")]
         [MaxLength(1)]
-        public string? активность { get; set; }
+        public bool активность { get; set; }
 
         [Column("ид_организации")]
         public int? ид_организации { get; set; }
