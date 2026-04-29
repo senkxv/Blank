@@ -41,7 +41,7 @@ namespace Blank.Controllers
                 var user = await _context.Пользователи
                     .FirstOrDefaultAsync(u => u.почта == model.Email);
 
-                if (user != null && HashPassword(model.Password) == user.хэш_пароль)
+                if (user != null && HashPassword(model.Password ?? "") == user.хэш_пароль)
                 {
                     HttpContext.Session.SetString("UserId", user.ид_пользователя.ToString());
                     HttpContext.Session.SetString("UserEmail", user.почта);

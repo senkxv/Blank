@@ -13,12 +13,12 @@ namespace Blank.Models.Tables
         [Column("почта")]
         [Required]
         [MaxLength(150)]
-        public string почта { get; set; }
+        public string? почта { get; set; }
 
         [Column("хэш_пароль")]
         [Required]
         [MaxLength(255)]
-        public string хэш_пароль { get; set; }
+        public string? хэш_пароль { get; set; }
 
         [Column("фамилия")]
         [MaxLength(100)]
