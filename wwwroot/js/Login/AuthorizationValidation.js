@@ -12,7 +12,6 @@
 
                 if (isPassword) {
                     input.type = 'text';
-                    // Рисуем перечёркнутый глаз
                     svg.innerHTML = `
                     <path d="M12 5C6 5 2.5 9.5 1 12C2.5 14.5 6 19 12 19C18 19 21.5 14.5 23 12C21.5 9.5 18 5 12 5Z" 
                           stroke="#666" stroke-width="1.5" fill="none" stroke-linecap="round"/>
@@ -21,7 +20,6 @@
                 `;
                 } else {
                     input.type = 'password';
-                    // Обычный глаз
                     svg.innerHTML = `
                     <path d="M12 5C6 5 2.5 9.5 1 12C2.5 14.5 6 19 12 19C18 19 21.5 14.5 23 12C21.5 9.5 18 5 12 5Z" 
                           stroke="#666" stroke-width="1.5" fill="none" stroke-linecap="round"/>

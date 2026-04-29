@@ -71,6 +71,7 @@ a:hover {
 
 .admin-row label {
     color: black;
+    padding-bottom: 10px;
 }
 
 .form {
@@ -395,4 +396,35 @@ input.error-border {
     color: #990000;
     font-size: 12px;
     margin: 5px 0;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-right: 40px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 43%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-password:hover svg path,
+.toggle-password:hover svg circle {
+    stroke: #990000;
+}
+
+.toggle-password:focus {
+    outline: none;
 }
