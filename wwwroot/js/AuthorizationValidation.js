@@ -44,7 +44,8 @@
         if (password.value === '') {
             showError('Password', 'Введите пароль');
             isValid = false;
-        } else if (password.value < 8) {
+        }
+        if (password.value < 8) {
             showError('Password', 'Введите корректный пароль');
         }
 
