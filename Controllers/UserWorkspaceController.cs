@@ -373,14 +373,12 @@ namespace Blank.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(string searchString)
         {
-            // Сначала получаем все данные из БД
             var данные = await _context.Главная.ToListAsync();
 
             if (!string.IsNullOrEmpty(searchString))
             {
                 searchString = searchString.ToLower().Trim();
 
-                // Фильтруем в памяти (LINQ to Objects)
                 данные = данные.Where(d =>
                     d.ид_документа.ToString().Contains(searchString) ||
                     (d.тип != null && d.тип.ToLower().Contains(searchString)) ||
