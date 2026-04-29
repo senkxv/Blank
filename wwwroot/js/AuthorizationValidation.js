@@ -5,6 +5,7 @@
         document.querySelectorAll('.error-message').forEach(el => el.remove());
         document.querySelectorAll('input').forEach(input => {
             input.classList.remove('error-border');
+            input.style.borderColor = '';
         });
     }
 
