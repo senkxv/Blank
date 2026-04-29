@@ -51,12 +51,3 @@
         </table>
     </div>
 </div>
-
-<script>
-    function selectDocument(id) {
-        console.log("Выбран ID: " + id);
-        sessionStorage.setItem('selectedDocumentId', id);
-        const radio = document.querySelector(`input[type="radio"][value="${id}"]`);
-        if (radio) radio.checked = true;
-    }
-</script>

@@ -13,8 +13,6 @@
     --dark-color: #000000;
     --light-gray-color: #999999;
     --dark-gray-color: #666666;
-    --dark-red-color: #990000;
-    --light-red-color: #FF0000;
 }
 
 html {
@@ -31,7 +29,6 @@ body {
     align-items: center;
 }
 
-/* Центрирование заголовка */
 header {
     text-align: center;
     width: 100%;
@@ -39,25 +36,25 @@ header {
 
 .has-account {
     text-align: center;
-    margin-top: 5px;
+    margin-top: 0px;
 }
 
 a {
     color: var(--dark-gray-color);
 }
 
-    a:hover {
-        color: var(--light-gray-color);
-    }
+a:hover {
+    color: var(--light-gray-color);
+}
 
 #registration-link {
     color: black;
     font-weight: bold;
 }
 
-    #registration-link:hover {
-        color: var(--dark-gray-color);
-    }
+#registration-link:hover {
+    color: var(--dark-gray-color);
+}
 
 .header-welcome-text {
     font-family: 'SN Pro', 'Comfortaa', sans-serif;
@@ -75,7 +72,6 @@ a {
     color: black;
 }
 
-/* Центрирование формы */
 .form {
     border: 1px solid black;
     border-radius: 10px;
@@ -89,7 +85,6 @@ a {
     overflow: hidden;
 }
 
-/* Центрирование содержимого формы */
 .main-section-form {
     display: flex;
     flex-direction: column;
@@ -97,20 +92,19 @@ a {
     width: 100%;
 }
 
-    .main-section-form > label,
-    .main-section-form > input,
-    .main-section-form > div,
-    .main-section-form > ul {
-        width: 100%;
-        max-width: 500px;
-    }
+.main-section-form > label,
+.main-section-form > input,
+.main-section-form > div,
+.main-section-form > ul {
+    width: 100%;
+    max-width: 500px;
+}
 
 label {
     color: var(--dark-gray-color);
     align-self: flex-start;
 }
 
-/* Строка "Режим администратора" + свитч */
 .admin-row {
     display: flex;
     justify-content: space-between;
@@ -120,12 +114,11 @@ label {
     margin-bottom: 20px;
 }
 
-    .admin-row label {
-        margin-bottom: 0;
-        align-self: auto;
-    }
+.admin-row label {
+    margin-bottom: 0;
+    align-self: auto;
+}
 
-/* Свитч */
 .switch {
     position: relative;
     display: inline-block;
@@ -133,11 +126,11 @@ label {
     height: 24px;
 }
 
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
 
 .slider {
     position: absolute;
@@ -151,25 +144,25 @@ label {
     border-radius: 34px;
 }
 
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 13px;
-        width: 13px;
-        left: 6px;
-        bottom: 6px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 13px;
+    width: 13px;
+    left: 6px;
+    bottom: 6px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
 
 input:checked + .slider {
     background-color: black;
 }
 
-    input:checked + .slider:before {
-        transform: translateX(26px);
-    }
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
 
 [type="password"], [type="text"], [type="email"] {
     max-width: 730px;
@@ -195,9 +188,9 @@ input:checked + .slider {
     cursor: pointer;
 }
 
-    [type="submit"]:hover {
-        box-shadow: 0 0 0 2px white, 0 0 0 4px black;
-    }
+[type="submit"]:hover {
+    box-shadow: 0 0 0 2px white, 0 0 0 4px black;
+}
 
 .form-list-password {
     position: relative;
@@ -210,7 +203,6 @@ input:checked + .slider {
     max-width: 700px;
 }
 
-/* Чекбокс на одной линии с текстом */
 .checkbox-wrapper {
     display: flex;
     align-items: center;
@@ -231,11 +223,6 @@ input:checked + .slider {
     margin: 0;
 }
 
-/*
-    АДАПТИВ
-*/
-
-/* 1024px - ноутбуки */
 @media (max-width: 1024px) {
     .form {
         max-width: 90%;
@@ -243,7 +230,6 @@ input:checked + .slider {
     }
 }
 
-/* 768px - планшеты */
 @media (max-width: 768px) {
     .header-welcome-text {
         font-size: 32px;
@@ -278,7 +264,6 @@ input:checked + .slider {
     }
 }
 
-/* 550px - исправление выезжания полей */
 @media (max-width: 550px) {
     .form {
         padding: 15px !important;
@@ -311,7 +296,6 @@ input:checked + .slider {
     }
 }
 
-/* 480px - телефоны */
 @media (max-width: 480px) {
     .header-welcome-text {
         font-size: 24px;
@@ -347,7 +331,6 @@ input:checked + .slider {
     }
 }
 
-/* 375px - маленькие телефоны */
 @media (max-width: 375px) {
     .header-welcome-text {
         font-size: 20px;
@@ -380,4 +363,34 @@ input:checked + .slider {
     .checkbox-user-data-computing {
         font-size: 10px;
     }
+}
+
+.error-message {
+    color: #990000;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+.checkbox-error {
+    color: #990000;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+input.error-border {
+    border-color: red !important;
+}
+
+.error-summary {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgba(153, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.error-summary p {
+    color: #990000;
+    font-size: 12px;
+    margin: 5px 0;
 }

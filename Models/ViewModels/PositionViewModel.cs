@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Blank.Models
+namespace Blank.Models.ViewModels
 {
     public class PositionViewModel
     {
@@ -30,6 +30,6 @@ namespace Blank.Models
         public int packages { get; set; }
 
         [MaxLength(500, ErrorMessage = "Примечание не более 500 символов")]
-        public string note { get; set; }
+        public string? note { get; set; }
     }
 }

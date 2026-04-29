@@ -5,22 +5,8 @@
     ViewData["Title"] = "Редактирование документа";
 }
 
-<style>
-    .form-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 15px; margin-bottom: 20px; }
-    .form-group { display: flex; flex-direction: column; }
-    .form-control { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; }
-    .goods-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    .goods-table th, .goods-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    .goods-table th { background-color: #f2f2f2; }
-    .goods-table input, .goods-table select { width: 100%; padding: 4px; box-sizing: border-box; }
-    .btn-add { margin-top: 10px; padding: 8px 16px; background-color: #990000; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    .remove-goods { background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
-    .btn-save { background-color: #990000; color: white; padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; }
-    .btn-cancel { background-color: #666; color: white; padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; text-align: center; }
-    .form-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-    .goods-summary { margin-top: 10px; text-align: right; font-weight: bold; }
-    .alert-info { background-color: #d1ecf1; color: #0c5460; padding: 10px; border-radius: 4px; margin-bottom: 20px; }
-</style>
+<link rel="stylesheet" href="/css/UserWorkspace/EditDocumentPage.css"/>
+<script src="/js/UserWorkspace/EditDocumentPage.js"></script>
 
 <div class="form-container">
     <h2>Редактирование документа</h2>
@@ -133,7 +119,6 @@
             </div>
         </div>
 
-        <!-- Товары -->
         <div class="goods-section">
             <h3>Товары (позиции накладной)</h3>
             <table class="goods-table" id="goodsTable">
@@ -154,7 +139,6 @@
                     {
                         foreach (var pos in ViewBag.ExistingPositions)
                         {
-                            // Исправлено: вычисляем сумму в коде с приведением типов
                             decimal sum = (decimal)pos.количество * pos.цена_за_единицу;
                             
                             <tr data-id="@pos.ид_позиции" data-is-existing="true">
@@ -214,142 +198,3 @@
         <input type="hidden" name="deletedPositions" id="deletedPositions" />
     </form>
 </div>
-
-@section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        const goodsList = @Html.Raw(Json.Serialize(ViewBag.Goods));
-        let deletedIds = [];
-
-        function getUnit(goodsId) {
-            const goods = goodsList.find(g => g.ид_товара == goodsId);
-            return goods ? goods.единицы_измерения : '';
-        }
-
-        function updateRowCalculations(row) {
-            const qty = parseFloat(row.find('.goods-quantity').val()) || 0;
-            const price = parseFloat(row.find('.goods-price').val()) || 0;
-            const sum = qty * price;
-            row.find('.goods-sum').text(sum.toFixed(2));
-            
-            calculateTotalWeight();
-        }
-
-        function calculateTotalWeight() {
-            let totalWeight = 0;
-            $('.goods-weight').each(function() { 
-                totalWeight += parseFloat($(this).val()) || 0; 
-            });
-            $('#totalWeight').text(totalWeight.toFixed(3));
-        }
-
-        function addNewRow() {
-            // Удаляем строку "Нет данных" если она есть
-            $('#noDataRow').remove();
-            
-            const newRow = $('<tr>');
-            const goodsOptions = '<option value="">-- Выберите товар --</option>' + 
-                goodsList.map(g => `<option value="${g.ид_товара}">${g.наименование}</option>`).join('');
-            
-            newRow.html(`
-                <td><select class="goods-select" style="width:100%">${goodsOptions}</select></td>
-                <td><input type="text" class="goods-unit" readonly style="width:60px"></td>
-                <td><input type="number" class="goods-quantity" value="0" step="0.001" style="width:90px"></td>
-                <td><input type="number" class="goods-price" value="0" step="0.01" style="width:100px"></td>
-                <td><input type="number" class="goods-vat" value="0" step="0.5" style="width:70px"></td>
-                <td class="goods-sum">0.00</td>
-                <td><input type="number" class="goods-weight" value="0" step="0.001" style="width:80px"></td>
-                <td><button type="button" class="remove-goods">✖</button></td>
-            `);
-            $('#goodsTableBody').append(newRow);
-            updateRowCalculations(newRow);
-        }
-
-        $(document).ready(function() {
-            $('#addGoodsBtn').click(addNewRow);
-            
-            $(document).on('change', '.goods-select', function() {
-                const goodsId = parseInt($(this).val());
-                const unit = getUnit(goodsId);
-                $(this).closest('tr').find('.goods-unit').val(unit);
-                updateRowCalculations($(this).closest('tr'));
-            });
-            
-            $(document).on('input', '.goods-quantity, .goods-price, .goods-vat', function() {
-                updateRowCalculations($(this).closest('tr'));
-            });
-            
-            $(document).on('input', '.goods-weight', function() {
-                calculateTotalWeight();
-            });
-            
-            $(document).on('click', '.remove-goods', function() {
-                const row = $(this).closest('tr');
-                const id = row.data('id');
-                const isExisting = row.data('is-existing');
-                
-                if (isExisting === true && id) {
-                    deletedIds.push(id);
-                    $('#deletedPositions').val(deletedIds.join(','));
-                    console.log('Добавлен ID для удаления:', id);
-                }
-                
-                row.remove();
-                calculateTotalWeight();
-                
-                // Если не осталось строк, показываем сообщение
-                if ($('#goodsTableBody tr').length === 0) {
-                    $('#goodsTableBody').html('<tr id="noDataRow"><td colspan="8" style="text-align: center;">Нет добавленных товаров</td></tr>');
-                }
-            });
-            
-            // Инициализация расчетов для существующих строк
-            $('.goods-quantity, .goods-price, .goods-vat').each(function() {
-                updateRowCalculations($(this).closest('tr'));
-            });
-            
-            calculateTotalWeight();
-            
-            // Отправка формы
-            $('#documentForm').on('submit', function(e) {
-                const positions = [];
-                let hasValidPositions = false;
-                
-                $('#goodsTableBody tr').each(function() {
-                    const row = $(this);
-                    const goodsId = parseInt(row.find('.goods-select').val()) || 0;
-                    const quantity = parseFloat(row.find('.goods-quantity').val()) || 0;
-                    const price = parseFloat(row.find('.goods-price').val()) || 0;
-                    
-                    // Добавляем только валидные позиции
-                    if (goodsId > 0 && quantity > 0 && price > 0) {
-                        positions.push({
-                            id: row.data('is-existing') === true ? (parseInt(row.data('id')) || 0) : 0,
-                            goodsId: goodsId,
-                            quantity: quantity,
-                            price: price,
-                            vatRate: parseFloat(row.find('.goods-vat').val()) || 0,
-                            weight: parseFloat(row.find('.goods-weight').val()) || 0,
-                            discount: 0,
-                            packages: 0,
-                            note: ''
-                        });
-                        hasValidPositions = true;
-                    }
-                });
-                
-                if (!hasValidPositions && positions.length === 0) {
-                    alert('Добавьте хотя бы одну позицию товара с заполненными полями!');
-                    e.preventDefault();
-                    return false;
-                }
-                
-                $('#positionsData').val(JSON.stringify(positions));
-                console.log('Отправка товаров:', positions);
-                console.log('Удаляемые ID:', deletedIds);
-                
-                return true;
-            });
-        });
-    </script>
-}

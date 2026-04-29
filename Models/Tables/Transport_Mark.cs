@@ -14,6 +14,6 @@ namespace Blank.Models.Tables
         [Column("наименование_марки")]
         [Required]
         [MaxLength(45)]
-        public string наименование_марки { get; set; }
+        public string? наименование_марки { get; set; }
     }
 }

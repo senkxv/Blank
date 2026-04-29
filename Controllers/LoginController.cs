@@ -1,6 +1,6 @@
 ﻿using Blank.Data;
-using Blank.Models;
 using Blank.Models.Tables;
+using Blank.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -17,7 +17,6 @@ namespace Blank.Controllers
             _context = context;
         }
 
-        // Хэширование пароля (SHA256)
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -27,13 +26,12 @@ namespace Blank.Controllers
             }
         }
 
-        // GET: /Login/Authorization
+        [HttpGet]
         public IActionResult Authorization()
         {
             return View();
         }
 
-        // POST: /Login/Authorization
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Authorization(LoginViewModel model)
@@ -43,10 +41,10 @@ namespace Blank.Controllers
                 var user = await _context.Пользователи
                     .FirstOrDefaultAsync(u => u.почта == model.Email);
 
-                if (user != null && HashPassword(model.Password) == user.хэш_пароль)
+                if (user != null && HashPassword(model.Password ?? "") == user.хэш_пароль)
                 {
                     HttpContext.Session.SetString("UserId", user.ид_пользователя.ToString());
-                    HttpContext.Session.SetString("UserEmail", user.почта);
+                    HttpContext.Session.SetString("UserEmail", user.почта ?? "");
                     HttpContext.Session.SetString("UserName", $"{user.фамилия} {user.имя}");
 
                     return RedirectToAction("Index", "UserWorkspace");
@@ -57,13 +55,12 @@ namespace Blank.Controllers
             return View(model);
         }
 
-        // GET: /Login/Registration
+        [HttpGet]
         public IActionResult Registration()
         {
             return View();
         }
 
-        // POST: /Login/Registration
         [HttpPost]
         [ValidateAntiForgeryToken]
 
@@ -71,7 +68,6 @@ namespace Blank.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Разбираем ФИО
                 var fioParts = model.ФИО?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 var фамилия = fioParts?.Length > 0 ? fioParts[0] : "";
                 var имя = fioParts?.Length > 1 ? fioParts[1] : "";
@@ -89,11 +85,11 @@ namespace Blank.Controllers
                 var user = new Users
                 {
                     почта = model.Email,
-                    хэш_пароль = HashPassword(model.Password),
+                    хэш_пароль = HashPassword(model.Password ?? ""),
                     фамилия = фамилия,
                     имя = имя,
                     отчество = отчество,
-                    активность = "1",
+                    активность = true,
                     ид_должности = 3,
                     ид_организации = 1
                 };
@@ -102,7 +98,7 @@ namespace Blank.Controllers
                 await _context.SaveChangesAsync();
 
                 HttpContext.Session.SetString("UserId", user.ид_пользователя.ToString());
-                HttpContext.Session.SetString("UserEmail", user.почта);
+                HttpContext.Session.SetString("UserEmail", user.почта ?? "");
                 HttpContext.Session.SetString("UserName", $"{user.фамилия} {user.имя}");
 
                 return RedirectToAction("Index", "UserWorkspace");
@@ -110,7 +106,7 @@ namespace Blank.Controllers
             return View(model);
         }
 
-        // GET: /Login/Logout
+        [HttpGet]
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

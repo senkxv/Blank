@@ -1,15 +1,12 @@
 using Blank.Data;
-using Blank.Models.Tables;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавляем DbContext для MySQL
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
-    options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseMySQL(builder.Configuration.GetConnectionString("RemoteConnection") ?? "")
 );
 
-// Добавляем сервисы для работы с сессиями
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -22,21 +19,19 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Включаем подробные ошибки для разработки
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/UserWorkspace/Error");
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// Добавляем UseSession перед UseAuthorization
 app.UseSession();
 
 app.UseAuthorization();

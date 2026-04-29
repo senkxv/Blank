@@ -5,14 +5,15 @@
     ViewData["Title"] = "Добавление документа";
 }
 
-<link rel="stylesheet" href="~/css/UserWorkspace/CreateDocumentPage.css" />
+<link rel="stylesheet" href="/css/UserWorkspace/CreateDocumentPage.css" asp-append-version="true" />
 
 <div class="form-container">
     <h2>Добавление документа</h2>
 
     <form method="post" asp-action="CreateDocumentPage" class="document-form" id="documentForm">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
         <div class="form-grid">
-            <!-- Тип документа -->
             <div class="form-group">
                 <label asp-for="ид_типа">Тип документа</label>
                 <select asp-for="ид_типа" class="form-control" required>
@@ -25,21 +26,18 @@
                 <span asp-validation-for="ид_типа" class="text-danger"></span>
             </div>
 
-            <!-- Номер документа -->
             <div class="form-group">
                 <label asp-for="номер_документа">Номер документа</label>
                 <input asp-for="номер_документа" class="form-control" required />
                 <span asp-validation-for="номер_документа" class="text-danger"></span>
             </div>
 
-            <!-- Дата создания -->
             <div class="form-group">
                 <label asp-for="дата_создания">Дата создания</label>
                 <input asp-for="дата_создания" type="date" class="form-control" required />
                 <span asp-validation-for="дата_создания" class="text-danger"></span>
             </div>
 
-            <!-- Грузоотправитель -->
             <div class="form-group">
                 <label asp-for="ид_грузоотправителя">Грузоотправитель</label>
                 <select asp-for="ид_грузоотправителя" class="form-control" required>
@@ -52,7 +50,6 @@
                 <span asp-validation-for="ид_грузоотправителя" class="text-danger"></span>
             </div>
 
-            <!-- Перевозчик -->
             <div class="form-group">
                 <label asp-for="ид_перевозчика">Перевозчик</label>
                 <select asp-for="ид_перевозчика" class="form-control" required>
@@ -65,7 +62,6 @@
                 <span asp-validation-for="ид_перевозчика" class="text-danger"></span>
             </div>
 
-            <!-- Грузополучатель -->
             <div class="form-group">
                 <label asp-for="ид_получателя">Грузополучатель</label>
                 <select asp-for="ид_получателя" class="form-control" required>
@@ -78,37 +74,30 @@
                 <span asp-validation-for="ид_получателя" class="text-danger"></span>
             </div>
 
-            <!-- Водитель -->
             <div class="form-group">
                 <label asp-for="ид_водителя">Водитель</label>
                 <select asp-for="ид_водителя" class="form-control" required>
                     <option value="">-- Выберите водителя --</option>
                     @foreach (var driver in ViewBag.Drivers)
                     {
-                        <option value="@driver.ид_водителя">
-                            @driver.фамилия @driver.имя @driver.отчество
-                        </option>
+                        <option value="@driver.ид_водителя">@driver.фамилия @driver.имя @driver.отчество</option>
                     }
                 </select>
                 <span asp-validation-for="ид_водителя" class="text-danger"></span>
             </div>
 
-            <!-- Транспорт -->
             <div class="form-group">
                 <label asp-for="ид_транспорта">Транспорт</label>
                 <select asp-for="ид_транспорта" class="form-control" required>
                     <option value="">-- Выберите транспорт --</option>
                     @foreach (var t in ViewBag.Transport)
                     {
-                        <option value="@t.ид_транспорта">
-                            @t.регистрационный_номер
-                        </option>
+                        <option value="@t.ид_транспорта">@t.регистрационный_номер</option>
                     }
                 </select>
                 <span asp-validation-for="ид_транспорта" class="text-danger"></span>
             </div>
 
-            <!-- Пункт погрузки -->
             <div class="form-group">
                 <label asp-for="ид_пункта_погрузки">Пункт погрузки</label>
                 <select asp-for="ид_пункта_погрузки" class="form-control" required>
@@ -121,7 +110,6 @@
                 <span asp-validation-for="ид_пункта_погрузки" class="text-danger"></span>
             </div>
 
-            <!-- Пункт разгрузки -->
             <div class="form-group">
                 <label asp-for="ид_пункта_разгрузки">Пункт разгрузки</label>
                 <select asp-for="ид_пункта_разгрузки" class="form-control" required>
@@ -135,33 +123,37 @@
             </div>
         </div>
 
-        <!-- === ТОВАРЫ (позиции накладной) === -->
         <div class="goods-section">
             <h3>Товары (позиции накладной)</h3>
-            <table class="goods-table" id="goodsTable">
-                <thead>
-                    <tr>
-                        <th>Товар</th>
-                        <th>Ед. изм.</th>
-                        <th>Кол-во</th>
-                        <th>Цена</th>
-                        <th>Ставка НДС</th>
-                        <th>Сумма НДС</th>
-                        <th>Стоимость с НДС</th>
-                        <th>Масса</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody id="goodsTableBody">
-                    <!-- Строки добавляются динамически через JS -->
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="8" class="right">Итого масса: </td>
-                        <td class="right" id="totalWeight">0</td>
-                    </tr>
-                </tfoot>
-            </table>
+            <div class="table-wrapper">
+                <table class="goods-table" id="goodsTable">
+                    <thead>
+                        <tr>
+                            <th>Товар</th>
+                            <th>Ед. изм.</th>
+                            <th>Кол-во</th>
+                            <th>Цена</th>
+                            <th>Ставка НДС</th>
+                            <th>Сумма НДС</th>
+                            <th>Стоимость с НДС</th>
+                            <th>Масса</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="goodsTableBody">
+                        <tr id="noDataRow">
+                            <td colspan="9" style="text-align: center;">Нет добавленных товаров</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="7" class="right">Итого масса:</td>
+                            <td class="right" id="totalWeight">0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
             <button type="button" id="addGoodsRow" class="btn-add">+ Добавить товар</button>
         </div>
 
@@ -175,230 +167,12 @@
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        window.goodsListData = @Html.Raw(Json.Serialize(ViewBag.Goods));
+    </script>
+    <script src="~/js/UserWorkspace/CreateDocumentPage.js"></script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        // Данные из ViewBag
-        const goodsList = @Html.Raw(Json.Serialize(ViewBag.Goods));
-    
-        // Массив для хранения строк товаров
-        let goodsRows = [];
-        let nextId = 1;
-    
-        // Функция генерации выпадающего списка товаров
-        function generateGoodsOptions(selectedId) {
-        let html = '<option value="">-- Выберите товар --</option>';
-        if (goodsList && goodsList.length) {
-        goodsList.forEach(g => {
-        const selected = (selectedId == g.ид_товара) ? 'selected' : '';
-        html += `<option value="${g.ид_товара}" ${selected}>${g.наименование}</option>`;
-        });
-        }
-        return html;
-        }
-    
-        // Получить единицу измерения по ID товара
-        function getUnit(goodsId) {
-        const goods = goodsList.find(g => g.ид_товара == goodsId);
-        return goods ? goods.единицы_измерения : '';
-        }
-    
-        // Рассчитать сумму НДС и стоимость с НДС для строки
-        function calculateRowAmounts(quantity, price, vatRate) {
-        const cost = quantity * price;
-        const vatAmount = cost * (vatRate / 100);
-        const totalWithVat = cost + vatAmount;
-        return { cost, vatAmount, totalWithVat };
-        }
-    
-        // Пересчитать итоговую массу
-        function recalcTotal() {
-        let totalWeight = 0;
-        goodsRows.forEach(row => {
-        totalWeight += parseFloat(row.weight) || 0;
-        });
-        $('#totalWeight').text(totalWeight.toFixed(3));
-        }
-    
-        // Обновить отображение строки
-        function updateRowDisplay(row) {
-        const quantity = parseFloat(row.quantity) || 0;
-        const price = parseFloat(row.price) || 0;
-        const vatRate = parseFloat(row.vatRate) || 0;
-        
-        const { vatAmount, totalWithVat } = calculateRowAmounts(quantity, price, vatRate);
-        
-        $(`.vat-amount[data-id="${row.id}"]`).text(vatAmount.toFixed(2));
-        $(`.total-with-vat[data-id="${row.id}"]`).text(totalWithVat.toFixed(2));
-        recalcTotal();
-        }
-    
-        // Отрисовать таблицу
-        function renderGoodsTable() {
-        const tbody = $('#goodsTableBody');
-        tbody.empty();
-        
-        if (goodsRows.length === 0) {
-        tbody.html('<tr><td colspan="9" style="text-align: center;">Нет добавленных товаров</td></tr>');
-        return;
-        }
-        
-        goodsRows.forEach(row => {
-        const quantity = parseFloat(row.quantity) || 0;
-        const price = parseFloat(row.price) || 0;
-        const vatRate = parseFloat(row.vatRate) || 0;
-            
-        const { vatAmount, totalWithVat } = calculateRowAmounts(quantity, price, vatRate);
-        const unit = getUnit(row.goodsId);
-            
-        const tr = $('<tr>');
-        tr.html(`
-        <td style="min-width: 150px;">
-        <select class="goods-select form-control" data-id="${row.id}" data-goods-id="${row.goodsId}">
-        ${generateGoodsOptions(row.goodsId)}
-        </select>
-        </td>
-        <td class="unit-display" data-id="${row.id}">${unit}</td>
-        <td><input type="number" class="quantity form-control" data-id="${row.id}" value="${row.quantity}" step="0.001" style="width: 90px;"></td>
-        <td><input type="number" class="price form-control" data-id="${row.id}" value="${row.price}" step="0.01" style="width: 100px;"></td>
-        <td><input type="number" class="vat-rate form-control" data-id="${row.id}" value="${row.vatRate}" step="0.5" style="width: 70px;"></td>
-        <td class="vat-amount" data-id="${row.id}">${vatAmount.toFixed(2)}</td>
-        <td class="total-with-vat" data-id="${row.id}">${totalWithVat.toFixed(2)}</td>
-        <td><input type="number" class="weight form-control" data-id="${row.id}" value="${row.weight}" step="0.001" style="width: 90px;"></td>
-        <td><button type="button" class="remove-row btn btn-danger btn-sm" data-id="${row.id}">✖</button></td>
-        `);
-        tbody.append(tr);
-        });
-        
-        recalcTotal();
-        }
-    
-        // Добавить новую строку
-        function addGoodsRow() {
-        goodsRows.push({
-        id: nextId++,
-        goodsId: 0,
-        quantity: 0,
-        price: 0,
-        vatRate: 0,
-        weight: 0,
-        packages: 0,
-        note: '',
-        discount: 0
-        });
-        renderGoodsTable();
-        }
-    
-        // Удалить строку
-        function removeGoodsRow(id) {
-        goodsRows = goodsRows.filter(r => r.id != id);
-        renderGoodsTable();
-        }
-    
-        // Обработчики событий
-        $(document).ready(function() {
-        // Добавляем первую пустую строку для удобства
-        addGoodsRow();
-        
-        // Кнопка добавления товара
-        $('#addGoodsRow').click(addGoodsRow);
-        });
-    
-        // Выбор товара
-        $(document).on('change', '.goods-select', function() {
-        const id = parseInt($(this).data('id'));
-        const goodsId = parseInt($(this).val());
-        const row = goodsRows.find(r => r.id == id);
-        if (row) {
-        row.goodsId = goodsId;
-        const unit = getUnit(goodsId);
-        $(`.unit-display[data-id="${id}"]`).text(unit);
-        }
-        });
-    
-        // Изменение количества
-        $(document).on('input', '.quantity', function() {
-        const id = parseInt($(this).data('id'));
-        const value = parseFloat($(this).val()) || 0;
-        const row = goodsRows.find(r => r.id == id);
-        if (row) {
-        row.quantity = value;
-        updateRowDisplay(row);
-        }
-        });
-    
-        // Изменение цены
-        $(document).on('input', '.price', function() {
-        const id = parseInt($(this).data('id'));
-        const value = parseFloat($(this).val()) || 0;
-        const row = goodsRows.find(r => r.id == id);
-        if (row) {
-        row.price = value;
-        updateRowDisplay(row);
-        }
-        });
-    
-        // Изменение ставки НДС
-        $(document).on('input', '.vat-rate', function() {
-        const id = parseInt($(this).data('id'));
-        const value = parseFloat($(this).val()) || 0;
-        const row = goodsRows.find(r => r.id == id);
-        if (row) {
-        row.vatRate = value;
-        updateRowDisplay(row);
-        }
-        });
-    
-        // Изменение массы
-        $(document).on('input', '.weight', function() {
-        const id = parseInt($(this).data('id'));
-        const value = parseFloat($(this).val()) || 0;
-        const row = goodsRows.find(r => r.id == id);
-        if (row) {
-        row.weight = value;
-        recalcTotal();
-        }
-        });
-    
-        // Удаление строки
-        $(document).on('click', '.remove-row', function() {
-        const id = parseInt($(this).data('id'));
-        removeGoodsRow(id);
-        });
-    
-        // Перед отправкой формы собираем данные
-        $('#documentForm').on('submit', function() {
-        // Фильтруем только заполненные строки (где выбран товар и есть количество)
-        const validPositions = goodsRows.filter(row =>
-        row.goodsId > 0 &&
-        row.quantity > 0 &&
-        row.price > 0
-        );
-        
-        const positions = validPositions.map(row => ({
-        id: 0, // Для новых записей id = 0
-        goodsId: row.goodsId,
-        quantity: row.quantity,
-        price: row.price,
-        discount: row.discount || 0,
-        vatRate: row.vatRate || 0,
-        weight: row.weight || 0,
-        packages: row.packages || 0,
-        note: row.note || ''
-        }));
-        
-        $('#positionsData').val(JSON.stringify(positions));
-        console.log('Отправляемые позиции:', positions);
-        console.log('Количество позиций:', positions.length);
-        
-        if (positions.length === 0) {
-        alert('Добавьте хотя бы одну позицию товара!');
-        return false;
-        }
-        
-        return true;
-        });
-    </script>
 }

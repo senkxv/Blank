@@ -2,16 +2,23 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Blank.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/_Layout.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/filter.css" asp-append-version="true" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+
+    <link rel="stylesheet" href="/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="/css/Modal/Filter.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="/css/Modal/Search.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="/css/Modal/Notification.css" asp-append-version="true"/>
+
+    <script src="/js/Modal/Notification.js"></script>
+    <script src="/js/UserWorkspace/Index.js"></script>
+    <script src="/js/Modal/Filter.js"></script>
+    <script src="/js/Modal/Search.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet"/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet"/>
 </head>
 <body>
     <header>
@@ -22,11 +29,13 @@
                     <li><a href="/UserWorkspace/CreateDocumentPage">Добавить</a></li>
                     <li><a href="#" onclick="editSelectedDocument()">Изменить</a></li>
                     <li><a href="#" onclick="deleteSelectedDocument()">Удалить</a></li>
+                    <li><a href="#" onclick="location.reload()">Обновить</a></li>
+                    <li><a href="#">Импорт</a></li>
                     <li><a href="/UserWorkspace/ExportAllToExcel">Экспорт</a></li>
-                    <li><a href="/UserWorkspace/Index">Обновить</a></li>
                     <li><a href="#" onclick="previewSelectedDocument()">Предпросмотр</a></li>
                     <li><a href="#" id="searchLink">Поиск</a></li>
                     <li><a href="#" id="filterLink">Фильтр</a></li>
+                    <li><a href="/Login/Logout">Выход</a></li>
                 </ul>
             </nav>
         </div>
@@ -34,8 +43,7 @@
 
     <div class="content-wrapper">
         <main>
-            <!-- Модальное окно поиска -->
-            <div id="searchModal" style="display: none; position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000;">
+            <div id="searchModal">
                 <form method="get" action="/UserWorkspace/Search" class="search-form">
                     <input type="text" name="searchString" placeholder="Введите текст для поиска..." />
                     <button type="submit">Найти</button>
@@ -43,50 +51,58 @@
                 </form>
             </div>
 
-            <!-- Модальное окно фильтра -->
-            <div id="filterModal" style="display: none; position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000; min-width: 300px; max-height: 80vh; overflow-y: auto;">
-                <h3>Настройка таблицы</h3>
-    
-                <div style="margin-bottom: 20px;">
-                    <h4>Сортировка</h4>
-                    <select id="sortField" style="width: 100%; padding: 8px; margin-bottom: 10px;">
-                        <option value="ид_документа">По порядковому номеру</option>
-                        <option value="тип">По типу документа</option>
-                        <option value="номер_документа">По номеру документа</option>
-                        <option value="дата_создания">По дате создания</option>
-                        <option value="грузоотправитель">По грузоотправителю</option>
-                        <option value="перевозчик">По перевозчику</option>
-                        <option value="грузополучатель">По грузополучателю</option>
-                        <option value="ФИО_Водителя">По ФИО водителя</option>
-                    </select>
-                    <select id="sortOrder" style="width: 100%; padding: 8px;">
-                        <option value="asc">По возрастанию</option>
-                        <option value="desc">По убыванию</option>
-                    </select>
+            <div id="notificationModal">
+                <div class="notification-content">
+                    <p id="notificationMessage"></p>
+                    <button id="closeNotificationBtn">Закрыть</button>
                 </div>
+            </div>
 
-                <div style="margin-bottom: 20px;">
-                    <h4>Отображаемые столбцы</h4>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;">
-                        <label><input type="checkbox" value="ид_документа" checked> Порядковый номер</label>
-                        <label><input type="checkbox" value="тип" checked> Тип документа</label>
-                        <label><input type="checkbox" value="номер_документа" checked> Номер документа</label>
-                        <label><input type="checkbox" value="дата_создания" checked> Дата создания</label>
-                        <label><input type="checkbox" value="грузоотправитель" checked> Грузоотправитель</label>
-                        <label><input type="checkbox" value="перевозчик" checked> Перевозчик</label>
-                        <label><input type="checkbox" value="грузополучатель" checked> Грузополучатель</label>
-                        <label><input type="checkbox" value="пункт_погрузки" checked> Пункт погрузки</label>
-                        <label><input type="checkbox" value="пункт_разгрузки" checked> Пункт разгрузки</label>
-                        <label><input type="checkbox" value="ФИО_Водителя" checked> ФИО водителя</label>
-                        <label><input type="checkbox" value="Марка_Машины" checked> Марка машины</label>
-                        <label><input type="checkbox" value="Регистрационный_Номер" checked> Рег. номер</label>
-                        <label><input type="checkbox" value="Тип_ТС" checked> Тип ТС</label>
+            <div id="filterModal">
+                <div class="filter-content">
+                    <h3>Настройка таблицы</h3>
+        
+                    <div class="filter-section">
+                        <h4>Сортировка</h4>
+                        <select id="sortField">
+                            <option value="ид_документа">По порядковому номеру</option>
+                            <option value="тип">По типу документа</option>
+                            <option value="номер_документа">По номеру документа</option>
+                            <option value="дата_создания">По дате создания</option>
+                            <option value="грузоотправитель">По грузоотправителю</option>
+                            <option value="перевозчик">По перевозчику</option>
+                            <option value="грузополучатель">По грузополучателю</option>
+                            <option value="ФИО_Водителя">По ФИО водителя</option>
+                        </select>
+                        <select id="sortOrder">
+                            <option value="asc">По возрастанию</option>
+                            <option value="desc">По убыванию</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-section">
+                        <h4>Отображаемые столбцы</h4>
+                        <div class="columns-grid">
+                            <label><input type="checkbox" value="ид_документа" checked> Порядковый номер</label>
+                            <label><input type="checkbox" value="тип" checked> Тип документа</label>
+                            <label><input type="checkbox" value="номер_документа" checked> Номер документа</label>
+                            <label><input type="checkbox" value="дата_создания" checked> Дата создания</label>
+                            <label><input type="checkbox" value="грузоотправитель" checked> Грузоотправитель</label>
+                            <label><input type="checkbox" value="перевозчик" checked> Перевозчик</label>
+                            <label><input type="checkbox" value="грузополучатель" checked> Грузополучатель</label>
+                            <label><input type="checkbox" value="пункт_погрузки" checked> Пункт погрузки</label>
+                            <label><input type="checkbox" value="пункт_разгрузки" checked> Пункт разгрузки</label>
+                            <label><input type="checkbox" value="ФИО_Водителя" checked> ФИО водителя</label>
+                            <label><input type="checkbox" value="Марка_Машины" checked> Марка машины</label>
+                            <label><input type="checkbox" value="Регистрационный_Номер" checked> Рег. номер</label>
+                            <label><input type="checkbox" value="Тип_ТС" checked> Тип ТС</label>
+                        </div>
                     </div>
                 </div>
 
-                <div class="filter-buttons" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; position: sticky; bottom: 0; background: white; padding-top: 10px;">
-                    <button id="applyFilterBtn" style="padding: 8px 16px; background-color: #990000; color: white; border: none; border-radius: 5px; cursor: pointer;">Применить</button>
-                    <button id="closeFilterBtn" style="padding: 8px 16px; background-color: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Отмена</button>
+                <div class="filter-buttons">
+                    <button id="applyFilterBtn">Применить</button>
+                    <button id="closeFilterBtn">Отмена</button>
                 </div>
             </div>
 
@@ -107,145 +123,5 @@
 
     @await RenderSectionAsync("Scripts", required: false)
 
-    <script src="~/js/Index.js"></script>
-    <script>
-            function editSelectedDocument() {
-                const id = sessionStorage.getItem('selectedDocumentId');
-                if (id) {
-                    window.location.href = '/UserWorkspace/EditDocumentPage?id=' + id;
-                } else {
-                    alert('Сначала выберите документ в таблице');
-                }
-            }
-
-            function deleteSelectedDocument() {
-                const id = sessionStorage.getItem('selectedDocumentId');
-                if (id) {
-                    if (confirm('Вы уверены, что хотите удалить документ?')) {
-                        window.location.href = '/UserWorkspace/DeleteDocument?id=' + id;
-                    }
-                } else {
-                    alert('Сначала выберите документ в таблице');
-                }
-            }
-
-            // === ПОИСК ===
-            const searchModal = document.getElementById('searchModal');
-            const searchLink = document.getElementById('searchLink');
-
-            if (searchLink && searchModal) {
-                searchLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    searchModal.style.display = 'block';
-                });
-            }
-
-            const closeSearchBtn = document.getElementById('closeSearchBtn');
-            if (closeSearchBtn && searchModal) {
-                closeSearchBtn.addEventListener('click', function() {
-                    searchModal.style.display = 'none';
-                });
-            }
-
-            // === ФИЛЬТР ===
-            const filterModal = document.getElementById('filterModal');
-            const filterLink = document.getElementById('filterLink');
-            const closeFilterBtn = document.getElementById('closeFilterBtn');
-            const applyFilterBtn = document.getElementById('applyFilterBtn');
-
-            if (filterLink && filterModal) {
-                filterLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    filterModal.style.display = 'block';
-                });
-            }
-
-            if (closeFilterBtn && filterModal) {
-                closeFilterBtn.addEventListener('click', function() {
-                    filterModal.style.display = 'none';
-                });
-            }
-
-            if (applyFilterBtn) {
-                applyFilterBtn.addEventListener('click', function() {
-                    const sortField = document.getElementById('sortField').value;
-                    const sortOrder = document.getElementById('sortOrder').value;
-                
-                    // === 1. Скрываем/показываем столбцы ===
-                    const checkboxes = document.querySelectorAll('#filterModal input[type="checkbox"]');
-                    checkboxes.forEach(cb => {
-                        const columnClass = 'col-' + cb.value;
-                        const elements = document.querySelectorAll('.' + columnClass);
-                        elements.forEach(el => {
-                            el.style.display = cb.checked ? '' : 'none';
-                        });
-                    
-                        // Также скрываем заголовки столбцов
-                        const headerElements = document.querySelectorAll('th.' + columnClass);
-                        headerElements.forEach(el => {
-                            el.style.display = cb.checked ? '' : 'none';
-                        });
-                    });
-
-                    // === 2. Сортировка строк ===
-                    const tbody = document.querySelector('#mainTable tbody');
-                    if (tbody) {
-                        const rows = Array.from(tbody.querySelectorAll('tr'));
-                    
-                        const getValue = (row, field) => {
-                            if (field === 'ид_документа') {
-                                const cell = row.cells[1];
-                                return cell ? parseInt(cell.innerText) : 0;
-                            }
-                            if (field === 'дата_создания') {
-                                const cell = row.querySelector('.col-' + field);
-                                return cell ? new Date(cell.innerText) : new Date(0);
-                            }
-                            const cell = row.querySelector('.col-' + field);
-                            return cell ? cell.innerText : '';
-                        };
-
-                        rows.sort((a, b) => {
-                            let valA = getValue(a, sortField);
-                            let valB = getValue(b, sortField);
-                        
-                            if (typeof valA === 'string') {
-                                valA = valA.toLowerCase();
-                                valB = valB.toLowerCase();
-                            }
-                        
-                            if (sortOrder === 'asc') {
-                                return valA > valB ? 1 : -1;
-                            } else {
-                                return valA < valB ? 1 : -1;
-                            }
-                        });
-
-                        rows.forEach(row => tbody.appendChild(row));
-                    }
-                
-                    filterModal.style.display = 'none';
-                });
-            }
-
-            // === Закрытие модальных окон при клике вне их ===
-            window.addEventListener('click', function(e) {
-                if (searchModal && e.target === searchModal) {
-                    searchModal.style.display = 'none';
-                }
-                if (filterModal && e.target === filterModal) {
-                    filterModal.style.display = 'none';
-                }
-            });
-
-                        function previewSelectedDocument() {
-                const id = sessionStorage.getItem('selectedDocumentId');
-                if (id) {
-                    window.open('/UserWorkspace/PreviewDocument/' + id, '_blank');
-                } else {
-                    alert('Сначала выберите документ в таблице');
-                }
-            }
-    </script>
 </body>
 </html>

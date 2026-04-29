@@ -12,10 +12,10 @@ namespace Blank.Models.Tables
 
         [Column("краткое_наименование")]
         [MaxLength(100)]
-        public string краткое_наименование { get; set; }
+        public string? краткое_наименование { get; set; }
 
         [Column("полное_наименование")]
         [MaxLength(100)]
-        public string полное_наименование { get; set; }
+        public string? полное_наименование { get; set; }
     }
 }

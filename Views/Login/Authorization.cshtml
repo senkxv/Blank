@@ -1,36 +1,47 @@
-﻿@model Blank.Models.LoginViewModel
+﻿@model Blank.Models.ViewModels.LoginViewModel
 
 @{
     Layout = null;
 }
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Авторизация</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="~/css/Authorization.css" />
+
+    <link rel="stylesheet" href="/css/Login/Authorization.css"/>
+    <script src="/js/Login/AuthorizationValidation.js" defer></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet"/>
 
     <link href="https://fonts.googleapis.com/css2?family=SN+Pro:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
         <p class="header-welcome-text">Авторизация пользователя</p>
-        <p>Хотите создать аккаунт? <a id="registration-link" href="/Login/Registration">Зарегистрироваться</a></p>
     </header>
     
     <main>
         <section>
             <div class="form">
-                <form method="post" asp-action="Authorization" asp-controller="Login" class="main-section-form">
+                <form method="post" asp-controller="Login" asp-action="Authorization" class="main-section-form">
                     @Html.AntiForgeryToken()
 
-                    <!-- Блок для вывода общих ошибок -->
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <p class="has-account">Хотите создать аккаунт? <a id="registration-link" href="/Login/Registration">Зарегистрироваться</a></p>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="error-message" style="margin-bottom: 15px;">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <p style="margin: 5px 0;">@error.ErrorMessage</p>
+                            }
+                        </div>
+                    }
 
                     <label for="Email">Электронная почта</label>
                     <input id="Email" type="email" name="Email" />
@@ -45,7 +56,5 @@
     </main>
     
     <footer></footer>
-
-    <script src="~/js/AuthorizationValidation.js"></script>
 </body>
 </html>

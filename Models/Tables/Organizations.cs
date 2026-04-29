@@ -13,21 +13,21 @@ namespace Blank.Models.Tables
         [Column("название")]
         [Required]
         [MaxLength(255)]
-        public string название { get; set; }
+        public string? название { get; set; }
 
         [Column("УНН")]
         [Required]
         [MaxLength(200)]
-        public string унн { get; set; }
+        public string? унн { get; set; }
 
         [Column("Адрес")]
         [Required]
         [MaxLength(150)]
-        public string адрес { get; set; }
+        public string? адрес { get; set; }
 
         [Column("Почта")]
         [Required]
         [MaxLength(150)]
-        public string почта { get; set; }
+        public string? почта { get; set; }
     }
 }

@@ -1,0 +1,147 @@
+﻿/* Модальное окно уведомлений */
+#notificationModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1100;
+    min-width: 300px;
+    max-width: 400px;
+    width: auto;
+    text-align: center;
+}
+
+.notification-content {
+    padding: 25px 30px;
+}
+
+#notificationMessage {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+#closeNotificationBtn {
+    padding: 8px 20px;
+    background-color: #990000;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+    #closeNotificationBtn:hover {
+        background-color: #660000;
+    }
+
+/* Планшеты */
+@media (max-width: 768px) {
+    #notificationModal {
+        min-width: 280px;
+        max-width: 350px;
+    }
+
+    .notification-content {
+        padding: 22px 25px;
+    }
+
+    #notificationMessage {
+        font-size: 15px;
+    }
+}
+
+/* Большие телефоны */
+@media (max-width: 550px) {
+    #notificationModal {
+        min-width: 260px;
+        max-width: 300px;
+    }
+
+    .notification-content {
+        padding: 18px 22px;
+    }
+
+    #notificationMessage {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    #closeNotificationBtn {
+        padding: 7px 18px;
+        font-size: 13px;
+    }
+}
+
+/* Маленькие телефоны */
+@media (max-width: 450px) {
+    #notificationModal {
+        min-width: 200px;
+        max-width: 260px;
+    }
+
+    .notification-content {
+        padding: 15px 18px;
+    }
+
+    #notificationMessage {
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    #closeNotificationBtn {
+        padding: 6px 15px;
+        font-size: 12px;
+    }
+}
+
+/* Очень маленькие телефоны */
+@media (max-width: 360px) {
+    #notificationModal {
+        min-width: 180px;
+        max-width: 220px;
+    }
+
+    .notification-content {
+        padding: 12px 15px;
+    }
+
+    #notificationMessage {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
+    #closeNotificationBtn {
+        padding: 5px 12px;
+        font-size: 11px;
+    }
+}
+
+/* Критически маленькие */
+@media (max-width: 280px) {
+    #notificationModal {
+        min-width: 160px;
+        max-width: 190px;
+    }
+
+    .notification-content {
+        padding: 10px 12px;
+    }
+
+    #notificationMessage {
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+
+    #closeNotificationBtn {
+        padding: 4px 10px;
+        font-size: 10px;
+    }
+}
