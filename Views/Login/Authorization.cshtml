@@ -29,8 +29,18 @@
     <main>
         <section>
             <div class="form">
-                <form method="post" asp-action="Authorization" asp-controller="Login" class="main-section-form">
+                <form method="post" asp-controller="Login" asp-action="Authorization" class="main-section-form">
                     @Html.AntiForgeryToken()
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="error-message" style="margin-bottom: 15px;">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <p style="margin: 5px 0;">@error.ErrorMessage</p>
+                            }
+                        </div>
+                    }
 
                     <label for="Email">Электронная почта</label>
                     <input id="Email" type="email" name="Email" />
