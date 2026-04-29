@@ -4,13 +4,12 @@ namespace Blank.Models.ViewModels
 {
     public class LoginViewModel
     {
-        [Required(ErrorMessage = "Введите email")]
-        [EmailAddress(ErrorMessage = "Введите корректный email")]
-        public string Email { get; set; }
+        [Required]
+        public string? Email { get; set; }
 
-        [Required(ErrorMessage = "Введите пароль")]
+        [Required]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         public bool RememberMe { get; set; }
     }
