@@ -1,0 +1,116 @@
+﻿/* Модальное окно поиска */
+#searchModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    min-width: 300px;
+    width: auto;
+}
+
+    /* Форма поиска */
+    #searchModal .search-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 0;
+    }
+
+    /* Поле ввода */
+    #searchModal input[type="text"] {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 250px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+        #searchModal input[type="text"]:focus {
+            outline: none;
+            border-color: #990000;
+        }
+
+    /* Кнопки */
+    #searchModal button[type="submit"] {
+        padding: 8px 16px;
+        background-color: #990000;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        #searchModal button[type="submit"]:hover {
+            background-color: #660000;
+        }
+
+#closeSearchBtn {
+    padding: 8px 16px;
+    background-color: #666;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    #closeSearchBtn:hover {
+        background-color: #444;
+    }
+
+/* Адаптив для поиска */
+@media (max-width: 480px) {
+    #searchModal {
+        width: calc(100% - 20px);
+        min-width: auto;
+        padding: 15px;
+    }
+
+        #searchModal .search-form {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        #searchModal input[type="text"] {
+            width: 100%;
+            padding: 8px;
+        }
+
+        #searchModal button[type="submit"],
+        #closeSearchBtn {
+            width: 100%;
+            padding: 8px;
+        }
+}
+
+@media (max-width: 350px) {
+    #searchModal {
+        padding: 12px;
+    }
+
+        #searchModal input[type="text"] {
+            font-size: 12px;
+        }
+
+        #searchModal button[type="submit"],
+        #closeSearchBtn {
+            font-size: 12px;
+            padding: 6px;
+        }
+}
+
+/* Маленькая высота */
+@media (max-height: 450px) {
+    #searchModal {
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+}

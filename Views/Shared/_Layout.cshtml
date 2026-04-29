@@ -4,9 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/css/Filter.css" asp-append-version="true"/>
-    <script src="~/js/Index.js"></script>
+    <link rel="stylesheet" href="/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="/css/Filter.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="/css/Search.css" asp-append-version="true" />
+    <script src="/js/Index.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +38,7 @@
 
     <div class="content-wrapper">
         <main>
-            <div id="searchModal" style="display: none; position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000;">
+            <div id="searchModal">
                 <form method="get" action="/UserWorkspace/Search" class="search-form">
                     <input type="text" name="searchString" placeholder="Введите текст для поиска..." />
                     <button type="submit">Найти</button>
