@@ -37,7 +37,8 @@ header {
 
 .has-account {
     text-align: center;
-    margin-top: 5px;
+    margin-top: -15px;
+    padding-bottom: 10px;
 }
 
 a {
@@ -107,7 +108,7 @@ label {
     min-width: 0;
     width: 100%;
     height: 45px;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     border-radius: 10px;
     border: 1px solid var(--light-gray-color);
     padding-left: 15px;
@@ -308,4 +309,35 @@ label {
 
 input.error-border {
     border-color: red !important;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-right: 40px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-password:hover svg path,
+.toggle-password:hover svg circle {
+    stroke: #990000;
+}
+
+.toggle-password:focus {
+    outline: none;
 }

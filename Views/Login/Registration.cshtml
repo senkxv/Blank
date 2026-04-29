@@ -58,11 +58,29 @@
                     <label for="FIO">ФИО</label>
                     <input id="FIO" type="text" name="ФИО"/>
 
-                    <label for="password">Пароль</label>
-                    <input id="password" type="password" name="Password"/>
+                    <label for="Password">Пароль</label>
+                    <div class="password-wrapper">
+                        <input id="Password" type="password" name="Password" />
+                        <button type="button" class="toggle-password" data-target="Password">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5C6 5 2.5 9.5 1 12C2.5 14.5 6 19 12 19C18 19 21.5 14.5 23 12C21.5 9.5 18 5 12 5Z"
+                                      stroke="#666" stroke-width="1.5" fill="none" stroke-linecap="round" />
+                                <circle cx="12" cy="12" r="2.5" stroke="#666" stroke-width="1.5" fill="none" />
+                            </svg>
+                        </button>
+                    </div>
 
                     <label for="password-repeat">Подтвердите пароль</label>
-                    <input id="password-repeat" type="password" name="ConfirmPassword"/>
+                    <div class="password-wrapper">
+                        <input id="password-repeat" type="password" name="password" />
+                        <button type="button" class="toggle-password" data-target="password-repeat">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5C6 5 2.5 9.5 1 12C2.5 14.5 6 19 12 19C18 19 21.5 14.5 23 12C21.5 9.5 18 5 12 5Z"
+                                      stroke="#666" stroke-width="1.5" fill="none" stroke-linecap="round" />
+                                <circle cx="12" cy="12" r="2.5" stroke="#666" stroke-width="1.5" fill="none" />
+                            </svg>
+                        </button>
+                    </div>
 
                     <ul class="form-list-password">
                         <li>Используйте 8 и более символов</li>
