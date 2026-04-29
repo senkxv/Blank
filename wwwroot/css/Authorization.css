@@ -13,8 +13,6 @@
     --dark-color: #000000;
     --light-gray-color: #999999;
     --dark-gray-color: #666666;
-    --dark-red-color: #990000;
-    --light-red-color: #FF0000;
 }
 
 html {
@@ -24,6 +22,7 @@ html {
 }
 
 body {
+    background: url(/images/Background.png);
     margin: 0;
     padding: 20px;
     display: flex;
@@ -133,27 +132,6 @@ label {
 
 [type="submit"]:hover {
     box-shadow: 0 0 0 2px white, 0 0 0 4px black;
-}
-
-.form-list-password {
-    position: relative;
-    margin-left: 0;
-    list-style: circle;
-    padding-left: 20px;
-    display: grid;
-    grid-template-columns: auto auto;
-    column-gap: 40px;
-    max-width: 100%;
-    font-size: 14px;
-}
-
-.checkbox-user-data-computing, #checkbox-user-data-computing {
-    margin-top: 30px;
-}
-
-[type="checkbox"] {
-    margin-right: 10px;
-    transform: scale(1.1);
 }
 
 @media (max-width: 1024px) {
