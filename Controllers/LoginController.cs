@@ -85,7 +85,7 @@ namespace Blank.Controllers
                 var user = new Users
                 {
                     почта = model.Email,
-                    хэш_пароль = HashPassword(model.Password),
+                    хэш_пароль = HashPassword(model.Password ?? ""),
                     фамилия = фамилия,
                     имя = имя,
                     отчество = отчество,
@@ -98,7 +98,7 @@ namespace Blank.Controllers
                 await _context.SaveChangesAsync();
 
                 HttpContext.Session.SetString("UserId", user.ид_пользователя.ToString());
-                HttpContext.Session.SetString("UserEmail", user.почта);
+                HttpContext.Session.SetString("UserEmail", user.почта ?? "");
                 HttpContext.Session.SetString("UserName", $"{user.фамилия} {user.имя}");
 
                 return RedirectToAction("Index", "UserWorkspace");

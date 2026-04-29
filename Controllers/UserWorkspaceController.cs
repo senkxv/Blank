@@ -103,7 +103,7 @@ namespace Blank.Controllers
                             }
                         }
                     }
-                    catch (JsonException ex)
+                    catch (JsonException)
                     {
                         ModelState.AddModelError("", "Ошибка при обработке данных товаров");
                     }
