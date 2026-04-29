@@ -29,11 +29,10 @@
 
         let isValid = true;
 
-        const email = document.getElementById('Email');      // ← исправлено
+        const email = document.getElementById('Email');    
         const fio = document.getElementById('FIO');
-        const password = document.getElementById('Password'); // ← исправлено
+        const password = document.getElementById('Password'); 
 
-        // Email
         if (email.value.trim() === '') {
             showError('Email', 'Введите email');
             isValid = false;
@@ -42,16 +41,6 @@
             isValid = false;
         }
 
-        // ФИО
-        if (fio.value.trim() === '') {
-            showError('FIO', 'Введите ФИО');
-            isValid = false;
-        } else if (fio.value.trim().length < 2) {
-            showError('FIO', 'ФИО должно содержать минимум 2 символа');
-            isValid = false;
-        }
-
-        // Пароль
         if (password.value === '') {
             showError('Password', 'Введите пароль');
             isValid = false;
