@@ -4,7 +4,7 @@
     function clearErrors() {
         document.querySelectorAll('.error-message').forEach(el => el.remove());
         document.querySelectorAll('input').forEach(input => {
-            input.style.borderColor = '#999999';
+            input.classList.remove('error-border');
         });
     }
 
@@ -12,6 +12,7 @@
         const input = document.getElementById(inputId);
         if (!input) return;
         input.style.borderColor = 'red';
+        input.classList.add('error-border');
 
         const oldError = input.parentNode.querySelector(`.error-message[data-for="${inputId}"]`);
         if (oldError) oldError.remove();
@@ -19,7 +20,6 @@
         const error = document.createElement('div');
         error.className = 'error-message';
         error.setAttribute('data-for', inputId);
-        error.style.cssText = 'color: #990000; font-size: 12px; margin-top: -10px; margin-bottom: 10px;';
         error.innerHTML = message;
         input.parentNode.insertBefore(error, input.nextSibling);
     }
@@ -30,7 +30,6 @@
         let isValid = true;
 
         const email = document.getElementById('Email');    
-        const fio = document.getElementById('FIO');
         const password = document.getElementById('Password'); 
 
         if (email.value.trim() === '') {
@@ -44,6 +43,8 @@
         if (password.value === '') {
             showError('Password', 'Введите пароль');
             isValid = false;
+        } else if (password.value < 8) {
+            showError('Password', 'Введите корректный пароль');
         }
 
         if (!isValid) {

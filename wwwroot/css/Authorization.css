@@ -299,3 +299,14 @@ label {
         font-size: 10px;
     }
 }
+
+.error-message {
+    color: #990000;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+input.error-border {
+    border-color: red !important;
+}
