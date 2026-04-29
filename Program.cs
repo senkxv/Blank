@@ -1,11 +1,10 @@
 using Blank.Data;
-using Blank.Models.Tables;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
-    options.UseMySQL(builder.Configuration.GetConnectionString("LocalConnection") ?? "RemoteConnection")
+    options.UseMySQL(builder.Configuration.GetConnectionString("LocalConnection") ?? "")
 );
 
 builder.Services.AddDistributedMemoryCache();
@@ -26,7 +25,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/UserWorkspace/Index");
     app.UseHsts();
 }
 
