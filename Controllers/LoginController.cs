@@ -1,6 +1,6 @@
 ﻿using Blank.Data;
-using Blank.Models;
 using Blank.Models.Tables;
+using Blank.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;

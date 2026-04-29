@@ -1,5 +1,4 @@
 ﻿using Blank.Data;
-using Blank.Models;
 using Blank.Models.Tables;
 using Blank.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +7,7 @@ using OfficeOpenXml;
 using SelectPdf;
 using System.Text;
 using System.Text.Json;
+using Blank.Models.ViewModels;
 
 namespace Blank.Controllers
 {
