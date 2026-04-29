@@ -20,7 +20,12 @@ namespace Blank.Controllers
             _context = context;
         }
 
-        public IActionResult Error()
+        public IActionResult Error404()
+        {
+            return View();
+        }
+
+        public IActionResult Error500()
         {
             return View();
         }
