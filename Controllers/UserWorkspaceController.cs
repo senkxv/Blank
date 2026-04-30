@@ -379,14 +379,13 @@ namespace Blank.Controllers
             {
                 searchString = searchString.ToLower().Trim();
 
-                // Пробуем распарсить как дату (поддерживает любые форматы)
                 DateTime? searchDate = null;
                 string[] dateFormats = {
-            "dd.MM.yyyy", "dd/MM/yyyy", "dd-MM-yyyy",
-            "dd.MM.yy", "dd/MM/yy", "dd-MM-yy",
-            "yyyy-MM-dd", "yyyy/MM/dd", "yyyy.MM.dd",
-            "MM/dd/yyyy", "MM-dd-yyyy", "MM.dd.yyyy"
-        };
+                    "dd.MM.yyyy", "dd/MM/yyyy", "dd-MM-yyyy",
+                    "dd.MM.yy", "dd/MM/yy", "dd-MM-yy",
+                    "yyyy-MM-dd", "yyyy/MM/dd", "yyyy.MM.dd",
+                    "MM/dd/yyyy", "MM-dd-yyyy", "MM.dd.yyyy"
+                };
 
                 if (DateTime.TryParseExact(searchString, dateFormats,
                     System.Globalization.CultureInfo.InvariantCulture,
@@ -394,7 +393,7 @@ namespace Blank.Controllers
                 {
                     searchDate = parsedDate;
                 }
-                // Если не распарсилось, пробуем просто TryParse
+
                 else if (DateTime.TryParse(searchString, out DateTime simpleDate))
                 {
                     searchDate = simpleDate;
@@ -413,11 +412,11 @@ namespace Blank.Controllers
                     (d.Марка_Машины != null && d.Марка_Машины.ToLower().Contains(searchString)) ||
                     (d.Регистрационный_Номер != null && d.Регистрационный_Номер.ToLower().Contains(searchString)) ||
                     (d.Тип_ТС != null && d.Тип_ТС.ToLower().Contains(searchString)) ||
-                    // Поиск по дате (если распарсили)
+
                     (searchDate.HasValue && d.дата_создания.Date == searchDate.Value.Date) ||
-                    // Поиск по году
+
                     d.дата_создания.Year.ToString().Contains(searchString) ||
-                    // Поиск по месяцу и году (например "01.2024")
+
                     d.дата_создания.ToString("MM.yyyy").Contains(searchString.Replace("/", ".").Replace("-", ".")) ||
                     d.дата_создания.ToString("yyyy").Contains(searchString)
                 ).ToList();
