@@ -15,10 +15,10 @@ namespace Blank.Models.Tables
         [MaxLength(255)]
         public string? название { get; set; }
 
-        [Column("УНН")]
+        [Column("УНП")]
         [Required]
         [MaxLength(200)]
-        public string? унн { get; set; }
+        public string? унп { get; set; }
 
         [Column("Адрес")]
         [Required]
