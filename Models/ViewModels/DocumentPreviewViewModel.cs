@@ -22,6 +22,8 @@ namespace Blank.Models.ViewModels
         public decimal РасстояниеПеревозки { get; set; }
         public decimal ОсновнойТариф { get; set; }
         public decimal КОплате { get; set; }
+        public string? отпуск_разрешил { get; set; }
+        public string? сдал_грузоотправитель { get; set; }
     }
 
     public class DocumentTotals

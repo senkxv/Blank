@@ -18,7 +18,6 @@ body {
     background: white;
 }
 
-/* Шапка документа */
 .doc-header {
     text-align: center;
     margin-bottom: 15px;
@@ -35,7 +34,6 @@ body {
     margin-top: 3px;
 }
 
-/* Участники (три колонки) */
 .participants {
     display: flex;
     border: 1px solid #000;
@@ -52,7 +50,6 @@ body {
         border-right: none;
     }
 
-/* Транспорт */
 .transport-line {
     display: flex;
     justify-content: space-between;
@@ -72,7 +69,6 @@ body {
     text-align: center;
 }
 
-/* Водитель */
 .driver-line {
     margin: 8px 0;
     padding-bottom: 3px;
@@ -85,7 +81,6 @@ body {
     margin-bottom: 8px;
 }
 
-/* Пункты погрузки/разгрузки */
 .points-line {
     display: flex;
     justify-content: space-between;
@@ -98,14 +93,12 @@ body {
         flex: 1;
     }
 
-/* Основание и переадресовка */
 .base-line, .redirect-line {
     margin: 8px 0;
     padding-bottom: 3px;
     border-bottom: 1px dashed #000;
 }
 
-/* Секции */
 .section-title {
     font-weight: bold;
     text-align: center;
@@ -115,10 +108,10 @@ body {
     padding: 3px;
 }
 
-/* Товарная таблица */
 .goods-table {
     width: 100%;
     margin: 8px 0;
+    overflow-x: auto;
 }
 
 .goods-header, .goods-row {
@@ -141,46 +134,46 @@ body {
         }
 
 .g-name {
-    width: 22%;
+    width: 18%;
 }
 
 .g-unit {
-    width: 8%;
+    width: 6%;
     text-align: center;
 }
 
 .g-qty {
-    width: 8%;
+    width: 6%;
     text-align: center;
 }
 
 .g-price {
-    width: 9%;
+    width: 7%;
     text-align: right;
 }
 
 .g-cost {
-    width: 10%;
+    width: 8%;
     text-align: right;
 }
 
 .g-vat {
-    width: 6%;
+    width: 5%;
     text-align: center;
 }
 
 .g-vat-sum {
-    width: 10%;
+    width: 8%;
     text-align: right;
 }
 
 .g-total {
-    width: 10%;
+    width: 9%;
     text-align: right;
 }
 
 .g-packs {
-    width: 6%;
+    width: 5%;
     text-align: center;
 }
 
@@ -190,15 +183,9 @@ body {
 }
 
 .g-note {
-    width: 4%;
+    width: 11%;
 }
 
-.total-row {
-    border-top: 1px solid #000;
-    font-weight: bold;
-}
-
-/* Итоги прописью */
 .totals-words {
     margin: 10px 0;
     padding: 5px;
@@ -206,26 +193,30 @@ body {
     background: #f9f9f9;
 }
 
-    .totals-words div {
-        margin: 3px 0;
-    }
+.totals-words div {
+    margin: 3px 0;
+}
 
-/* Подписи */
 .signatures-row {
     display: flex;
-    margin: 20px 0 10px;
+    margin: 20px 0 20px;
+    gap: 20px;
 }
 
 .sign-item {
     flex: 1;
-    min-height: 60px;
     text-align: center;
-    border-top: 1px dashed #000;
-    padding-top: 20px;
-    margin: 0 5px;
 }
 
-/* Инфоблок */
+.sign-title {
+    margin-bottom: 15px;
+}
+
+.sign-name {
+    margin-bottom: -20px;
+    min-height: 25px;
+}
+
 .info-block {
     margin: 10px 0;
     padding: 8px;
@@ -245,7 +236,6 @@ body {
     border-bottom: 1px solid #000;
 }
 
-/* Кнопки */
 .print-buttons {
     margin-top: 20px;
     text-align: center;

@@ -150,10 +150,23 @@
         </div>
 
         <!-- ПОДПИСИ -->
+        <!-- ПОДПИСИ -->
         <div class="signatures-row">
-            <div class="sign-item"><strong>Отпуск разрешил</strong><br><br><br>____________________</div>
-            <div class="sign-item"><strong>Сдал грузоотправитель</strong><br><br><br>____________________</div>
-            <div class="sign-item"><strong>Груз получил грузополучатель</strong><br><br><br>____________________</div>
+            <div class="sign-item">
+                <div class="sign-title"><strong>Отпуск разрешил</strong></div>
+                <div class="sign-name">@(Model.отпуск_разрешил ?? "")</div>
+                <div class="sign-line">____________________</div>
+            </div>
+            <div class="sign-item">
+                <div class="sign-title"><strong>Сдал грузоотправитель</strong></div>
+                <div class="sign-name">@(Model.сдал_грузоотправитель ?? "")</div>
+                <div class="sign-line">____________________</div>
+            </div>
+            <div class="sign-item">
+                <div class="sign-title"><strong>Груз получил грузополучатель</strong></div>
+                <div class="sign-name"></div>
+                <div class="sign-line">____________________</div>
+            </div>
         </div>
 
         <!-- III. ПРОЧИЕ СВЕДЕНИЯ -->

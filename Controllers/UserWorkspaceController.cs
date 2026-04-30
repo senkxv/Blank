@@ -1,13 +1,14 @@
 ﻿using Blank.Data;
-using Blank.Models.Tables;
 using Blank.Helpers;
+using Blank.Models.Tables;
+using Blank.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using SelectPdf;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
-using Blank.Models.ViewModels;
 
 namespace Blank.Controllers
 {
@@ -554,7 +555,6 @@ namespace Blank.Controllers
         }
 
         [HttpGet]
-        [HttpGet]
         public async Task<IActionResult> PreviewDocument(int id)
         {
             try
@@ -660,7 +660,9 @@ namespace Blank.Controllers
                     ПунктРазгрузки = пунктРазгрузки,
                     ТипДокумента = типДокумента,
                     Итоги = итоги,
-                    ОснованиеОтпуска = ""
+                    ОснованиеОтпуска = "",
+                    отпуск_разрешил = документ.отпуск_разрешил,
+                    сдал_грузоотправитель = документ.сдал_грузоотправитель
                 };
 
                 string templateName = GetTemplateName(типДокумента?.краткое_наименование);
