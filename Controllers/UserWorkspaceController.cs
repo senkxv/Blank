@@ -679,9 +679,9 @@ namespace Blank.Controllers
         {
             return documentType?.ToUpper() switch
             {
-                "ТТН-1" => "TTN1",
+                "ТТН" => "TTN1",
                 "CMR" => "CMR",
-                "ТН-2" => "TN2",
+                "ТН" => "TN2",
                 _ => "TTN1"
             };
         }
