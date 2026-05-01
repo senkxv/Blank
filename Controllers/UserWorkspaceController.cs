@@ -6,9 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using SelectPdf;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+
+// Псевдонимы для устранения конфликта имён
+using WordprocessingDocument = DocumentFormat.OpenXml.Packaging.WordprocessingDocument;
+using Text = DocumentFormat.OpenXml.Wordprocessing.Text;
+using Body = DocumentFormat.OpenXml.Wordprocessing.Body;
 
 namespace Blank.Controllers
 {
@@ -555,6 +561,194 @@ namespace Blank.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> DownloadCmr(int id)
+        {
+            try
+            {
+                // 1. Получаем документ
+                var документ = await _context.Документы
+                    .FirstOrDefaultAsync(d => d.ид_документа == id);
+
+                if (документ == null)
+                {
+                    return NotFound($"Документ с ID {id} не найден");
+                }
+
+                // 2. Получаем позиции
+                var позиции = new List<PositionViewModel>();
+
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = @"
+                SELECT 
+                    p.ид_позиции,
+                    p.ид_товара,
+                    IFNULL(p.количество, 0) as количество,
+                    IFNULL(p.цена_за_единицу, 0) as цена_за_единицу,
+                    p.ставка_ндс,
+                    p.масса_груза,
+                    p.грузовых_мест,
+                    p.примечание,
+                    IFNULL(g.наименование, 'Товар не найден') as товар_наименование,
+                    IFNULL(g.единицы_измерения, '') as единицы_измерения
+                FROM Позиции p
+                LEFT JOIN Товары g ON p.ид_товара = g.ид_товара
+                WHERE p.ид_документа = @id";
+
+                    var param = command.CreateParameter();
+                    param.ParameterName = "@id";
+                    param.Value = id;
+                    command.Parameters.Add(param);
+
+                    await _context.Database.OpenConnectionAsync();
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            позиции.Add(new PositionViewModel
+                            {
+                                id = reader.GetInt32(0),
+                                goodsId = reader.IsDBNull(1) ? 0 : reader.GetInt32(1),
+                                quantity = reader.GetDouble(2),
+                                price = reader.GetDecimal(3),
+                                ставка_ндс = reader.IsDBNull(4) ? (decimal?)null : reader.GetDecimal(4),
+                                weight = reader.IsDBNull(5) ? 0 : (decimal)reader.GetDecimal(5),
+                                packages = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
+                                note = reader.IsDBNull(7) ? null : reader.GetString(7),
+                                товар_наименование = reader.GetString(8),
+                                единицы_измерения = reader.GetString(9)
+                            });
+                        }
+                    }
+                }
+
+                // 3. Получаем связанные данные
+                var грузоотправитель = await _context.Организации
+                    .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_грузоотправителя);
+                var грузополучатель = await _context.Организации
+                    .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_получателя);
+                var перевозчик = await _context.Организации
+                    .FirstOrDefaultAsync(o => o.ид_организации == документ.ид_перевозчика);
+                var транспорт = await _context.Транспорт
+                    .FirstOrDefaultAsync(t => t.ид_транспорта == документ.ид_транспорта);
+
+                if (транспорт != null)
+                {
+                    await _context.Entry(транспорт)
+                        .Reference(t => t.Марка_Транспорта)
+                        .LoadAsync();
+                }
+
+                var пунктПогрузки = await _context.Пункт_Погрузки
+                    .FirstOrDefaultAsync(p => p.ид_пункта_погрузки == документ.ид_пункта_погрузки);
+                var пунктРазгрузки = await _context.Пункт_Разгрузки
+                    .FirstOrDefaultAsync(p => p.ид_пункта_разгрузки == документ.ид_пункта_разгрузки);
+
+                // 4. Считаем итоги
+                decimal totalWeight = позиции.Sum(p => p.weight);
+                int totalPackages = позиции.Sum(p => p.packages);
+                decimal totalAmount = позиции.Sum(p => p.price * (decimal)p.quantity);
+
+                // 5. Путь к шаблону Word
+                string templatePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "Template",
+                    "CMR.docx");
+
+                if (!System.IO.File.Exists(templatePath))
+                {
+                    return Content($"Файл шаблона не найден по пути: {templatePath}");
+                }
+
+                // 6. Создаём временный файл Word
+                string tempFile = Path.GetTempFileName();
+                string tempFileWithExt = Path.ChangeExtension(tempFile, ".docx");
+                System.IO.File.Copy(templatePath, tempFileWithExt, overwrite: true);
+
+                // 7. Заменяем заполнители в Word (РУССКИЕ названия)
+                using (WordprocessingDocument doc = WordprocessingDocument.Open(tempFileWithExt, true))
+                {
+                    var body = doc.MainDocumentPart.Document.Body;
+
+                    var replacements = new Dictionary<string, string>
+    {
+        { "{{sender}}", (грузоотправитель?.название ?? "") + ", " + (грузоотправитель?.адрес ?? "") },
+        { "{{receiver}}", (грузополучатель?.название ?? "") + ", " + (грузополучатель?.адрес ?? "") },
+        { "{{transporter}}", перевозчик?.название ?? "" },
+        { "{{unloading_point}}", пунктРазгрузки?.наименование ?? "" },
+        { "{{loading_point}}", пунктПогрузки?.наименование ?? "" },
+        { "{{date}}", документ.дата_создания.ToString("dd.MM.yyyy") },
+        { "{{reg_number}}", транспорт?.регистрационный_номер ?? "" },
+        { "{{good_name}}", позиции.FirstOrDefault()?.товар_наименование ?? "Не указано" },
+        { "{{weight}}", totalWeight.ToString("F0") + " кг" },
+        { "{{total_sum}}", totalAmount.ToString("N2") },
+        { "{{mark}}", транспорт?.Марка_Транспорта?.наименование_марки ?? "Не указана" }
+    };
+
+                    foreach (var replacement in replacements)
+                    {
+                        ReplaceTextInBody(body, replacement.Key, replacement.Value);
+                    }
+
+                    doc.MainDocumentPart.Document.Save();
+                }
+
+                // 8. Конвертируем Word в PDF
+                string pdfPath = Path.ChangeExtension(tempFileWithExt, ".pdf");
+
+                var wordDocument = new Spire.Doc.Document();
+                wordDocument.LoadFromFile(tempFileWithExt);
+                wordDocument.SaveToFile(pdfPath, Spire.Doc.FileFormat.PDF);
+                wordDocument.Close();
+
+                // 9. Читаем PDF
+                byte[] resultBytes = System.IO.File.ReadAllBytes(pdfPath);
+
+                // 10. Удаляем временные файлы
+                System.IO.File.Delete(tempFileWithExt);
+                System.IO.File.Delete(pdfPath);
+
+                // 11. Отдаём PDF для просмотра в браузере (без русских символов в заголовке!)
+                Response.Headers.Add("Content-Disposition", "inline");
+                return File(resultBytes, "application/pdf");
+            }
+            catch (Exception ex)
+            {
+                return Content($"Ошибка: {ex.Message}<br><br>StackTrace: {ex.StackTrace}");
+            }
+        }
+
+
+
+        // Вспомогательный метод для замены текста в Word-документе
+        private void ReplaceTextInBody(Body body, string oldText, string newText)
+        {
+            // Находим все параграфы
+            var paragraphs = body.Descendants<DocumentFormat.OpenXml.Wordprocessing.Paragraph>().ToList();
+
+            foreach (var paragraph in paragraphs)
+            {
+                // Получаем весь текст параграфа
+                string fullText = paragraph.InnerText;
+
+                if (fullText.Contains(oldText))
+                {
+                    // Заменяем текст
+                    var newFullText = fullText.Replace(oldText, newText);
+
+                    // Очищаем параграф
+                    paragraph.RemoveAllChildren<DocumentFormat.OpenXml.Wordprocessing.Run>();
+
+                    // Добавляем новый Run с заменённым текстом
+                    var newRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+                    newRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(newFullText));
+                    paragraph.AppendChild(newRun);
+                }
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> PreviewDocument(int id)
         {
             try
@@ -567,6 +761,19 @@ namespace Blank.Controllers
                     return Content($"Документ с ID {id} не найден", "text/html");
                 }
 
+                // Определяем тип документа
+                var типДокумента = await _context.Типы_Документов
+                    .FirstOrDefaultAsync(t => t.ид_типа == документ.ид_типа);
+
+                string documentType = типДокумента?.краткое_наименование?.ToUpper();
+
+                // Если это CMR - генерируем PDF через DownloadCmr
+                if (documentType == "CMR")
+                {
+                    return RedirectToAction("DownloadCmr", new { id = id });
+                }
+
+                // Для остальных типов - показываем HTML
                 var позиции = new List<PositionViewModel>();
 
                 using (var command = _context.Database.GetDbConnection().CreateCommand())
@@ -629,8 +836,6 @@ namespace Blank.Controllers
                     .FirstOrDefaultAsync(p => p.ид_пункта_погрузки == документ.ид_пункта_погрузки);
                 var пунктРазгрузки = await _context.Пункт_Разгрузки
                     .FirstOrDefaultAsync(p => p.ид_пункта_разгрузки == документ.ид_пункта_разгрузки);
-                var типДокумента = await _context.Типы_Документов
-                    .FirstOrDefaultAsync(t => t.ид_типа == документ.ид_типа);
 
                 var итоги = new DocumentTotals();
                 foreach (var pos in позиции)
@@ -666,6 +871,17 @@ namespace Blank.Controllers
                 };
 
                 string templateName = GetTemplateName(типДокумента?.краткое_наименование);
+
+                // Проверяем существование файла вручную
+                string templatePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "Views", "Shared", "DocumentTemplates",
+                    $"{templateName}.cshtml");
+
+                if (!System.IO.File.Exists(templatePath))
+                {
+                    templateName = "TTN1";
+                }
 
                 return View($"~/Views/Shared/DocumentTemplates/{templateName}.cshtml", model);
             }
