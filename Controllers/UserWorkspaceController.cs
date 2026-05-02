@@ -672,24 +672,16 @@ namespace Blank.Controllers
                                         var firstName = sheetDrivers.Cells[row, 3]?.Value?.ToString();
                                         if (string.IsNullOrEmpty(lastName)) continue;
 
-                                        // Получаем номер лицензии
                                         var licenseNumber = sheetDrivers.Cells[row, 5]?.Value?.ToString();
-
-                                        // Если номер лицензии пустой, пропускаем этого водителя
                                         if (string.IsNullOrEmpty(licenseNumber))
                                         {
-                                            continue;
+                                            licenseNumber = $"DRV_{lastName}_{firstName}_{row}_{DateTime.Now.Ticks}";
                                         }
 
-                                        // Проверяем, существует ли уже водитель с таким номером лицензии
                                         var existingDriver = await _context.Водители
                                             .FirstOrDefaultAsync(d => d.номер_лицензии == licenseNumber);
 
-                                        if (existingDriver != null)
-                                        {
-                                            // Если уже есть, пропускаем
-                                            continue;
-                                        }
+                                        if (existingDriver != null) continue;
 
                                         await _context.Database.ExecuteSqlRawAsync(
                                             "INSERT INTO Водители (фамилия, имя, отчество, номер_лицензии, номер_телефона) VALUES ({0}, {1}, {2}, {3}, {4})",
@@ -767,6 +759,25 @@ namespace Blank.Controllers
 
                                 if (sheetDocs != null && sheetDocs.Dimension != null && sheetDocs.Dimension.Rows > 1)
                                 {
+                                    // Получаем значения по умолчанию
+                                    var defaultDocType = await _context.Типы_Документов.FirstOrDefaultAsync();
+                                    int defaultTypeId = defaultDocType?.ид_типа ?? 1;
+
+                                    var defaultOrg = await _context.Организации.FirstOrDefaultAsync();
+                                    int defaultOrgId = defaultOrg?.ид_организации ?? 1;
+
+                                    var defaultDriver = await _context.Водители.FirstOrDefaultAsync();
+                                    int defaultDriverId = defaultDriver?.ид_водителя ?? 1;
+
+                                    var defaultTransport = await _context.Транспорт.FirstOrDefaultAsync();
+                                    int defaultTransportId = defaultTransport?.ид_транспорта ?? 1;
+
+                                    var defaultLoadingPoint = await _context.Пункт_Погрузки.FirstOrDefaultAsync();
+                                    int defaultLoadingPointId = defaultLoadingPoint?.ид_пункта_погрузки ?? 1;
+
+                                    var defaultUnloadingPoint = await _context.Пункт_Разгрузки.FirstOrDefaultAsync();
+                                    int defaultUnloadingPointId = defaultUnloadingPoint?.ид_пункта_разгрузки ?? 1;
+
                                     for (int row = 2; row <= sheetDocs.Dimension.Rows; row++)
                                     {
                                         var docNumber = sheetDocs.Cells[row, 2]?.Value?.ToString();
@@ -778,13 +789,90 @@ namespace Blank.Controllers
                                             docDate = DateTime.Now;
                                         }
 
+                                        // Тип документа
+                                        var typeName = sheetDocs.Cells[row, 4]?.Value?.ToString();
+                                        int typeId = defaultTypeId;
+                                        if (!string.IsNullOrEmpty(typeName))
+                                        {
+                                            var docType = await _context.Типы_Документов.FirstOrDefaultAsync(t => t.краткое_наименование == typeName);
+                                            if (docType != null) typeId = docType.ид_типа;
+                                        }
+
+                                        // Грузоотправитель
+                                        var senderName = sheetDocs.Cells[row, 5]?.Value?.ToString();
+                                        int senderId = defaultOrgId;
+                                        if (!string.IsNullOrEmpty(senderName))
+                                        {
+                                            var org = await _context.Организации.FirstOrDefaultAsync(o => o.название == senderName);
+                                            if (org != null) senderId = org.ид_организации;
+                                        }
+
+                                        // Перевозчик
+                                        var carrierName = sheetDocs.Cells[row, 6]?.Value?.ToString();
+                                        int carrierId = defaultOrgId;
+                                        if (!string.IsNullOrEmpty(carrierName))
+                                        {
+                                            var org = await _context.Организации.FirstOrDefaultAsync(o => o.название == carrierName);
+                                            if (org != null) carrierId = org.ид_организации;
+                                        }
+
+                                        // Получатель
+                                        var receiverName = sheetDocs.Cells[row, 7]?.Value?.ToString();
+                                        int receiverId = defaultOrgId;
+                                        if (!string.IsNullOrEmpty(receiverName))
+                                        {
+                                            var org = await _context.Организации.FirstOrDefaultAsync(o => o.название == receiverName);
+                                            if (org != null) receiverId = org.ид_организации;
+                                        }
+
+                                        // Пункт погрузки
+                                        var loadingPointName = sheetDocs.Cells[row, 8]?.Value?.ToString();
+                                        int loadingPointId = defaultLoadingPointId;
+                                        if (!string.IsNullOrEmpty(loadingPointName))
+                                        {
+                                            var point = await _context.Пункт_Погрузки.FirstOrDefaultAsync(p => p.наименование == loadingPointName);
+                                            if (point != null) loadingPointId = point.ид_пункта_погрузки;
+                                        }
+
+                                        // Пункт разгрузки
+                                        var unloadingPointName = sheetDocs.Cells[row, 9]?.Value?.ToString();
+                                        int unloadingPointId = defaultUnloadingPointId;
+                                        if (!string.IsNullOrEmpty(unloadingPointName))
+                                        {
+                                            var point = await _context.Пункт_Разгрузки.FirstOrDefaultAsync(p => p.наименование == unloadingPointName);
+                                            if (point != null) unloadingPointId = point.ид_пункта_разгрузки;
+                                        }
+
+                                        // Водитель
+                                        var driverFullName = sheetDocs.Cells[row, 10]?.Value?.ToString();
+                                        int driverId = defaultDriverId;
+                                        if (!string.IsNullOrEmpty(driverFullName))
+                                        {
+                                            var parts = driverFullName.Split(' ');
+                                            var lastName = parts.Length > 0 ? parts[0] : "";
+                                            var firstName = parts.Length > 1 ? parts[1] : "";
+                                            var driver = await _context.Водители.FirstOrDefaultAsync(d => d.фамилия == lastName && d.имя == firstName);
+                                            if (driver != null) driverId = driver.ид_водителя;
+                                        }
+
+                                        // Транспорт
+                                        var regNumber = sheetDocs.Cells[row, 11]?.Value?.ToString();
+                                        int transportId = defaultTransportId;
+                                        if (!string.IsNullOrEmpty(regNumber))
+                                        {
+                                            var transport = await _context.Транспорт.FirstOrDefaultAsync(t => t.регистрационный_номер == regNumber);
+                                            if (transport != null) transportId = transport.ид_транспорта;
+                                        }
+
                                         await _context.Database.ExecuteSqlRawAsync(@"
                                     INSERT INTO Документы (номер_документа, дата_создания, 
                                         ид_типа, ид_грузоотправителя, ид_перевозчика, ид_получателя,
                                         ид_пункта_погрузки, ид_пункта_разгрузки, ид_водителя, ид_транспорта,
                                         ид_пользователя, отпуск_разрешил, сдал_грузоотправитель) 
-                                    VALUES ({0}, {1}, 1, 1, 1, 1, 1, 1, 1, 1, 1, '', '')",
-                                            docNumber, docDate);
+                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, 1, '', '')",
+                                            docNumber, docDate,
+                                            typeId, senderId, carrierId, receiverId,
+                                            loadingPointId, unloadingPointId, driverId, transportId);
                                         countDocs++;
                                     }
                                 }
