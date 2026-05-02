@@ -780,53 +780,108 @@ namespace Blank.Controllers
                                 {
                                     for (int row = 2; row <= sheetDocs.Dimension.Rows; row++)
                                     {
+                                        // Используем колонку 2 (номер_документа)
                                         var docNumber = sheetDocs.Cells[row, 2]?.Value?.ToString();
                                         if (string.IsNullOrEmpty(docNumber)) continue;
 
-                                        // Получаем тип документа
-                                        var типName = sheetDocs.Cells[row, 4]?.Value?.ToString();
-                                        int типId = типName != null && typeIdMap.ContainsKey(типName) ? typeIdMap[типName] : 1;
+                                        // Проверяем, существует ли уже документ с таким номером
+                                        var existingDoc = await _context.Документы.FirstOrDefaultAsync(d => d.номер_документа == docNumber);
+                                        if (existingDoc != null)
+                                        {
+                                            // Если существует - пропускаем
+                                            System.Diagnostics.Debug.WriteLine($"Документ с номером {docNumber} уже существует, пропускаем");
+                                            continue;
+                                        }
 
-                                        // Получаем грузоотправителя
-                                        var грузоотправительName = sheetDocs.Cells[row, 5]?.Value?.ToString();
-                                        int грузоотправительId = грузоотправительName != null && orgIdMap.ContainsKey(грузоотправительName) ? orgIdMap[грузоотправительName] : 1;
-
-                                        // Получаем перевозчика
-                                        var перевозчикName = sheetDocs.Cells[row, 6]?.Value?.ToString();
-                                        int перевозчикId = перевозчикName != null && orgIdMap.ContainsKey(перевозчикName) ? orgIdMap[перевозчикName] : 1;
-
-                                        // Получаем получателя
-                                        var получательName = sheetDocs.Cells[row, 7]?.Value?.ToString();
-                                        int получательId = получательName != null && orgIdMap.ContainsKey(получательName) ? orgIdMap[получательName] : 1;
-
-                                        // Получаем пункт погрузки
-                                        var пунктПогрузкиName = sheetDocs.Cells[row, 8]?.Value?.ToString();
-                                        int пунктПогрузкиId = пунктПогрузкиName != null && loadingIdMap.ContainsKey(пунктПогрузкиName) ? loadingIdMap[пунктПогрузкиName] : 1;
-
-                                        // Получаем пункт разгрузки
-                                        var пунктРазгрузкиName = sheetDocs.Cells[row, 9]?.Value?.ToString();
-                                        int пунктРазгрузкиId = пунктРазгрузкиName != null && unloadingIdMap.ContainsKey(пунктРазгрузкиName) ? unloadingIdMap[пунктРазгрузкиName] : 1;
-
-                                        // Получаем водителя
-                                        var фиоВодителя = sheetDocs.Cells[row, 10]?.Value?.ToString();
-                                        int водительId = фиоВодителя != null && driverIdMap.ContainsKey(фиоВодителя) ? driverIdMap[фиоВодителя] : 1;
-
-                                        // Получаем транспорт
-                                        var регНомер = sheetDocs.Cells[row, 11]?.Value?.ToString();
-                                        int транспортId = регНомер != null && transportIdMap.ContainsKey(регНомер) ? transportIdMap[регНомер] : 1;
-
+                                        // Получаем дату (колонка 3)
                                         DateTime docDate;
                                         if (!DateTime.TryParse(sheetDocs.Cells[row, 3]?.Value?.ToString(), out docDate))
                                         {
                                             docDate = DateTime.Now;
                                         }
 
+                                        // Получаем тип документа (колонка 4)
+                                        var типName = sheetDocs.Cells[row, 4]?.Value?.ToString();
+                                        int типId = 1;
+                                        if (!string.IsNullOrEmpty(типName))
+                                        {
+                                            var docType = await _context.Типы_Документов.FirstOrDefaultAsync(t => t.краткое_наименование == типName);
+                                            if (docType != null) типId = docType.ид_типа;
+                                        }
+
+                                        // Получаем грузоотправителя (колонка 5)
+                                        var грузоотправительName = sheetDocs.Cells[row, 5]?.Value?.ToString();
+                                        int грузоотправительId = 1;
+                                        if (!string.IsNullOrEmpty(грузоотправительName))
+                                        {
+                                            var org = await _context.Организации.FirstOrDefaultAsync(o => o.название == грузоотправительName);
+                                            if (org != null) грузоотправительId = org.ид_организации;
+                                        }
+
+                                        // Получаем перевозчика (колонка 6)
+                                        var перевозчикName = sheetDocs.Cells[row, 6]?.Value?.ToString();
+                                        int перевозчикId = 1;
+                                        if (!string.IsNullOrEmpty(перевозчикName))
+                                        {
+                                            var org = await _context.Организации.FirstOrDefaultAsync(o => o.название == перевозчикName);
+                                            if (org != null) перевозчикId = org.ид_организации;
+                                        }
+
+                                        // Получаем получателя (колонка 7)
+                                        var получательName = sheetDocs.Cells[row, 7]?.Value?.ToString();
+                                        int получательId = 1;
+                                        if (!string.IsNullOrEmpty(получательName))
+                                        {
+                                            var org = await _context.Организации.FirstOrDefaultAsync(o => o.название == получательName);
+                                            if (org != null) получательId = org.ид_организации;
+                                        }
+
+                                        // Получаем пункт погрузки (колонка 8)
+                                        var пунктПогрузкиName = sheetDocs.Cells[row, 8]?.Value?.ToString();
+                                        int пунктПогрузкиId = 1;
+                                        if (!string.IsNullOrEmpty(пунктПогрузкиName))
+                                        {
+                                            var point = await _context.Пункт_Погрузки.FirstOrDefaultAsync(p => p.наименование == пунктПогрузкиName);
+                                            if (point != null) пунктПогрузкиId = point.ид_пункта_погрузки;
+                                        }
+
+                                        // Получаем пункт разгрузки (колонка 9)
+                                        var пунктРазгрузкиName = sheetDocs.Cells[row, 9]?.Value?.ToString();
+                                        int пунктРазгрузкиId = 1;
+                                        if (!string.IsNullOrEmpty(пунктРазгрузкиName))
+                                        {
+                                            var point = await _context.Пункт_Разгрузки.FirstOrDefaultAsync(p => p.наименование == пунктРазгрузкиName);
+                                            if (point != null) пунктРазгрузкиId = point.ид_пункта_разгрузки;
+                                        }
+
+                                        // Получаем водителя (колонка 10)
+                                        var фиоВодителя = sheetDocs.Cells[row, 10]?.Value?.ToString();
+                                        int водительId = 1;
+                                        if (!string.IsNullOrEmpty(фиоВодителя))
+                                        {
+                                            var parts = фиоВодителя.Split(' ');
+                                            var lastName = parts.Length > 0 ? parts[0] : "";
+                                            var firstName = parts.Length > 1 ? parts[1] : "";
+                                            var driver = await _context.Водители.FirstOrDefaultAsync(d => d.фамилия == lastName && d.имя == firstName);
+                                            if (driver != null) водительId = driver.ид_водителя;
+                                        }
+
+                                        // Получаем транспорт (колонка 11)
+                                        var регНомер = sheetDocs.Cells[row, 11]?.Value?.ToString();
+                                        int транспортId = 1;
+                                        if (!string.IsNullOrEmpty(регНомер))
+                                        {
+                                            var transport = await _context.Транспорт.FirstOrDefaultAsync(t => t.регистрационный_номер == регНомер);
+                                            if (transport != null) транспортId = transport.ид_транспорта;
+                                        }
+
+                                        // Вставляем документ
                                         await _context.Database.ExecuteSqlRawAsync(@"
-                                    INSERT INTO Документы (номер_документа, дата_создания, 
-                                        ид_типа, ид_грузоотправителя, ид_перевозчика, ид_получателя,
-                                        ид_пункта_погрузки, ид_пункта_разгрузки, ид_водителя, ид_транспорта,
-                                        ид_пользователя, отпуск_разрешил, сдал_грузоотправитель) 
-                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, 1, '', '')",
+            INSERT INTO Документы (номер_документа, дата_создания, 
+                ид_типа, ид_грузоотправителя, ид_перевозчика, ид_получателя,
+                ид_пункта_погрузки, ид_пункта_разгрузки, ид_водителя, ид_транспорта,
+                ид_пользователя, отпуск_разрешил, сдал_грузоотправитель) 
+            VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, 1, '', '')",
                                             docNumber, docDate,
                                             типId, грузоотправительId, перевозчикId, получательId,
                                             пунктПогрузкиId, пунктРазгрузкиId, водительId, транспортId);
