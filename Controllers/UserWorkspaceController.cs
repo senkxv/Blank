@@ -32,10 +32,10 @@ namespace Blank.Controllers
             return View();
         }
 
-        public IActionResult Error500()
+        /*public IActionResult Error500()
         {
             return View();
-        }
+        }*/
 
         public IActionResult Index()
         {
