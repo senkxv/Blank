@@ -1,0 +1,37 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Восстановление из бэкапа";
+}
+
+<h2>Восстановление базы данных из бэкапа</h2>
+
+<div class="alert alert-warning">
+    <strong>Внимание!</strong> Это действие полностью заменит все текущие данные в базе.
+    Операция необратима!
+</div>
+
+<form asp-action="RestoreFromBackup"
+      asp-controller="UserWorkspace"
+      method="post"
+      enctype="multipart/form-data">
+
+    <div class="form-group">
+        <label for="file">Выберите файл бэкапа (.xlsx):</label>
+        <input type="file" name="file" id="file" class="form-control" accept=".xlsx" required />
+    </div>
+
+    <button type="submit" class="btn btn-danger btn-lg">
+        <i class="fas fa-database"></i> Восстановить из бэкапа
+    </button>
+    
+    <a href="@Url.Action("Index", "UserWorkspace")" class="btn btn-secondary btn-lg">Отмена</a>
+</form>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success mt-4">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-4">@TempData["Error"]</div>
+}

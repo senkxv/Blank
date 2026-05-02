@@ -26,7 +26,6 @@ namespace Blank.Models.Tables
         public string? адрес { get; set; }
 
         [Column("Почта")]
-        [Required]
         [MaxLength(150)]
         public string? почта { get; set; }
     }

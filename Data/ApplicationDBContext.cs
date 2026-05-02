@@ -15,11 +15,96 @@ namespace Blank.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Представление (без ключа)
             modelBuilder.Entity<MainPage>(entity =>
             {
                 entity.HasNoKey();
                 entity.ToView("Главная");
             });
+
+            // ==================== ОСНОВНЫЕ ТАБЛИЦЫ ====================
+
+            modelBuilder.Entity<Documents>(entity =>
+            {
+                entity.HasKey(e => e.ид_документа);
+                entity.Property(e => e.ид_документа).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Positions>(entity =>
+            {
+                entity.HasKey(e => e.ид_позиции);
+                entity.Property(e => e.ид_позиции).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Organization>(entity =>
+            {
+                entity.HasKey(e => e.ид_организации);
+                entity.Property(e => e.ид_организации).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Drivers>(entity =>
+            {
+                entity.HasKey(e => e.ид_водителя);
+                entity.Property(e => e.ид_водителя).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Goods>(entity =>
+            {
+                entity.HasKey(e => e.ид_товара);
+                entity.Property(e => e.ид_товара).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Document_Type>(entity =>
+            {
+                entity.HasKey(e => e.ид_типа);
+                entity.Property(e => e.ид_типа).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Loading_Point>(entity =>
+            {
+                entity.HasKey(e => e.ид_пункта_погрузки);
+                entity.Property(e => e.ид_пункта_погрузки).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Unloading_Point>(entity =>
+            {
+                entity.HasKey(e => e.ид_пункта_разгрузки);
+                entity.Property(e => e.ид_пункта_разгрузки).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Transport>(entity =>
+            {
+                entity.HasKey(e => e.ид_транспорта);
+                entity.Property(e => e.ид_транспорта).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Transport_Mark>(entity =>
+            {
+                entity.HasKey(e => e.ид_марки);
+                entity.Property(e => e.ид_марки).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Transport_Type>(entity =>
+            {
+                entity.HasKey(e => e.ид_типа_транспорта);
+                entity.Property(e => e.ид_типа_транспорта).ValueGeneratedOnAdd();
+            });
+
+            // ==================== ОСТАЛЬНЫЕ СУЩНОСТИ ====================
+
+            modelBuilder.Entity<Users>(entity =>
+            {
+                entity.HasKey(e => e.ид_пользователя);           // предположительное название ключа
+                entity.Property(e => e.ид_пользователя).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Posts>(entity =>
+            {
+                entity.HasKey(e => e.ид_должности);
+                entity.Property(e => e.ид_должности).ValueGeneratedOnAdd();
+            });
+
+            // Если у вас есть другие сущности — добавьте их сюда аналогично
         }
 
         public DbSet<MainPage> Главная { get; set; }
