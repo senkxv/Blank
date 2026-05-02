@@ -331,7 +331,7 @@ namespace Blank.Controllers
         {
             using (var package = new ExcelPackage())
             {
-                // ========== ЛИСТ 1: ДОКУМЕНТЫ (с ID) ==========
+                // Лист 1: Документы (с ID)
                 var sheetDocuments = package.Workbook.Worksheets.Add("Документы");
                 sheetDocuments.Cells[1, 1].Value = "ид_документа";
                 sheetDocuments.Cells[1, 2].Value = "номер_документа";
@@ -344,9 +344,6 @@ namespace Blank.Controllers
                 sheetDocuments.Cells[1, 9].Value = "ид_пункта_разгрузки";
                 sheetDocuments.Cells[1, 10].Value = "ид_водителя";
                 sheetDocuments.Cells[1, 11].Value = "ид_транспорта";
-                sheetDocuments.Cells[1, 12].Value = "ид_пользователя";
-                sheetDocuments.Cells[1, 13].Value = "отпуск_разрешил";
-                sheetDocuments.Cells[1, 14].Value = "сдал_грузоотправитель";
 
                 var документы = _context.Документы.ToList();
                 int row = 2;
@@ -354,7 +351,7 @@ namespace Blank.Controllers
                 {
                     sheetDocuments.Cells[row, 1].Value = doc.ид_документа;
                     sheetDocuments.Cells[row, 2].Value = doc.номер_документа;
-                    sheetDocuments.Cells[row, 3].Value = doc.дата_создания.ToString("yyyy-MM-dd");
+                    sheetDocuments.Cells[row, 3].Value = doc.дата_создания.ToString("yyyy-MM-dd HH:mm:ss");
                     sheetDocuments.Cells[row, 4].Value = doc.ид_типа;
                     sheetDocuments.Cells[row, 5].Value = doc.ид_грузоотправителя;
                     sheetDocuments.Cells[row, 6].Value = doc.ид_перевозчика;
@@ -363,14 +360,11 @@ namespace Blank.Controllers
                     sheetDocuments.Cells[row, 9].Value = doc.ид_пункта_разгрузки;
                     sheetDocuments.Cells[row, 10].Value = doc.ид_водителя;
                     sheetDocuments.Cells[row, 11].Value = doc.ид_транспорта;
-                    sheetDocuments.Cells[row, 12].Value = doc.ид_пользователя;
-                    sheetDocuments.Cells[row, 13].Value = doc.отпуск_разрешил;
-                    sheetDocuments.Cells[row, 14].Value = doc.сдал_грузоотправитель;
                     row++;
                 }
                 sheetDocuments.Cells.AutoFitColumns();
 
-                // ========== ЛИСТ 2: ПОЗИЦИИ ==========
+                // Лист 2: Позиции
                 var sheetPositions = package.Workbook.Worksheets.Add("Позиции");
                 sheetPositions.Cells[1, 1].Value = "ид_позиции";
                 sheetPositions.Cells[1, 2].Value = "ид_документа";
@@ -378,12 +372,11 @@ namespace Blank.Controllers
                 sheetPositions.Cells[1, 4].Value = "количество";
                 sheetPositions.Cells[1, 5].Value = "цена_за_единицу";
                 sheetPositions.Cells[1, 6].Value = "ставка_ндс";
-                sheetPositions.Cells[1, 7].Value = "скидка";
-                sheetPositions.Cells[1, 8].Value = "сумма_ндс";
-                sheetPositions.Cells[1, 9].Value = "стоимость_с_ндс";
-                sheetPositions.Cells[1, 10].Value = "грузовых_мест";
-                sheetPositions.Cells[1, 11].Value = "масса_груза";
-                sheetPositions.Cells[1, 12].Value = "примечание";
+                sheetPositions.Cells[1, 7].Value = "масса_груза";
+                sheetPositions.Cells[1, 8].Value = "грузовых_мест";
+                sheetPositions.Cells[1, 9].Value = "примечание";
+                sheetPositions.Cells[1, 10].Value = "сумма_ндс";
+                sheetPositions.Cells[1, 11].Value = "стоимость_с_ндс";
 
                 var позиции = _context.Позиции.ToList();
                 row = 2;
@@ -395,17 +388,16 @@ namespace Blank.Controllers
                     sheetPositions.Cells[row, 4].Value = pos.количество;
                     sheetPositions.Cells[row, 5].Value = pos.цена_за_единицу;
                     sheetPositions.Cells[row, 6].Value = pos.ставка_ндс;
-                    sheetPositions.Cells[row, 7].Value = pos.скидка;
-                    sheetPositions.Cells[row, 8].Value = pos.сумма_ндс;
-                    sheetPositions.Cells[row, 9].Value = pos.стоимость_с_ндс;
-                    sheetPositions.Cells[row, 10].Value = pos.грузовых_мест;
-                    sheetPositions.Cells[row, 11].Value = pos.масса_груза;
-                    sheetPositions.Cells[row, 12].Value = pos.примечание;
+                    sheetPositions.Cells[row, 7].Value = pos.масса_груза;
+                    sheetPositions.Cells[row, 8].Value = pos.грузовых_мест;
+                    sheetPositions.Cells[row, 9].Value = pos.примечание;
+                    sheetPositions.Cells[row, 10].Value = pos.сумма_ндс;
+                    sheetPositions.Cells[row, 11].Value = pos.стоимость_с_ндс;
                     row++;
                 }
                 sheetPositions.Cells.AutoFitColumns();
 
-                // ========== ЛИСТ 3: ТОВАРЫ ==========
+                // Лист 3: Товары
                 var sheetGoods = package.Workbook.Worksheets.Add("Товары");
                 sheetGoods.Cells[1, 1].Value = "ид_товара";
                 sheetGoods.Cells[1, 2].Value = "наименование";
@@ -422,7 +414,7 @@ namespace Blank.Controllers
                 }
                 sheetGoods.Cells.AutoFitColumns();
 
-                // ========== ЛИСТ 4: ОРГАНИЗАЦИИ ==========
+                // Лист 4: Организации
                 var sheetOrganizations = package.Workbook.Worksheets.Add("Организации");
                 sheetOrganizations.Cells[1, 1].Value = "ид_организации";
                 sheetOrganizations.Cells[1, 2].Value = "название";
@@ -443,14 +435,13 @@ namespace Blank.Controllers
                 }
                 sheetOrganizations.Cells.AutoFitColumns();
 
-                // ========== ЛИСТ 5: ВОДИТЕЛИ ==========
+                // Лист 5: Водители
                 var sheetDrivers = package.Workbook.Worksheets.Add("Водители");
                 sheetDrivers.Cells[1, 1].Value = "ид_водителя";
                 sheetDrivers.Cells[1, 2].Value = "фамилия";
                 sheetDrivers.Cells[1, 3].Value = "имя";
                 sheetDrivers.Cells[1, 4].Value = "отчество";
                 sheetDrivers.Cells[1, 5].Value = "номер_лицензии";
-                sheetDrivers.Cells[1, 6].Value = "номер_телефона";
 
                 var водители = _context.Водители.ToList();
                 row = 2;
@@ -461,12 +452,11 @@ namespace Blank.Controllers
                     sheetDrivers.Cells[row, 3].Value = driver.имя;
                     sheetDrivers.Cells[row, 4].Value = driver.отчество;
                     sheetDrivers.Cells[row, 5].Value = driver.номер_лицензии;
-                    sheetDrivers.Cells[row, 6].Value = driver.номер_телефона;
                     row++;
                 }
                 sheetDrivers.Cells.AutoFitColumns();
 
-                // ========== ЛИСТ 6: ТРАНСПОРТ ==========
+                // Лист 6: Транспорт
                 var sheetTransport = package.Workbook.Worksheets.Add("Транспорт");
                 sheetTransport.Cells[1, 1].Value = "ид_транспорта";
                 sheetTransport.Cells[1, 2].Value = "регистрационный_номер";
@@ -485,37 +475,7 @@ namespace Blank.Controllers
                 }
                 sheetTransport.Cells.AutoFitColumns();
 
-                // ========== ЛИСТ 7: МАРКИ ТРАНСПОРТА ==========
-                var sheetMarks = package.Workbook.Worksheets.Add("МаркиТранспорта");
-                sheetMarks.Cells[1, 1].Value = "ид_марки";
-                sheetMarks.Cells[1, 2].Value = "наименование_марки";
-
-                var марки = _context.Марка_Транспорта.ToList();
-                row = 2;
-                foreach (var mark in марки)
-                {
-                    sheetMarks.Cells[row, 1].Value = mark.ид_марки;
-                    sheetMarks.Cells[row, 2].Value = mark.наименование_марки;
-                    row++;
-                }
-                sheetMarks.Cells.AutoFitColumns();
-
-                // ========== ЛИСТ 8: ТИПЫ ТРАНСПОРТА ==========
-                var sheetTransportTypes = package.Workbook.Worksheets.Add("ТипыТранспорта");
-                sheetTransportTypes.Cells[1, 1].Value = "ид_типа_транспорта";
-                sheetTransportTypes.Cells[1, 2].Value = "наименование_типа";
-
-                var типыТранспорта = _context.Тип_Транспорта.ToList();
-                row = 2;
-                foreach (var type in типыТранспорта)
-                {
-                    sheetTransportTypes.Cells[row, 1].Value = type.ид_типа_транспорта;
-                    sheetTransportTypes.Cells[row, 2].Value = type.наименование_типа;
-                    row++;
-                }
-                sheetTransportTypes.Cells.AutoFitColumns();
-
-                // ========== ЛИСТ 9: ПУНКТЫ ПОГРУЗКИ ==========
+                // Лист 7: Пункты погрузки
                 var sheetLoadingPoints = package.Workbook.Worksheets.Add("ПунктыПогрузки");
                 sheetLoadingPoints.Cells[1, 1].Value = "ид_пункта_погрузки";
                 sheetLoadingPoints.Cells[1, 2].Value = "наименование";
@@ -532,7 +492,7 @@ namespace Blank.Controllers
                 }
                 sheetLoadingPoints.Cells.AutoFitColumns();
 
-                // ========== ЛИСТ 10: ПУНКТЫ РАЗГРУЗКИ ==========
+                // Лист 8: Пункты разгрузки
                 var sheetUnloadingPoints = package.Workbook.Worksheets.Add("ПунктыРазгрузки");
                 sheetUnloadingPoints.Cells[1, 1].Value = "ид_пункта_разгрузки";
                 sheetUnloadingPoints.Cells[1, 2].Value = "наименование";
@@ -549,7 +509,7 @@ namespace Blank.Controllers
                 }
                 sheetUnloadingPoints.Cells.AutoFitColumns();
 
-                // ========== ЛИСТ 11: ТИПЫ ДОКУМЕНТОВ ==========
+                // Лист 9: Типы документов
                 var sheetDocTypes = package.Workbook.Worksheets.Add("ТипыДокументов");
                 sheetDocTypes.Cells[1, 1].Value = "ид_типа";
                 sheetDocTypes.Cells[1, 2].Value = "краткое_наименование";
@@ -614,6 +574,8 @@ namespace Blank.Controllers
                                 // ========== 1. ОЧИЩАЕМ ТАБЛИЦЫ ==========
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Позиции;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Документы;");
+                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Позиции;");
+                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Документы;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Пункт_Погрузки;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Пункт_Разгрузки;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Водители;");
@@ -624,251 +586,225 @@ namespace Blank.Controllers
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Марки_Транспорта;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Типы_Транспорта;");
 
-                                // ========== 2. ВОССТАНАВЛИВАЕМ ТИПЫ ДОКУМЕНТОВ ==========
+                                // ========== 2. ВОССТАНАВЛИВАЕМ МАРКИ ТРАНСПОРТА ==========
+                                var sheetMarks = package.Workbook.Worksheets["МаркиТранспорта"];
+                                if (sheetMarks != null && sheetMarks.Dimension != null && sheetMarks.Dimension.Rows > 1)
+                                {
+                                    for (int row = 2; row <= sheetMarks.Dimension.Rows; row++)
+                                    {
+                                        var id = sheetMarks.Cells[row, 1]?.Value;
+                                        var name = sheetMarks.Cells[row, 2]?.Value?.ToString();
+                                        if (id == null || string.IsNullOrEmpty(name)) continue;
+
+                                        await _context.Database.ExecuteSqlRawAsync(
+                                            "INSERT INTO Марки_Транспорта (ид_марки, наименование_марки) VALUES ({0}, {1})",
+                                            Convert.ToInt32(id), name);
+                                    }
+                                }
+
+                                // ========== 3. ВОССТАНАВЛИВАЕМ ТИПЫ ТРАНСПОРТА ==========
+                                var sheetTransportTypes = package.Workbook.Worksheets["ТипыТранспорта"];
+                                if (sheetTransportTypes != null && sheetTransportTypes.Dimension != null && sheetTransportTypes.Dimension.Rows > 1)
+                                {
+                                    for (int row = 2; row <= sheetTransportTypes.Dimension.Rows; row++)
+                                    {
+                                        var id = sheetTransportTypes.Cells[row, 1]?.Value;
+                                        var name = sheetTransportTypes.Cells[row, 2]?.Value?.ToString();
+                                        if (id == null || string.IsNullOrEmpty(name)) continue;
+
+                                        await _context.Database.ExecuteSqlRawAsync(
+                                            "INSERT INTO Типы_Транспорта (ид_типа_транспорта, наименование_типа) VALUES ({0}, {1})",
+                                            Convert.ToInt32(id), name);
+                                    }
+                                }
+
+                                // ========== 4. ВОССТАНАВЛИВАЕМ ТИПЫ ДОКУМЕНТОВ ==========
                                 var sheetTypes = package.Workbook.Worksheets["ТипыДокументов"];
                                 if (sheetTypes != null && sheetTypes.Dimension != null && sheetTypes.Dimension.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetTypes.Dimension.Rows; row++)
                                     {
+                                        var id = sheetTypes.Cells[row, 1]?.Value;
                                         var shortName = sheetTypes.Cells[row, 2]?.Value?.ToString();
                                         var fullName = sheetTypes.Cells[row, 3]?.Value?.ToString();
-                                        if (string.IsNullOrEmpty(shortName)) continue;
+                                        if (id == null || string.IsNullOrEmpty(shortName)) continue;
 
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Типы_Документов (краткое_наименование, полное_наименование) VALUES ({0}, {1})",
-                                            shortName, fullName ?? "");
+                                            "INSERT INTO Типы_Документов (ид_типа, краткое_наименование, полное_наименование) VALUES ({0}, {1}, {2})",
+                                            Convert.ToInt32(id), shortName, fullName ?? "");
                                     }
                                 }
 
-                                // ========== 3. ВОССТАНАВЛИВАЕМ ОРГАНИЗАЦИИ ==========
+                                // ========== 5. ВОССТАНАВЛИВАЕМ ОРГАНИЗАЦИИ ==========
                                 var sheetOrgs = package.Workbook.Worksheets["Организации"];
                                 if (sheetOrgs != null && sheetOrgs.Dimension != null && sheetOrgs.Dimension.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetOrgs.Dimension.Rows; row++)
                                     {
+                                        var id = sheetOrgs.Cells[row, 1]?.Value;
                                         var name = sheetOrgs.Cells[row, 2]?.Value?.ToString();
-                                        var unp = sheetOrgs.Cells[row, 3]?.Value?.ToString();
-                                        var address = sheetOrgs.Cells[row, 4]?.Value?.ToString();
-                                        if (string.IsNullOrEmpty(name)) continue;
+                                        if (id == null || string.IsNullOrEmpty(name)) continue;
 
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Организации (название, унп, адрес, почта) VALUES ({0}, {1}, {2}, '')",
-                                            name, unp ?? "", address ?? "");
+                                            "INSERT INTO Организации (ид_организации, название, унп, адрес, почта) VALUES ({0}, {1}, {2}, {3}, {4})",
+                                            Convert.ToInt32(id), name,
+                                            sheetOrgs.Cells[row, 3]?.Value?.ToString() ?? "",
+                                            sheetOrgs.Cells[row, 4]?.Value?.ToString() ?? "",
+                                            sheetOrgs.Cells[row, 5]?.Value?.ToString() ?? "");
                                     }
                                 }
 
-                                // ========== 4. ВОССТАНАВЛИВАЕМ ВОДИТЕЛЕЙ ==========
-                                var sheetDrivers = package.Workbook.Worksheets["Водители"];
-                                if (sheetDrivers != null && sheetDrivers.Dimension != null && sheetDrivers.Dimension.Rows > 1)
-                                {
-                                    for (int row = 2; row <= sheetDrivers.Dimension.Rows; row++)
-                                    {
-                                        var lastName = sheetDrivers.Cells[row, 2]?.Value?.ToString();
-                                        var firstName = sheetDrivers.Cells[row, 3]?.Value?.ToString();
-                                        if (string.IsNullOrEmpty(lastName)) continue;
-
-                                        var licenseNumber = sheetDrivers.Cells[row, 5]?.Value?.ToString();
-                                        if (string.IsNullOrEmpty(licenseNumber))
-                                        {
-                                            licenseNumber = $"DRV_{lastName}_{firstName}_{row}_{DateTime.Now.Ticks}";
-                                        }
-
-                                        var existingDriver = await _context.Водители
-                                            .FirstOrDefaultAsync(d => d.номер_лицензии == licenseNumber);
-
-                                        if (existingDriver != null) continue;
-
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Водители (фамилия, имя, отчество, номер_лицензии, номер_телефона) VALUES ({0}, {1}, {2}, {3}, {4})",
-                                            lastName,
-                                            firstName ?? "",
-                                            sheetDrivers.Cells[row, 4]?.Value?.ToString() ?? "",
-                                            licenseNumber,
-                                            sheetDrivers.Cells[row, 6]?.Value?.ToString() ?? "");
-                                    }
-                                }
-
-                                // ========== 5. ВОССТАНАВЛИВАЕМ ПУНКТЫ ПОГРУЗКИ ==========
-                                var sheetLoading = package.Workbook.Worksheets["ПунктыПогрузки"];
-                                if (sheetLoading != null && sheetLoading.Dimension != null && sheetLoading.Dimension.Rows > 1)
-                                {
-                                    for (int row = 2; row <= sheetLoading.Dimension.Rows; row++)
-                                    {
-                                        var name = sheetLoading.Cells[row, 2]?.Value?.ToString();
-                                        if (string.IsNullOrEmpty(name)) continue;
-
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Пункт_Погрузки (наименование, адрес) VALUES ({0}, '')",
-                                            name);
-                                    }
-                                }
-
-                                // ========== 6. ВОССТАНАВЛИВАЕМ ПУНКТЫ РАЗГРУЗКИ ==========
-                                var sheetUnloading = package.Workbook.Worksheets["ПунктыРазгрузки"];
-                                if (sheetUnloading != null && sheetUnloading.Dimension != null && sheetUnloading.Dimension.Rows > 1)
-                                {
-                                    for (int row = 2; row <= sheetUnloading.Dimension.Rows; row++)
-                                    {
-                                        var name = sheetUnloading.Cells[row, 2]?.Value?.ToString();
-                                        if (string.IsNullOrEmpty(name)) continue;
-
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Пункт_Разгрузки (наименование, адрес) VALUES ({0}, '')",
-                                            name);
-                                    }
-                                }
-
-                                // ========== 7. ВОССТАНАВЛИВАЕМ ТРАНСПОРТ ==========
-                                var sheetTransport = package.Workbook.Worksheets["Транспорт"];
-                                if (sheetTransport != null && sheetTransport.Dimension != null && sheetTransport.Dimension.Rows > 1)
-                                {
-                                    for (int row = 2; row <= sheetTransport.Dimension.Rows; row++)
-                                    {
-                                        var regNumber = sheetTransport.Cells[row, 2]?.Value?.ToString();
-                                        if (string.IsNullOrEmpty(regNumber)) continue;
-
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Транспорт (регистрационный_номер, ид_марки, ид_типа_транспорта) VALUES ({0}, 1, 1)",
-                                            regNumber);
-                                    }
-                                }
-
-                                // ========== 8. ВОССТАНАВЛИВАЕМ ТОВАРЫ ==========
+                                // ========== 6. ВОССТАНАВЛИВАЕМ ТОВАРЫ ==========
                                 var sheetGoods = package.Workbook.Worksheets["Товары"];
                                 if (sheetGoods != null && sheetGoods.Dimension != null && sheetGoods.Dimension.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetGoods.Dimension.Rows; row++)
                                     {
-                                        var name = sheetGoods.Cells[row, 3]?.Value?.ToString();
-                                        if (string.IsNullOrEmpty(name)) continue;
+                                        var id = sheetGoods.Cells[row, 1]?.Value;
+                                        var name = sheetGoods.Cells[row, 2]?.Value?.ToString();
+                                        if (id == null || string.IsNullOrEmpty(name)) continue;
 
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Товары (наименование, единицы_измерения) VALUES ({0}, '')",
-                                            name);
+                                            "INSERT INTO Товары (ид_товара, наименование, единицы_измерения) VALUES ({0}, {1}, {2})",
+                                            Convert.ToInt32(id), name,
+                                            sheetGoods.Cells[row, 3]?.Value?.ToString() ?? "");
                                     }
                                 }
 
-                                // ========== 9. ВОССТАНАВЛИВАЕМ ДОКУМЕНТЫ ==========
+                                // ========== 7. ВОССТАНАВЛИВАЕМ ВОДИТЕЛЕЙ ==========
+                                var sheetDrivers = package.Workbook.Worksheets["Водители"];
+                                if (sheetDrivers != null && sheetDrivers.Dimension != null && sheetDrivers.Dimension.Rows > 1)
+                                {
+                                    for (int row = 2; row <= sheetDrivers.Dimension.Rows; row++)
+                                    {
+                                        var id = sheetDrivers.Cells[row, 1]?.Value;
+                                        var lastName = sheetDrivers.Cells[row, 2]?.Value?.ToString();
+                                        if (id == null || string.IsNullOrEmpty(lastName)) continue;
+
+                                        await _context.Database.ExecuteSqlRawAsync(
+                                            "INSERT INTO Водители (ид_водителя, фамилия, имя, отчество, номер_лицензии) VALUES ({0}, {1}, {2}, {3}, {4})",
+                                            Convert.ToInt32(id), lastName,
+                                            sheetDrivers.Cells[row, 3]?.Value?.ToString() ?? "",
+                                            sheetDrivers.Cells[row, 4]?.Value?.ToString() ?? "",
+                                            sheetDrivers.Cells[row, 5]?.Value?.ToString() ?? "");
+                                    }
+                                }
+
+                                // ========== 8. ВОССТАНАВЛИВАЕМ ТРАНСПОРТ ==========
+                                var sheetTransport = package.Workbook.Worksheets["Транспорт"];
+                                if (sheetTransport != null && sheetTransport.Dimension != null && sheetTransport.Dimension.Rows > 1)
+                                {
+                                    for (int row = 2; row <= sheetTransport.Dimension.Rows; row++)
+                                    {
+                                        var id = sheetTransport.Cells[row, 1]?.Value;
+                                        var regNumber = sheetTransport.Cells[row, 2]?.Value?.ToString();
+                                        if (id == null || string.IsNullOrEmpty(regNumber)) continue;
+
+                                        await _context.Database.ExecuteSqlRawAsync(
+                                            "INSERT INTO Транспорт (ид_транспорта, регистрационный_номер, ид_марки, ид_типа_транспорта) VALUES ({0}, {1}, {2}, {3})",
+                                            Convert.ToInt32(id), regNumber,
+                                            sheetTransport.Cells[row, 3]?.Value ?? 1,
+                                            sheetTransport.Cells[row, 4]?.Value ?? 1);
+                                    }
+                                }
+
+                                // ========== 9. ВОССТАНАВЛИВАЕМ ПУНКТЫ ПОГРУЗКИ ==========
+                                var sheetLoading = package.Workbook.Worksheets["ПунктыПогрузки"];
+                                if (sheetLoading != null && sheetLoading.Dimension != null && sheetLoading.Dimension.Rows > 1)
+                                {
+                                    for (int row = 2; row <= sheetLoading.Dimension.Rows; row++)
+                                    {
+                                        var id = sheetLoading.Cells[row, 1]?.Value;
+                                        var name = sheetLoading.Cells[row, 2]?.Value?.ToString();
+                                        if (id == null || string.IsNullOrEmpty(name)) continue;
+
+                                        await _context.Database.ExecuteSqlRawAsync(
+                                            "INSERT INTO Пункт_Погрузки (ид_пункта_погрузки, наименование, адрес) VALUES ({0}, {1}, {2})",
+                                            Convert.ToInt32(id), name,
+                                            sheetLoading.Cells[row, 3]?.Value?.ToString() ?? "");
+                                    }
+                                }
+
+                                // ========== 10. ВОССТАНАВЛИВАЕМ ПУНКТЫ РАЗГРУЗКИ ==========
+                                var sheetUnloading = package.Workbook.Worksheets["ПунктыРазгрузки"];
+                                if (sheetUnloading != null && sheetUnloading.Dimension != null && sheetUnloading.Dimension.Rows > 1)
+                                {
+                                    for (int row = 2; row <= sheetUnloading.Dimension.Rows; row++)
+                                    {
+                                        var id = sheetUnloading.Cells[row, 1]?.Value;
+                                        var name = sheetUnloading.Cells[row, 2]?.Value?.ToString();
+                                        if (id == null || string.IsNullOrEmpty(name)) continue;
+
+                                        await _context.Database.ExecuteSqlRawAsync(
+                                            "INSERT INTO Пункт_Разгрузки (ид_пункта_разгрузки, наименование, адрес) VALUES ({0}, {1}, {2})",
+                                            Convert.ToInt32(id), name,
+                                            sheetUnloading.Cells[row, 3]?.Value?.ToString() ?? "");
+                                    }
+                                }
+
+                                // ========== 11. ВОССТАНАВЛИВАЕМ ДОКУМЕНТЫ ==========
                                 var sheetDocs = package.Workbook.Worksheets["Документы"];
                                 int countDocs = 0;
 
                                 if (sheetDocs != null && sheetDocs.Dimension != null && sheetDocs.Dimension.Rows > 1)
                                 {
-                                    // Получаем значения по умолчанию
-                                    var defaultDocType = await _context.Типы_Документов.FirstOrDefaultAsync();
-                                    int defaultTypeId = defaultDocType?.ид_типа ?? 1;
-
-                                    var defaultOrg = await _context.Организации.FirstOrDefaultAsync();
-                                    int defaultOrgId = defaultOrg?.ид_организации ?? 1;
-
-                                    var defaultDriver = await _context.Водители.FirstOrDefaultAsync();
-                                    int defaultDriverId = defaultDriver?.ид_водителя ?? 1;
-
-                                    var defaultTransport = await _context.Транспорт.FirstOrDefaultAsync();
-                                    int defaultTransportId = defaultTransport?.ид_транспорта ?? 1;
-
-                                    var defaultLoadingPoint = await _context.Пункт_Погрузки.FirstOrDefaultAsync();
-                                    int defaultLoadingPointId = defaultLoadingPoint?.ид_пункта_погрузки ?? 1;
-
-                                    var defaultUnloadingPoint = await _context.Пункт_Разгрузки.FirstOrDefaultAsync();
-                                    int defaultUnloadingPointId = defaultUnloadingPoint?.ид_пункта_разгрузки ?? 1;
-
                                     for (int row = 2; row <= sheetDocs.Dimension.Rows; row++)
                                     {
-                                        var docNumber = sheetDocs.Cells[row, 2]?.Value?.ToString();
+                                        var docNumber = sheetDocs.Cells[row, 1]?.Value?.ToString();
                                         if (string.IsNullOrEmpty(docNumber)) continue;
 
-                                        DateTime docDate;
-                                        if (!DateTime.TryParse(sheetDocs.Cells[row, 3]?.Value?.ToString(), out docDate))
+                                        DateTime docDate = DateTime.Now;
+                                        var dateObj = sheetDocs.Cells[row, 2]?.Value;
+                                        if (dateObj != null && DateTime.TryParse(dateObj.ToString(), out DateTime parsedDate))
                                         {
-                                            docDate = DateTime.Now;
-                                        }
-
-                                        // Тип документа
-                                        var typeName = sheetDocs.Cells[row, 4]?.Value?.ToString();
-                                        int typeId = defaultTypeId;
-                                        if (!string.IsNullOrEmpty(typeName))
-                                        {
-                                            var docType = await _context.Типы_Документов.FirstOrDefaultAsync(t => t.краткое_наименование == typeName);
-                                            if (docType != null) typeId = docType.ид_типа;
-                                        }
-
-                                        // Грузоотправитель
-                                        var senderName = sheetDocs.Cells[row, 5]?.Value?.ToString();
-                                        int senderId = defaultOrgId;
-                                        if (!string.IsNullOrEmpty(senderName))
-                                        {
-                                            var org = await _context.Организации.FirstOrDefaultAsync(o => o.название == senderName);
-                                            if (org != null) senderId = org.ид_организации;
-                                        }
-
-                                        // Перевозчик
-                                        var carrierName = sheetDocs.Cells[row, 6]?.Value?.ToString();
-                                        int carrierId = defaultOrgId;
-                                        if (!string.IsNullOrEmpty(carrierName))
-                                        {
-                                            var org = await _context.Организации.FirstOrDefaultAsync(o => o.название == carrierName);
-                                            if (org != null) carrierId = org.ид_организации;
-                                        }
-
-                                        // Получатель
-                                        var receiverName = sheetDocs.Cells[row, 7]?.Value?.ToString();
-                                        int receiverId = defaultOrgId;
-                                        if (!string.IsNullOrEmpty(receiverName))
-                                        {
-                                            var org = await _context.Организации.FirstOrDefaultAsync(o => o.название == receiverName);
-                                            if (org != null) receiverId = org.ид_организации;
-                                        }
-
-                                        // Пункт погрузки
-                                        var loadingPointName = sheetDocs.Cells[row, 8]?.Value?.ToString();
-                                        int loadingPointId = defaultLoadingPointId;
-                                        if (!string.IsNullOrEmpty(loadingPointName))
-                                        {
-                                            var point = await _context.Пункт_Погрузки.FirstOrDefaultAsync(p => p.наименование == loadingPointName);
-                                            if (point != null) loadingPointId = point.ид_пункта_погрузки;
-                                        }
-
-                                        // Пункт разгрузки
-                                        var unloadingPointName = sheetDocs.Cells[row, 9]?.Value?.ToString();
-                                        int unloadingPointId = defaultUnloadingPointId;
-                                        if (!string.IsNullOrEmpty(unloadingPointName))
-                                        {
-                                            var point = await _context.Пункт_Разгрузки.FirstOrDefaultAsync(p => p.наименование == unloadingPointName);
-                                            if (point != null) unloadingPointId = point.ид_пункта_разгрузки;
-                                        }
-
-                                        // Водитель
-                                        var driverFullName = sheetDocs.Cells[row, 10]?.Value?.ToString();
-                                        int driverId = defaultDriverId;
-                                        if (!string.IsNullOrEmpty(driverFullName))
-                                        {
-                                            var parts = driverFullName.Split(' ');
-                                            var lastName = parts.Length > 0 ? parts[0] : "";
-                                            var firstName = parts.Length > 1 ? parts[1] : "";
-                                            var driver = await _context.Водители.FirstOrDefaultAsync(d => d.фамилия == lastName && d.имя == firstName);
-                                            if (driver != null) driverId = driver.ид_водителя;
-                                        }
-
-                                        // Транспорт
-                                        var regNumber = sheetDocs.Cells[row, 11]?.Value?.ToString();
-                                        int transportId = defaultTransportId;
-                                        if (!string.IsNullOrEmpty(regNumber))
-                                        {
-                                            var transport = await _context.Транспорт.FirstOrDefaultAsync(t => t.регистрационный_номер == regNumber);
-                                            if (transport != null) transportId = transport.ид_транспорта;
+                                            docDate = parsedDate;
                                         }
 
                                         await _context.Database.ExecuteSqlRawAsync(@"
                                     INSERT INTO Документы (номер_документа, дата_создания, 
                                         ид_типа, ид_грузоотправителя, ид_перевозчика, ид_получателя,
                                         ид_пункта_погрузки, ид_пункта_разгрузки, ид_водителя, ид_транспорта,
-                                        ид_пользователя, отпуск_разрешил, сдал_грузоотправитель) 
-                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, 1, '', '')",
+                                        отпуск_разрешил, сдал_грузоотправитель, ид_пользователя) 
+                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, '', '', 1)",
                                             docNumber, docDate,
-                                            typeId, senderId, carrierId, receiverId,
-                                            loadingPointId, unloadingPointId, driverId, transportId);
+                                            sheetDocs.Cells[row, 3]?.Value ?? 1,
+                                            sheetDocs.Cells[row, 4]?.Value ?? 1,
+                                            sheetDocs.Cells[row, 5]?.Value ?? 1,
+                                            sheetDocs.Cells[row, 6]?.Value ?? 1,
+                                            sheetDocs.Cells[row, 7]?.Value ?? 1,
+                                            sheetDocs.Cells[row, 8]?.Value ?? 1,
+                                            sheetDocs.Cells[row, 9]?.Value ?? 1,
+                                            sheetDocs.Cells[row, 10]?.Value ?? 1);
                                         countDocs++;
+                                    }
+                                }
+
+                                // ========== 12. ВОССТАНАВЛИВАЕМ ПОЗИЦИИ ==========
+                                var sheetPositions = package.Workbook.Worksheets["Позиции"];
+                                int countPositions = 0;
+
+                                if (sheetPositions != null && sheetPositions.Dimension != null && sheetPositions.Dimension.Rows > 1)
+                                {
+                                    for (int row = 2; row <= sheetPositions.Dimension.Rows; row++)
+                                    {
+                                        var docId = sheetPositions.Cells[row, 1]?.Value;
+                                        if (docId == null) continue;
+
+                                        await _context.Database.ExecuteSqlRawAsync(@"
+                                    INSERT INTO Позиции (ид_документа, ид_товара, количество, цена_за_единицу,
+                                        ставка_ндс, масса_груза, грузовых_мест, примечание, сумма_ндс, стоимость_с_ндс) 
+                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})",
+                                            Convert.ToInt32(docId),
+                                            sheetPositions.Cells[row, 2]?.Value ?? 1,
+                                            sheetPositions.Cells[row, 3]?.Value ?? 0,
+                                            sheetPositions.Cells[row, 4]?.Value ?? 0,
+                                            sheetPositions.Cells[row, 5]?.Value,
+                                            sheetPositions.Cells[row, 6]?.Value,
+                                            sheetPositions.Cells[row, 7]?.Value,
+                                            sheetPositions.Cells[row, 8]?.Value?.ToString() ?? "",
+                                            sheetPositions.Cells[row, 9]?.Value,
+                                            sheetPositions.Cells[row, 10]?.Value);
+                                        countPositions++;
                                     }
                                 }
 
@@ -878,7 +814,7 @@ namespace Blank.Controllers
 
                                 await transaction.CommitAsync();
 
-                                TempData["Success"] = $"Восстановлено документов: {countDocs}";
+                                TempData["Success"] = $"Восстановлено: Документов: {countDocs}, Позиций: {countPositions}";
                             }
                             catch (Exception ex)
                             {
@@ -1200,7 +1136,7 @@ namespace Blank.Controllers
                 totalQuantity += quantityDecimal;
                 totalCost += cost;
                 totalVat += vatAmount;
-                totalWeight += pos.масса_груза ?? 0;    
+                totalWeight += pos.масса_груза ?? 0;
                 totalPackages += pos.грузовых_мест ?? 0;
 
                 goodsHtml.AppendLine($@"
@@ -1594,11 +1530,11 @@ namespace Blank.Controllers
                 if (!System.IO.File.Exists(templatePath))
                 {
                     templateName = "TTN1";
-                }   
+                }
 
                 return View($"~/Views/Shared/DocumentTemplates/{templateName}.cshtml", model);
             }
-            catch (Exception ex)    
+            catch (Exception ex)
             {
                 return Content($"Ошибка: {ex.Message}<br><br>Stack trace:<br>{ex.StackTrace}", "text/html");
             }
