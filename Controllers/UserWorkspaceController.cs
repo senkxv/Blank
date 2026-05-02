@@ -331,7 +331,7 @@ namespace Blank.Controllers
         {
             using (var package = new ExcelPackage())
             {
-                // Лист 1: Документы (с ID)
+                // ========== ЛИСТ 1: ДОКУМЕНТЫ ==========
                 var sheetDocuments = package.Workbook.Worksheets.Add("Документы");
                 sheetDocuments.Cells[1, 1].Value = "ид_документа";
                 sheetDocuments.Cells[1, 2].Value = "номер_документа";
@@ -364,7 +364,7 @@ namespace Blank.Controllers
                 }
                 sheetDocuments.Cells.AutoFitColumns();
 
-                // Лист 2: Позиции
+                // ========== ЛИСТ 2: ПОЗИЦИИ (ВАЖНО!) ==========
                 var sheetPositions = package.Workbook.Worksheets.Add("Позиции");
                 sheetPositions.Cells[1, 1].Value = "ид_позиции";
                 sheetPositions.Cells[1, 2].Value = "ид_документа";
@@ -397,7 +397,7 @@ namespace Blank.Controllers
                 }
                 sheetPositions.Cells.AutoFitColumns();
 
-                // Лист 3: Товары
+                // ========== ЛИСТ 3: ТОВАРЫ ==========
                 var sheetGoods = package.Workbook.Worksheets.Add("Товары");
                 sheetGoods.Cells[1, 1].Value = "ид_товара";
                 sheetGoods.Cells[1, 2].Value = "наименование";
@@ -414,7 +414,7 @@ namespace Blank.Controllers
                 }
                 sheetGoods.Cells.AutoFitColumns();
 
-                // Лист 4: Организации
+                // ========== ЛИСТ 4: ОРГАНИЗАЦИИ ==========
                 var sheetOrganizations = package.Workbook.Worksheets.Add("Организации");
                 sheetOrganizations.Cells[1, 1].Value = "ид_организации";
                 sheetOrganizations.Cells[1, 2].Value = "название";
@@ -435,7 +435,7 @@ namespace Blank.Controllers
                 }
                 sheetOrganizations.Cells.AutoFitColumns();
 
-                // Лист 5: Водители
+                // ========== ЛИСТ 5: ВОДИТЕЛИ ==========
                 var sheetDrivers = package.Workbook.Worksheets.Add("Водители");
                 sheetDrivers.Cells[1, 1].Value = "ид_водителя";
                 sheetDrivers.Cells[1, 2].Value = "фамилия";
@@ -456,7 +456,7 @@ namespace Blank.Controllers
                 }
                 sheetDrivers.Cells.AutoFitColumns();
 
-                // Лист 6: Транспорт
+                // ========== ЛИСТ 6: ТРАНСПОРТ ==========
                 var sheetTransport = package.Workbook.Worksheets.Add("Транспорт");
                 sheetTransport.Cells[1, 1].Value = "ид_транспорта";
                 sheetTransport.Cells[1, 2].Value = "регистрационный_номер";
@@ -475,7 +475,37 @@ namespace Blank.Controllers
                 }
                 sheetTransport.Cells.AutoFitColumns();
 
-                // Лист 7: Пункты погрузки
+                // ========== ЛИСТ 7: МАРКИ ТРАНСПОРТА ==========
+                var sheetMarks = package.Workbook.Worksheets.Add("МаркиТранспорта");
+                sheetMarks.Cells[1, 1].Value = "ид_марки";
+                sheetMarks.Cells[1, 2].Value = "наименование_марки";
+
+                var марки = _context.Марка_Транспорта.ToList();
+                row = 2;
+                foreach (var mark in марки)
+                {
+                    sheetMarks.Cells[row, 1].Value = mark.ид_марки;
+                    sheetMarks.Cells[row, 2].Value = mark.наименование_марки;
+                    row++;
+                }
+                sheetMarks.Cells.AutoFitColumns();
+
+                // ========== ЛИСТ 8: ТИПЫ ТРАНСПОРТА ==========
+                var sheetTransportTypes = package.Workbook.Worksheets.Add("ТипыТранспорта");
+                sheetTransportTypes.Cells[1, 1].Value = "ид_типа_транспорта";
+                sheetTransportTypes.Cells[1, 2].Value = "наименование_типа";
+
+                var типыТранспорта = _context.Тип_Транспорта.ToList();
+                row = 2;
+                foreach (var type in типыТранспорта)
+                {
+                    sheetTransportTypes.Cells[row, 1].Value = type.ид_типа_транспорта;
+                    sheetTransportTypes.Cells[row, 2].Value = type.наименование_типа;
+                    row++;
+                }
+                sheetTransportTypes.Cells.AutoFitColumns();
+
+                // ========== ЛИСТ 9: ПУНКТЫ ПОГРУЗКИ ==========
                 var sheetLoadingPoints = package.Workbook.Worksheets.Add("ПунктыПогрузки");
                 sheetLoadingPoints.Cells[1, 1].Value = "ид_пункта_погрузки";
                 sheetLoadingPoints.Cells[1, 2].Value = "наименование";
@@ -492,7 +522,7 @@ namespace Blank.Controllers
                 }
                 sheetLoadingPoints.Cells.AutoFitColumns();
 
-                // Лист 8: Пункты разгрузки
+                // ========== ЛИСТ 10: ПУНКТЫ РАЗГРУЗКИ ==========
                 var sheetUnloadingPoints = package.Workbook.Worksheets.Add("ПунктыРазгрузки");
                 sheetUnloadingPoints.Cells[1, 1].Value = "ид_пункта_разгрузки";
                 sheetUnloadingPoints.Cells[1, 2].Value = "наименование";
@@ -509,7 +539,7 @@ namespace Blank.Controllers
                 }
                 sheetUnloadingPoints.Cells.AutoFitColumns();
 
-                // Лист 9: Типы документов
+                // ========== ЛИСТ 11: ТИПЫ ДОКУМЕНТОВ ==========
                 var sheetDocTypes = package.Workbook.Worksheets.Add("ТипыДокументов");
                 sheetDocTypes.Cells[1, 1].Value = "ид_типа";
                 sheetDocTypes.Cells[1, 2].Value = "краткое_наименование";
