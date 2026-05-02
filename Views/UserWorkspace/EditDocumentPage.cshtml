@@ -117,6 +117,17 @@
                     }
                 </select>
             </div>
+
+            <!-- ДОБАВЛЕННЫЕ ДВА ПОЛЯ -->
+            <div class="form-group">
+                <label asp-for="отпуск_разрешил">Отпуск разрешил (ФИО, должность)</label>
+                <input asp-for="отпуск_разрешил" class="form-control" placeholder="Например: Иванов И.И., директор" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="сдал_грузоотправитель">Сдал грузоотправитель (ФИО, должность)</label>
+                <input asp-for="сдал_грузоотправитель" class="form-control" placeholder="Например: Петров П.П., кладовщик" />
+            </div>
         </div>
 
         <div class="goods-section">

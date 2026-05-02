@@ -1,0 +1,207 @@
+﻿@using Blank.Helpers
+@model Blank.Models.ViewModels.DocumentPreviewViewModel
+
+@{
+    Layout = null;
+    ViewBag.Title = $"Товарно-транспортная накладная (ТТН-1) № {Model.Документ.номер_документа}";
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="/css/DocumentsTemplates/TTN1.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="ttn-container">
+
+        <!-- ШАПКА -->
+        <div class="doc-header">
+            <div class="doc-title">ТОВАРНО-ТРАНСПОРТНАЯ НАКЛАДНАЯ</div>
+            <div class="doc-number">от «@Model.Документ.дата_создания.ToString("dd.MM.yyyy")» № @Model.Документ.номер_документа</div>
+        </div>
+
+        <!-- УЧАСТНИКИ: три колонки -->
+        <div class="participants">
+            <div class="participant">
+                <strong>Грузоотправитель</strong><br>
+                @Model.Грузоотправитель?.название<br>
+                УНП: @Model.Грузоотправитель?.унп<br>
+                @Model.Грузоотправитель?.адрес
+            </div>
+            <div class="participant">
+                <strong>Грузополучатель</strong><br>
+                @Model.Грузополучатель?.название<br>
+                УНП: @Model.Грузополучатель?.унп<br>
+                @Model.Грузополучатель?.адрес
+            </div>
+            <div class="participant">
+                <strong>Заказчик (плательщик)</strong><br>
+                @Model.Перевозчик?.название<br>
+                УНП: @Model.Перевозчик?.унп<br>
+                @Model.Перевозчик?.адрес
+            </div>
+        </div>
+
+        <!-- АВТОМОБИЛЬ, ПРИЦЕП, ПУТЕВОЙ ЛИСТ -->
+        <div class="transport-line">
+            <div><strong>Автомобиль</strong> @Model.Транспорт?.регистрационный_номер</div>
+            <div><strong>Прицеп</strong> ________________________</div>
+            <div><strong>К путевому листу №</strong> ________________</div>
+        </div>
+        <div class="transport-sub">
+            (марка, регистрационный знак) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(марка, регистрационный знак)
+        </div>
+
+        <!-- ВОДИТЕЛЬ -->
+        <div class="driver-line">
+            <strong>Водитель</strong> @Model.Водитель?.фамилия @Model.Водитель?.имя @Model.Водитель?.отчество
+        </div>
+        <div class="driver-sub">(фамилия и инициалы)</div>
+
+        <!-- ПУНКТЫ ПОГРУЗКИ И РАЗГРУЗКИ -->
+        <div class="points-line">
+            <div><strong>Пункт погрузки</strong> @Model.ПунктПогрузки?.наименование, @Model.ПунктПогрузки?.адрес</div>
+            <div><strong>Пункт разгрузки</strong> @Model.ПунктРазгрузки?.наименование, @Model.ПунктРазгрузки?.адрес</div>
+        </div>
+
+        <!-- ОСНОВАНИЕ ОТПУСКА -->
+        <div class="base-line">
+            <strong>Основание отпуска</strong> @Model.ОснованиеОтпуска
+        </div>
+
+        <!-- ПЕРЕАДРЕСОВКА -->
+        <div class="redirect-line">
+            <strong>Переадресовка</strong> ________________________________________
+        </div>
+
+        <!-- I. ТОВАРНЫЙ РАЗДЕЛ -->
+        <div class="section-title">I. ТОВАРНЫЙ РАЗДЕЛ</div>
+
+        @{
+            decimal totalQty = 0, totalCost = 0, totalVat = 0, totalWeight = 0;
+            int totalPackages = 0;
+        }
+
+        <div class="goods-table">
+            <div class="goods-header">
+                <div class="g-name">Наименование товара</div>
+                <div class="g-unit">Ед. изм.</div>
+                <div class="g-qty">Кол-во</div>
+                <div class="g-price">Цена, руб.</div>
+                <div class="g-cost">Стоимость, руб.</div>
+                <div class="g-vat">НДС, %</div>
+                <div class="g-vat-sum">Сумма НДС, руб.</div>
+                <div class="g-total">Стоимость с НДС, руб.</div>
+                <div class="g-packs">Груз. мест</div>
+                <div class="g-weight">Масса, кг</div>
+                <div class="g-note">Примечание</div>
+            </div>
+
+            @foreach (var pos in Model.Позиции)
+            {
+                decimal qty = (decimal)pos.quantity;
+                decimal cost = qty * pos.price;
+                decimal vatRate = pos.ставка_ндс ?? 0;
+                decimal vatAmount = cost * (vatRate / 100);
+                decimal total = cost + vatAmount;
+                totalQty += qty;
+                totalCost += cost;
+                totalVat += vatAmount;
+                totalWeight += pos.weight;
+                totalPackages += pos.packages;
+
+                <div class="goods-row">
+                    <div class="g-name">@pos.товар_наименование</div>
+                    <div class="g-unit">@pos.единицы_измерения</div>
+                    <div class="g-qty">@pos.quantity.ToString("0.###")</div>
+                    <div class="g-price">@pos.price.ToString("0.00")</div>
+                    <div class="g-cost">@cost.ToString("0.00")</div>
+                    <div class="g-vat">@vatRate</div>
+                    <div class="g-vat-sum">@vatAmount.ToString("0.00")</div>
+                    <div class="g-total">@total.ToString("0.00")</div>
+                    <div class="g-packs">@pos.packages</div>
+                    <div class="g-weight">@pos.weight.ToString("0.###")</div>
+                    <div class="g-note">@pos.note</div>
+                </div>
+            }
+
+            <div class="goods-row total-row">
+                <div class="g-name"><strong>ИТОГО</strong></div>
+                <div class="g-unit"></div>
+                <div class="g-qty"><strong>@totalQty.ToString("0.###")</strong></div>
+                <div class="g-price"></div>
+                <div class="g-cost"><strong>@totalCost.ToString("0.00")</strong></div>
+                <div class="g-vat"></div>
+                <div class="g-vat-sum"><strong>@totalVat.ToString("0.00")</strong></div>
+                <div class="g-total"><strong>@((totalCost + totalVat).ToString("0.00"))</strong></div>
+                <div class="g-packs"><strong>@totalPackages</strong></div>
+                <div class="g-weight"><strong>@totalWeight.ToString("0.###")</strong></div>
+                <div class="g-note"></div>
+            </div>
+        </div>
+
+        <div class="totals-words">
+            <div>Всего сумма НДС: @NumToTextHelper.SumInWords(totalVat)</div>
+            <div>Всего стоимость с НДС: @NumToTextHelper.SumInWords(totalCost + totalVat)</div>
+            <div>Всего масса груза: @NumToTextHelper.WeightInWords(totalWeight)</div>
+            <div>Всего грузовых мест: @NumToTextHelper.PackagesInWords(totalPackages)</div>
+        </div>
+
+        <!-- ПОДПИСИ -->
+        <!-- ПОДПИСИ -->
+        <div class="signatures-row">
+            <div class="sign-item">
+                <div class="sign-title"><strong>Отпуск разрешил</strong></div>
+                <div class="sign-name">@(Model.отпуск_разрешил ?? "")</div>
+                <div class="sign-line">____________________</div>
+            </div>
+            <div class="sign-item">
+                <div class="sign-title"><strong>Сдал грузоотправитель</strong></div>
+                <div class="sign-name">@(Model.сдал_грузоотправитель ?? "")</div>
+                <div class="sign-line">____________________</div>
+            </div>
+            <div class="sign-item">
+                <div class="sign-title"><strong>Груз получил грузополучатель</strong></div>
+                <div class="sign-name"></div>
+                <div class="sign-line">____________________</div>
+            </div>
+        </div>
+
+        <!-- III. ПРОЧИЕ СВЕДЕНИЯ -->
+        <div class="section-title">III. ПРОЧИЕ СВЕДЕНИЯ (заполняются перевозчиком)</div>
+
+        <div class="info-block">
+            <div class="info-row">
+                <span><strong>Расстояние перевозки по группам дорог, км:</strong></span>
+                <span>в городе ______</span>
+                <span>I ______</span>
+                <span>II ______</span>
+                <span>III ______</span>
+                <span>всего ______</span>
+            </div>
+            <div class="info-row">
+                <span><strong>Поправочный коэффициент:</strong> ______</span>
+                <span><strong>Код экспедирования:</strong> ______</span>
+            </div>
+            <div class="info-row">
+                <span><strong>За тонны ______</strong></span>
+                <span><strong>За расстояние ______</strong></span>
+                <span><strong>За специальный транспорт ______</strong></span>
+                <span><strong>За транспортные услуги ______</strong></span>
+            </div>
+        </div>
+
+        <div class="docs-line">
+            <strong>С товаром переданы документы:</strong> ________________________________________
+        </div>
+
+        <div class="print-buttons no-print">
+            <button onclick="window.print()">Печать</button>
+            <button onclick="window.close()">Закрыть</button>
+        </div>
+
+    </div>
+</body>
+</html>

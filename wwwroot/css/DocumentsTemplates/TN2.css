@@ -1,0 +1,212 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: white;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 9pt;
+    padding: 10mm;
+    margin: 0;
+}
+
+.tn2-container {
+    max-width: 210mm;
+    margin: 0 auto;
+    background: white;
+}
+
+.doc-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.doc-title {
+    font-size: 14pt;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.doc-number {
+    font-size: 11pt;
+    margin-top: 3px;
+}
+
+.row-2col {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.col {
+    flex: 1;
+}
+
+.date-line {
+    margin: 8px 0;
+    text-align: left;
+}
+
+.base-line {
+    margin: 8px 0;
+    padding: 5px;
+    border-bottom: 1px solid #000;
+}
+
+.section-title {
+    font-weight: bold;
+    text-align: center;
+    margin: 15px 0 8px;
+    font-size: 11pt;
+    background: #e8e8e8;
+    padding: 3px;
+}
+
+.goods-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.goods-table th,
+.goods-table td {
+    border: 1px solid #000;
+    padding: 4px;
+    vertical-align: top;
+}
+
+.goods-table th {
+    background: #e8e8e8;
+    font-weight: bold;
+    text-align: center;
+}
+
+.goods-table td {
+    text-align: left;
+}
+
+.g-name {
+    width: 20%;
+}
+
+.g-unit {
+    width: 8%;
+    text-align: center;
+}
+
+.g-qty {
+    width: 8%;
+    text-align: center;
+}
+
+.g-price {
+    width: 9%;
+    text-align: right;
+}
+
+.g-cost {
+    width: 10%;
+    text-align: right;
+}
+
+.g-vat {
+    width: 7%;
+    text-align: center;
+}
+
+.g-vat-sum {
+    width: 11%;
+    text-align: right;
+}
+
+.g-total {
+    width: 12%;
+    text-align: right;
+}
+
+.g-note {
+    width: 15%;
+}
+
+.total-row {
+    background: #f5f5f5;
+}
+
+.totals-nds, .totals-total {
+    margin: 10px 0;
+}
+
+.indent {
+    margin-left: 20px;
+    margin-top: 3px;
+}
+
+
+.line {
+    border-bottom: 1px solid #000;
+    display: inline-block;
+    min-width: 195px; 
+}
+
+.line-bg {
+    border-bottom: 1px solid #000;
+    display: inline-block;
+    min-width: 195px; 
+    text-align: center;
+    padding: 0 5px;
+}
+
+.line-value {
+    border-bottom: 1px solid #000;
+    display: inline-block;
+    min-width: 795px; 
+    padding-left: 5px;
+}
+
+.signature-block {
+    margin: 15px 0;
+}
+
+.signature-block div {
+    margin: 3px 0;
+}
+
+.sign-label {
+    font-size: 8pt;
+    color: #555;
+}
+
+.docs-line {
+    margin: 15px 0;
+    padding-top: 5px;
+    border-top: 1px solid #000;
+}
+
+.print-buttons {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.print-buttons button {
+    padding: 5px 15px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+@media print {
+    body {
+        padding: 0;
+        margin: 0;
+    }
+
+    .no-print {
+        display: none;
+    }
+
+    .section-title {
+        background: #e8e8e8;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

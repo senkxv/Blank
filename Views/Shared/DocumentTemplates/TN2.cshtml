@@ -1,0 +1,178 @@
+﻿@using Blank.Helpers
+@model Blank.Models.ViewModels.DocumentPreviewViewModel
+
+@{
+    Layout = null;
+    ViewBag.Title = $"Товарная накладная (ТН-2) № {Model.Документ.номер_документа}";
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="/css/DocumentsTemplates/TN2.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="tn2-container">
+
+        <div class="doc-header">
+            <div class="doc-title">ТОВАРНАЯ НАКЛАДНАЯ</div>
+            <div class="doc-number">от «@Model.Документ.дата_создания.ToString("dd.MM.yyyy")» № @Model.Документ.номер_документа</div>
+        </div>
+
+        <div class="date-line">
+            " @Model.Документ.дата_создания.ToString("dd.MM").@Model.Документ.дата_создания.ToString("yyyy") " г.
+        </div>
+
+        <div class="row-2col">
+            <div class="col">
+                <strong>Грузоотправитель</strong><br>
+                (наименование, адрес)<br>
+                @Model.Грузоотправитель?.название, @Model.Грузоотправитель?.адрес
+            </div>
+            <div class="col">
+                <strong>Грузополучатель</strong><br>
+                (наименование, адрес)<br>
+                @Model.Грузополучатель?.название, @Model.Грузополучатель?.адрес
+            </div>
+        </div>
+
+        <div class="base-line">
+            <strong>Основание отпуска</strong><br>
+            (наименование, дата и номер документа)<br>
+            @Model.ОснованиеОтпуска
+        </div>
+
+        <div class="section-title">I. ТОВАРНЫЙ РАЗДЕЛ</div>
+
+        @{
+            decimal totalQty = 0, totalCost = 0, totalVat = 0, totalWeight = 0;
+            int totalPackages = 0;
+        }
+
+        <table class="goods-table">
+            <thead>
+                <tr>
+                    <th class="g-name">Наименование товара</th>
+                    <th class="g-unit">Единица измерения</th>
+                    <th class="g-qty">Кол-во</th>
+                    <th class="g-price">Цена, руб. коп.</th>
+                    <th class="g-cost">Стоимость, руб. коп.</th>
+                    <th class="g-vat">Ставка НДС, %</th>
+                    <th class="g-vat-sum">Сумма НДС, руб. коп.</th>
+                    <th class="g-total">Стоимость с НДС, руб. коп.</th>
+                    <th class="g-note">Примечание</th>
+                </tr>
+                <tr>
+                    <th class="g-name">1</th>
+                    <th class="g-unit">2</th>
+                    <th class="g-qty">3</th>
+                    <th class="g-price">4</th>
+                    <th class="g-cost">5</th>
+                    <th class="g-vat">6</th>
+                    <th class="g-vat-sum">7</th>
+                    <th class="g-total">8</th>
+                    <th class="g-note">9</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pos in Model.Позиции)
+                {
+                    decimal qty = (decimal)pos.quantity;
+                    decimal cost = qty * pos.price;
+                    decimal vatRate = pos.ставка_ндс ?? 0;
+                    decimal vatAmount = cost * (vatRate / 100);
+                    decimal total = cost + vatAmount;
+                    totalQty += qty;
+                    totalCost += cost;
+                    totalVat += vatAmount;
+                    totalWeight += pos.weight;
+                    totalPackages += pos.packages;
+
+                    <tr>
+                        <td class="g-name">@pos.товар_наименование</td>
+                        <td class="g-unit">@pos.единицы_измерения</td>
+                        <td class="g-qty">@pos.quantity.ToString("0.###")</td>
+                        <td class="g-price">@pos.price.ToString("0.00")</td>
+                        <td class="g-cost">@cost.ToString("0.00")</td>
+                        <td class="g-vat">@vatRate</td>
+                        <td class="g-vat-sum">@vatAmount.ToString("0.00")</td>
+                        <td class="g-total">@total.ToString("0.00")</td>
+                        <td class="g-note">@pos.note</td>
+                    </tr>
+                }
+                <tr class="total-row">
+                    <td class="g-name"><strong>ИТОГО</strong></td>
+                    <td class="g-unit">x</td>
+                    <td class="g-qty"><strong>@totalQty.ToString("0.###")</strong></td>
+                    <td class="g-price"></td>
+                    <td class="g-cost"><strong>@totalCost.ToString("0.00")</strong></td>
+                    <td class="g-vat"></td>
+                    <td class="g-vat-sum"><strong>@totalVat.ToString("0.00")</strong></td>
+                    <td class="g-total"><strong>@((totalCost + totalVat).ToString("0.00"))</strong></td>
+                    <td class="g-note">x</td>
+                </tr>
+            </tbody>
+        </table>
+
+        @{
+            string totalVatStr = totalVat.ToString("0.00");
+            string[] totalVatParts = totalVatStr.Split(new char[] { ',', '.' });
+            string totalVatRub = totalVatParts[0];
+            string totalVatKop = totalVatParts.Length > 1 ? totalVatParts[1] : "00";
+    
+            string totalWithVatStr = (totalCost + totalVat).ToString("0.00");
+            string[] totalWithVatParts = totalWithVatStr.Split(new char[] { ',', '.' });
+            string totalWithVatRub = totalWithVatParts[0];
+            string totalWithVatKop = totalWithVatParts.Length > 1 ? totalWithVatParts[1] : "00";
+    
+            string totalVatWords = NumToTextHelper.SumInWords(totalVat);
+            string totalWithVatWords = NumToTextHelper.SumInWords(totalCost + totalVat);
+        }
+        <div class="totals-nds">
+            <div>Всего сумма НДС <span class="line-value">@totalVatWords</span></div>
+        </div>
+
+        <div class="totals-total">
+            <div>Всего стоимость с НДС <span class="line-value">@totalWithVatWords</span></div>
+        </div>
+
+        <div class="signature-block">
+            <div><strong>Отпуск разрешил</strong></div>
+            <div class="sign-line">_____________________________________________________________________________________________________________________________________</div>
+            <div class="sign-label">(должность служащего (профессия рабочего), фамилия, инициалы, подпись)</div>
+        </div>
+
+        <div class="signature-block">
+            <div><strong>Сдал грузоотправитель</strong></div>
+            <div class="sign-line">_____________________________________________________________________________________________________________________________________</div>
+            <div class="sign-label">(должность служащего (профессия рабочего), фамилия, инициалы, подпись)</div>
+        </div>
+
+        <div class="signature-block">
+            <div><strong>Товар к доставке принял</strong></div>
+            <div>по доверенности</div>
+            <div>выданной</div>
+            <div class="sign-line">_____________________________________________________________________________________________________________________________________</div>
+            <div class="sign-label">(должность служащего (профессия рабочего), фамилия, инициалы, подпись)</div>
+        </div>
+
+        <div class="signature-block">
+            <div><strong>Принял грузополучатель</strong></div>
+            <div class="sign-line">_____________________________________________________________________________________________________________________________________</div>
+            <div class="sign-label">(должность служащего (профессия рабочего), фамилия, инициалы, подпись)</div>
+        </div>
+
+        <div class="docs-line">
+            <strong>С товаром переданы документы:</strong> _____________________________________________________________________________________________________________________________________
+        </div>
+
+        <div class="print-buttons no-print">
+            <button onclick="window.print()">Печать</button>
+            <button onclick="window.close()">Закрыть</button>
+        </div>
+
+    </div>
+</body>
+</html>

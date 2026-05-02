@@ -15,5 +15,10 @@ namespace Blank.Models.Tables
         [Required]
         [MaxLength(255)]
         public string? наименование { get; set; }
+
+        [Column("адрес")]
+        [Required]
+        [MaxLength(255)]
+        public string? адрес { get; set; }
     }
 }

@@ -1,0 +1,271 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: white;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 9pt;
+    padding: 10mm;
+    margin: 0;
+}
+
+.ttn-container {
+    max-width: 210mm;
+    margin: 0 auto;
+    background: white;
+}
+
+.doc-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.doc-title {
+    font-size: 14pt;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.doc-number {
+    font-size: 12pt;
+    margin-top: 3px;
+}
+
+.participants {
+    display: flex;
+    border: 1px solid #000;
+    margin-bottom: 15px;
+}
+
+.participant {
+    flex: 1;
+    padding: 5px;
+    border-right: 1px solid #000;
+}
+
+    .participant:last-child {
+        border-right: none;
+    }
+
+.transport-line {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #000;
+}
+
+    .transport-line > div {
+        flex: 1;
+    }
+
+.transport-sub {
+    font-size: 8pt;
+    color: #555;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.driver-line {
+    margin: 8px 0;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #000;
+}
+
+.driver-sub {
+    font-size: 8pt;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.points-line {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #000;
+}
+
+    .points-line > div {
+        flex: 1;
+    }
+
+.base-line, .redirect-line {
+    margin: 8px 0;
+    padding-bottom: 3px;
+    border-bottom: 1px dashed #000;
+}
+
+.section-title {
+    font-weight: bold;
+    text-align: center;
+    margin: 15px 0 8px;
+    font-size: 11pt;
+    background: #e8e8e8;
+    padding: 3px;
+}
+
+.goods-table {
+    width: 100%;
+    margin: 8px 0;
+    overflow-x: auto;
+}
+
+.goods-header, .goods-row {
+    display: flex;
+    border-bottom: 1px solid #000;
+}
+
+.goods-header {
+    font-weight: bold;
+    border-top: 1px solid #000;
+}
+
+    .goods-header > div, .goods-row > div {
+        padding: 4px;
+        border-right: 1px solid #000;
+    }
+
+        .goods-header > div:last-child, .goods-row > div:last-child {
+            border-right: none;
+        }
+
+.g-name {
+    width: 18%;
+}
+
+.g-unit {
+    width: 6%;
+    text-align: center;
+}
+
+.g-qty {
+    width: 6%;
+    text-align: center;
+}
+
+.g-price {
+    width: 7%;
+    text-align: right;
+}
+
+.g-cost {
+    width: 8%;
+    text-align: right;
+}
+
+.g-vat {
+    width: 5%;
+    text-align: center;
+}
+
+.g-vat-sum {
+    width: 8%;
+    text-align: right;
+}
+
+.g-total {
+    width: 9%;
+    text-align: right;
+}
+
+.g-packs {
+    width: 5%;
+    text-align: center;
+}
+
+.g-weight {
+    width: 7%;
+    text-align: right;
+}
+
+.g-note {
+    width: 11%;
+}
+
+.totals-words {
+    margin: 10px 0;
+    padding: 5px;
+    border: 1px solid #000;
+    background: #f9f9f9;
+}
+
+.totals-words div {
+    margin: 3px 0;
+}
+
+.signatures-row {
+    display: flex;
+    margin: 20px 0 20px;
+    gap: 20px;
+}
+
+.sign-item {
+    flex: 1;
+    text-align: center;
+}
+
+.sign-title {
+    margin-bottom: 15px;
+}
+
+.sign-name {
+    margin-bottom: -20px;
+    min-height: 25px;
+}
+
+.info-block {
+    margin: 10px 0;
+    padding: 8px;
+    border: 1px solid #000;
+}
+
+.info-row {
+    margin: 6px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.docs-line {
+    margin: 12px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #000;
+}
+
+.print-buttons {
+    margin-top: 20px;
+    text-align: center;
+}
+
+    .print-buttons button {
+        padding: 5px 15px;
+        margin: 0 5px;
+        cursor: pointer;
+    }
+
+@media print {
+    body {
+        padding: 0;
+        margin: 0;
+    }
+
+    .no-print {
+        display: none;
+    }
+
+    .section-title {
+        background: #e8e8e8;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .totals-words {
+        background: #f9f9f9;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

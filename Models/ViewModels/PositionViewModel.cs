@@ -28,8 +28,13 @@ namespace Blank.Models.ViewModels
 
         [Range(0, int.MaxValue, ErrorMessage = "Количество мест не может быть отрицательным")]
         public int packages { get; set; }
-
+       
         [MaxLength(500, ErrorMessage = "Примечание не более 500 символов")]
         public string? note { get; set; }
+
+        // Добавлено для предпросмотра
+        public decimal? ставка_ндс { get; set; }
+        public string? товар_наименование { get; set; }
+        public string? единицы_измерения { get; set; }
     }
 }
