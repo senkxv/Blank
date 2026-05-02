@@ -344,6 +344,9 @@ namespace Blank.Controllers
                 sheetDocuments.Cells[1, 9].Value = "ид_пункта_разгрузки";
                 sheetDocuments.Cells[1, 10].Value = "ид_водителя";
                 sheetDocuments.Cells[1, 11].Value = "ид_транспорта";
+                sheetDocuments.Cells[1, 12].Value = "ид_пользователя";
+                sheetDocuments.Cells[1, 13].Value = "отпуск_разрешил";
+                sheetDocuments.Cells[1, 14].Value = "сдал_грузоотправитель";
 
                 var документы = _context.Документы.ToList();
                 int row = 2;
@@ -351,7 +354,7 @@ namespace Blank.Controllers
                 {
                     sheetDocuments.Cells[row, 1].Value = doc.ид_документа;
                     sheetDocuments.Cells[row, 2].Value = doc.номер_документа;
-                    sheetDocuments.Cells[row, 3].Value = doc.дата_создания.ToString("yyyy-MM-dd HH:mm:ss");
+                    sheetDocuments.Cells[row, 3].Value = doc.дата_создания.ToString("yyyy-MM-dd");
                     sheetDocuments.Cells[row, 4].Value = doc.ид_типа;
                     sheetDocuments.Cells[row, 5].Value = doc.ид_грузоотправителя;
                     sheetDocuments.Cells[row, 6].Value = doc.ид_перевозчика;
@@ -360,23 +363,28 @@ namespace Blank.Controllers
                     sheetDocuments.Cells[row, 9].Value = doc.ид_пункта_разгрузки;
                     sheetDocuments.Cells[row, 10].Value = doc.ид_водителя;
                     sheetDocuments.Cells[row, 11].Value = doc.ид_транспорта;
+                    sheetDocuments.Cells[row, 12].Value = doc.ид_пользователя;
+                    sheetDocuments.Cells[row, 13].Value = doc.отпуск_разрешил;
+                    sheetDocuments.Cells[row, 14].Value = doc.сдал_грузоотправитель;
                     row++;
                 }
                 sheetDocuments.Cells.AutoFitColumns();
 
-                // ========== ЛИСТ 2: ПОЗИЦИИ (ВАЖНО!) ==========
+                // ========== ЛИСТ 2: ПОЗИЦИИ ==========
                 var sheetPositions = package.Workbook.Worksheets.Add("Позиции");
                 sheetPositions.Cells[1, 1].Value = "ид_позиции";
                 sheetPositions.Cells[1, 2].Value = "ид_документа";
                 sheetPositions.Cells[1, 3].Value = "ид_товара";
                 sheetPositions.Cells[1, 4].Value = "количество";
                 sheetPositions.Cells[1, 5].Value = "цена_за_единицу";
-                sheetPositions.Cells[1, 6].Value = "ставка_ндс";
-                sheetPositions.Cells[1, 7].Value = "масса_груза";
-                sheetPositions.Cells[1, 8].Value = "грузовых_мест";
-                sheetPositions.Cells[1, 9].Value = "примечание";
-                sheetPositions.Cells[1, 10].Value = "сумма_ндс";
-                sheetPositions.Cells[1, 11].Value = "стоимость_с_ндс";
+                sheetPositions.Cells[1, 6].Value = "скидка";
+                sheetPositions.Cells[1, 7].Value = "ндс";
+                sheetPositions.Cells[1, 8].Value = "сумма_ндс";
+                sheetPositions.Cells[1, 9].Value = "стоимость_с_ндс";
+                sheetPositions.Cells[1, 10].Value = "грузовых_мест";
+                sheetPositions.Cells[1, 11].Value = "масса_груза";
+                sheetPositions.Cells[1, 12].Value = "ставка_ндс";
+                sheetPositions.Cells[1, 13].Value = "примечание";
 
                 var позиции = _context.Позиции.ToList();
                 row = 2;
@@ -387,12 +395,15 @@ namespace Blank.Controllers
                     sheetPositions.Cells[row, 3].Value = pos.ид_товара;
                     sheetPositions.Cells[row, 4].Value = pos.количество;
                     sheetPositions.Cells[row, 5].Value = pos.цена_за_единицу;
-                    sheetPositions.Cells[row, 6].Value = pos.ставка_ндс;
-                    sheetPositions.Cells[row, 7].Value = pos.масса_груза;
-                    sheetPositions.Cells[row, 8].Value = pos.грузовых_мест;
-                    sheetPositions.Cells[row, 9].Value = pos.примечание;
-                    sheetPositions.Cells[row, 10].Value = pos.сумма_ндс;
-                    sheetPositions.Cells[row, 11].Value = pos.стоимость_с_ндс;
+                    sheetPositions.Cells[row, 6].Value = pos.скидка;
+                    // sheetPositions.Cells[row, 7].Value = pos.ндс;  // Удалите
+                    sheetPositions.Cells[row, 7].Value = pos.сумма_ндс;
+                    sheetPositions.Cells[row, 8].Value = pos.стоимость_с_ндс;
+                    sheetPositions.Cells[row, 9].Value = pos.грузовых_мест;
+                    sheetPositions.Cells[row, 10].Value = pos.масса_груза;
+                    sheetPositions.Cells[row, 11].Value = pos.ставка_ндс;
+                    sheetPositions.Cells[row, 12].Value = pos.примечание;
+                    row++;
                     row++;
                 }
                 sheetPositions.Cells.AutoFitColumns();
@@ -400,16 +411,18 @@ namespace Blank.Controllers
                 // ========== ЛИСТ 3: ТОВАРЫ ==========
                 var sheetGoods = package.Workbook.Worksheets.Add("Товары");
                 sheetGoods.Cells[1, 1].Value = "ид_товара";
-                sheetGoods.Cells[1, 2].Value = "наименование";
-                sheetGoods.Cells[1, 3].Value = "единицы_измерения";
+                sheetGoods.Cells[1, 2].Value = "код_товара";
+                sheetGoods.Cells[1, 3].Value = "наименование";
+                sheetGoods.Cells[1, 4].Value = "единицы_измерения";
 
                 var товары = _context.Товары.ToList();
                 row = 2;
                 foreach (var товар in товары)
                 {
                     sheetGoods.Cells[row, 1].Value = товар.ид_товара;
-                    sheetGoods.Cells[row, 2].Value = товар.наименование;
-                    sheetGoods.Cells[row, 3].Value = товар.единицы_измерения;
+                    sheetGoods.Cells[row, 2].Value = товар.код_товара;
+                    sheetGoods.Cells[row, 3].Value = товар.наименование;
+                    sheetGoods.Cells[row, 4].Value = товар.единицы_измерения;
                     row++;
                 }
                 sheetGoods.Cells.AutoFitColumns();
@@ -442,6 +455,7 @@ namespace Blank.Controllers
                 sheetDrivers.Cells[1, 3].Value = "имя";
                 sheetDrivers.Cells[1, 4].Value = "отчество";
                 sheetDrivers.Cells[1, 5].Value = "номер_лицензии";
+                sheetDrivers.Cells[1, 6].Value = "номер_телефона";
 
                 var водители = _context.Водители.ToList();
                 row = 2;
@@ -452,6 +466,7 @@ namespace Blank.Controllers
                     sheetDrivers.Cells[row, 3].Value = driver.имя;
                     sheetDrivers.Cells[row, 4].Value = driver.отчество;
                     sheetDrivers.Cells[row, 5].Value = driver.номер_лицензии;
+                    sheetDrivers.Cells[row, 6].Value = driver.номер_телефона;
                     row++;
                 }
                 sheetDrivers.Cells.AutoFitColumns();
@@ -604,8 +619,6 @@ namespace Blank.Controllers
                                 // ========== 1. ОЧИЩАЕМ ТАБЛИЦЫ ==========
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Позиции;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Документы;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Позиции;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Документы;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Пункт_Погрузки;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Пункт_Разгрузки;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Водители;");
@@ -695,9 +708,11 @@ namespace Blank.Controllers
                                         if (id == null || string.IsNullOrEmpty(name)) continue;
 
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Товары (ид_товара, наименование, единицы_измерения) VALUES ({0}, {1}, {2})",
-                                            Convert.ToInt32(id), name,
-                                            sheetGoods.Cells[row, 3]?.Value?.ToString() ?? "");
+                                            "INSERT INTO Товары (ид_товара, код_товара, наименование, единицы_измерения) VALUES ({0}, {1}, {2}, {3})",
+                                            Convert.ToInt32(id),
+                                            sheetGoods.Cells[row, 2]?.Value?.ToString() ?? "",
+                                            sheetGoods.Cells[row, 3]?.Value?.ToString() ?? "",
+                                            sheetGoods.Cells[row, 4]?.Value?.ToString() ?? "");
                                     }
                                 }
 
@@ -712,11 +727,12 @@ namespace Blank.Controllers
                                         if (id == null || string.IsNullOrEmpty(lastName)) continue;
 
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Водители (ид_водителя, фамилия, имя, отчество, номер_лицензии) VALUES ({0}, {1}, {2}, {3}, {4})",
+                                            "INSERT INTO Водители (ид_водителя, фамилия, имя, отчество, номер_лицензии, номер_телефона) VALUES ({0}, {1}, {2}, {3}, {4}, {5})",
                                             Convert.ToInt32(id), lastName,
                                             sheetDrivers.Cells[row, 3]?.Value?.ToString() ?? "",
                                             sheetDrivers.Cells[row, 4]?.Value?.ToString() ?? "",
-                                            sheetDrivers.Cells[row, 5]?.Value?.ToString() ?? "");
+                                            sheetDrivers.Cells[row, 5]?.Value?.ToString() ?? "",
+                                            sheetDrivers.Cells[row, 6]?.Value?.ToString() ?? "");
                                     }
                                 }
 
@@ -780,31 +796,35 @@ namespace Blank.Controllers
                                 {
                                     for (int row = 2; row <= sheetDocs.Dimension.Rows; row++)
                                     {
-                                        var docNumber = sheetDocs.Cells[row, 1]?.Value?.ToString();
-                                        if (string.IsNullOrEmpty(docNumber)) continue;
+                                        var id = sheetDocs.Cells[row, 1]?.Value;
+                                        if (id == null) continue;
 
-                                        DateTime docDate = DateTime.Now;
-                                        var dateObj = sheetDocs.Cells[row, 2]?.Value;
-                                        if (dateObj != null && DateTime.TryParse(dateObj.ToString(), out DateTime parsedDate))
+                                        DateTime docDate;
+                                        if (!DateTime.TryParse(sheetDocs.Cells[row, 3]?.Value?.ToString(), out docDate))
                                         {
-                                            docDate = parsedDate;
+                                            docDate = DateTime.Now;
                                         }
 
                                         await _context.Database.ExecuteSqlRawAsync(@"
-                                    INSERT INTO Документы (номер_документа, дата_создания, 
+                                    INSERT INTO Документы (ид_документа, номер_документа, дата_создания, 
                                         ид_типа, ид_грузоотправителя, ид_перевозчика, ид_получателя,
                                         ид_пункта_погрузки, ид_пункта_разгрузки, ид_водителя, ид_транспорта,
-                                        отпуск_разрешил, сдал_грузоотправитель, ид_пользователя) 
-                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, '', '', 1)",
-                                            docNumber, docDate,
-                                            sheetDocs.Cells[row, 3]?.Value ?? 1,
+                                        ид_пользователя, отпуск_разрешил, сдал_грузоотправитель) 
+                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13})",
+                                            Convert.ToInt32(id),
+                                            sheetDocs.Cells[row, 2]?.Value?.ToString() ?? "",
+                                            docDate,
                                             sheetDocs.Cells[row, 4]?.Value ?? 1,
                                             sheetDocs.Cells[row, 5]?.Value ?? 1,
                                             sheetDocs.Cells[row, 6]?.Value ?? 1,
                                             sheetDocs.Cells[row, 7]?.Value ?? 1,
                                             sheetDocs.Cells[row, 8]?.Value ?? 1,
                                             sheetDocs.Cells[row, 9]?.Value ?? 1,
-                                            sheetDocs.Cells[row, 10]?.Value ?? 1);
+                                            sheetDocs.Cells[row, 10]?.Value ?? 1,
+                                            sheetDocs.Cells[row, 11]?.Value ?? 1,
+                                            sheetDocs.Cells[row, 12]?.Value ?? 1,
+                                            sheetDocs.Cells[row, 13]?.Value?.ToString() ?? "",
+                                            sheetDocs.Cells[row, 14]?.Value?.ToString() ?? "");
                                         countDocs++;
                                     }
                                 }
@@ -817,23 +837,26 @@ namespace Blank.Controllers
                                 {
                                     for (int row = 2; row <= sheetPositions.Dimension.Rows; row++)
                                     {
-                                        var docId = sheetPositions.Cells[row, 1]?.Value;
-                                        if (docId == null) continue;
+                                        var id = sheetPositions.Cells[row, 1]?.Value;
+                                        if (id == null) continue;
 
                                         await _context.Database.ExecuteSqlRawAsync(@"
-                                    INSERT INTO Позиции (ид_документа, ид_товара, количество, цена_за_единицу,
-                                        ставка_ндс, масса_груза, грузовых_мест, примечание, сумма_ндс, стоимость_с_ндс) 
-                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})",
-                                            Convert.ToInt32(docId),
+                                    INSERT INTO Позиции (ид_позиции, ид_документа, ид_товара, количество, цена_за_единицу,
+                                        скидка, ндс, сумма_ндс, стоимость_с_ндс, грузовых_мест, масса_груза, ставка_ндс, примечание) 
+                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12})",
+                                            Convert.ToInt32(id),
                                             sheetPositions.Cells[row, 2]?.Value ?? 1,
-                                            sheetPositions.Cells[row, 3]?.Value ?? 0,
-                                            sheetPositions.Cells[row, 4]?.Value ?? 0,
-                                            sheetPositions.Cells[row, 5]?.Value,
-                                            sheetPositions.Cells[row, 6]?.Value,
-                                            sheetPositions.Cells[row, 7]?.Value,
-                                            sheetPositions.Cells[row, 8]?.Value?.ToString() ?? "",
-                                            sheetPositions.Cells[row, 9]?.Value,
-                                            sheetPositions.Cells[row, 10]?.Value);
+                                            sheetPositions.Cells[row, 3]?.Value ?? 1,
+                                            Convert.ToDouble(sheetPositions.Cells[row, 4]?.Value ?? 0),
+                                            Convert.ToDecimal(sheetPositions.Cells[row, 5]?.Value ?? 0),
+                                            sheetPositions.Cells[row, 6]?.Value != null ? Convert.ToDecimal(sheetPositions.Cells[row, 6].Value) : null,
+                                            sheetPositions.Cells[row, 7]?.Value != null ? Convert.ToDecimal(sheetPositions.Cells[row, 7].Value) : null,
+                                            sheetPositions.Cells[row, 8]?.Value != null ? Convert.ToDecimal(sheetPositions.Cells[row, 8].Value) : null,
+                                            sheetPositions.Cells[row, 9]?.Value != null ? Convert.ToDecimal(sheetPositions.Cells[row, 9].Value) : null,
+                                            sheetPositions.Cells[row, 10]?.Value != null ? Convert.ToInt32(sheetPositions.Cells[row, 10].Value) : null,
+                                            sheetPositions.Cells[row, 11]?.Value != null ? Convert.ToDecimal(sheetPositions.Cells[row, 11].Value) : null,
+                                            sheetPositions.Cells[row, 12]?.Value != null ? Convert.ToDecimal(sheetPositions.Cells[row, 12].Value) : null,
+                                            sheetPositions.Cells[row, 13]?.Value?.ToString() ?? "");
                                         countPositions++;
                                     }
                                 }
