@@ -331,7 +331,7 @@ namespace Blank.Controllers
         {
             using (var package = new ExcelPackage())
             {
-                // ========== ЛИСТ 1: ДОКУМЕНТЫ ==========
+                // ========== ЛИСТ 1: ДОКУМЕНТЫ (с ID) ==========
                 var sheetDocuments = package.Workbook.Worksheets.Add("Документы");
                 sheetDocuments.Cells[1, 1].Value = "ид_документа";
                 sheetDocuments.Cells[1, 2].Value = "номер_документа";
@@ -377,14 +377,13 @@ namespace Blank.Controllers
                 sheetPositions.Cells[1, 3].Value = "ид_товара";
                 sheetPositions.Cells[1, 4].Value = "количество";
                 sheetPositions.Cells[1, 5].Value = "цена_за_единицу";
-                sheetPositions.Cells[1, 6].Value = "скидка";
-                sheetPositions.Cells[1, 7].Value = "ндс";
+                sheetPositions.Cells[1, 6].Value = "ставка_ндс";
+                sheetPositions.Cells[1, 7].Value = "скидка";
                 sheetPositions.Cells[1, 8].Value = "сумма_ндс";
                 sheetPositions.Cells[1, 9].Value = "стоимость_с_ндс";
                 sheetPositions.Cells[1, 10].Value = "грузовых_мест";
                 sheetPositions.Cells[1, 11].Value = "масса_груза";
-                sheetPositions.Cells[1, 12].Value = "ставка_ндс";
-                sheetPositions.Cells[1, 13].Value = "примечание";
+                sheetPositions.Cells[1, 12].Value = "примечание";
 
                 var позиции = _context.Позиции.ToList();
                 row = 2;
@@ -395,15 +394,13 @@ namespace Blank.Controllers
                     sheetPositions.Cells[row, 3].Value = pos.ид_товара;
                     sheetPositions.Cells[row, 4].Value = pos.количество;
                     sheetPositions.Cells[row, 5].Value = pos.цена_за_единицу;
-                    sheetPositions.Cells[row, 6].Value = pos.скидка;
-                    // sheetPositions.Cells[row, 7].Value = pos.ндс;  // Удалите
-                    sheetPositions.Cells[row, 7].Value = pos.сумма_ндс;
-                    sheetPositions.Cells[row, 8].Value = pos.стоимость_с_ндс;
-                    sheetPositions.Cells[row, 9].Value = pos.грузовых_мест;
-                    sheetPositions.Cells[row, 10].Value = pos.масса_груза;
-                    sheetPositions.Cells[row, 11].Value = pos.ставка_ндс;
+                    sheetPositions.Cells[row, 6].Value = pos.ставка_ндс;
+                    sheetPositions.Cells[row, 7].Value = pos.скидка;
+                    sheetPositions.Cells[row, 8].Value = pos.сумма_ндс;
+                    sheetPositions.Cells[row, 9].Value = pos.стоимость_с_ндс;
+                    sheetPositions.Cells[row, 10].Value = pos.грузовых_мест;
+                    sheetPositions.Cells[row, 11].Value = pos.масса_груза;
                     sheetPositions.Cells[row, 12].Value = pos.примечание;
-                    row++;
                     row++;
                 }
                 sheetPositions.Cells.AutoFitColumns();
@@ -411,18 +408,16 @@ namespace Blank.Controllers
                 // ========== ЛИСТ 3: ТОВАРЫ ==========
                 var sheetGoods = package.Workbook.Worksheets.Add("Товары");
                 sheetGoods.Cells[1, 1].Value = "ид_товара";
-                sheetGoods.Cells[1, 2].Value = "код_товара";
-                sheetGoods.Cells[1, 3].Value = "наименование";
-                sheetGoods.Cells[1, 4].Value = "единицы_измерения";
+                sheetGoods.Cells[1, 2].Value = "наименование";
+                sheetGoods.Cells[1, 3].Value = "единицы_измерения";
 
                 var товары = _context.Товары.ToList();
                 row = 2;
                 foreach (var товар in товары)
                 {
                     sheetGoods.Cells[row, 1].Value = товар.ид_товара;
-                    sheetGoods.Cells[row, 2].Value = товар.код_товара;
-                    sheetGoods.Cells[row, 3].Value = товар.наименование;
-                    sheetGoods.Cells[row, 4].Value = товар.единицы_измерения;
+                    sheetGoods.Cells[row, 2].Value = товар.наименование;
+                    sheetGoods.Cells[row, 3].Value = товар.единицы_измерения;
                     row++;
                 }
                 sheetGoods.Cells.AutoFitColumns();
