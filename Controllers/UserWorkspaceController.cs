@@ -672,9 +672,32 @@ namespace Blank.Controllers
                                         var firstName = sheetDrivers.Cells[row, 3]?.Value?.ToString();
                                         if (string.IsNullOrEmpty(lastName)) continue;
 
+                                        // Получаем номер лицензии
+                                        var licenseNumber = sheetDrivers.Cells[row, 5]?.Value?.ToString();
+
+                                        // Если номер лицензии пустой, пропускаем этого водителя
+                                        if (string.IsNullOrEmpty(licenseNumber))
+                                        {
+                                            continue;
+                                        }
+
+                                        // Проверяем, существует ли уже водитель с таким номером лицензии
+                                        var existingDriver = await _context.Водители
+                                            .FirstOrDefaultAsync(d => d.номер_лицензии == licenseNumber);
+
+                                        if (existingDriver != null)
+                                        {
+                                            // Если уже есть, пропускаем
+                                            continue;
+                                        }
+
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Водители (фамилия, имя, отчество, номер_лицензии, номер_телефона) VALUES ({0}, {1}, '', '', '')",
-                                            lastName, firstName ?? "");
+                                            "INSERT INTO Водители (фамилия, имя, отчество, номер_лицензии, номер_телефона) VALUES ({0}, {1}, {2}, {3}, {4})",
+                                            lastName,
+                                            firstName ?? "",
+                                            sheetDrivers.Cells[row, 4]?.Value?.ToString() ?? "",
+                                            licenseNumber,
+                                            sheetDrivers.Cells[row, 6]?.Value?.ToString() ?? "");
                                     }
                                 }
 
