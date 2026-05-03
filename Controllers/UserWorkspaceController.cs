@@ -28,10 +28,10 @@ namespace Blank.Controllers
             _context = context;
         }
 
-        public IActionResult Error404()
+        /*public IActionResult Error404()
         {
             return View();
-        }
+        }*/
 
         /*public IActionResult Error500()
         {
