@@ -565,3 +565,13 @@ select.form-control {
         min-width: 120px;
     }
 }
+
+.goods-table .goods-select {
+    min-width: 180px;
+}
+
+/* Или если не работает — задайте ширину для первой колонки */
+.goods-table td:first-child,
+.goods-table th:first-child {
+    min-width: 200px;
+}

@@ -3,35 +3,162 @@
     ViewData["Title"] = "Восстановление из бэкапа";
 }
 
-<h2>Восстановление базы данных из бэкапа</h2>
-
-<div class="alert alert-warning">
-    <strong>Внимание!</strong> Это действие полностью заменит все текущие данные в базе.
-    Операция необратима!
-</div>
-
-<form asp-action="RestoreFromBackup"
-      asp-controller="UserWorkspace"
-      method="post"
-      enctype="multipart/form-data">
-
-    <div class="form-group">
-        <label for="file">Выберите файл бэкапа (.xlsx):</label>
-        <input type="file" name="file" id="file" class="form-control" accept=".xlsx" required />
+<div class="table-container">
+    <h2>Восстановление базы данных</h2>
+    
+    <div class="alert alert-warning" style="margin: 20px 0; padding: 15px; border-radius: 8px; background-color: #fff3cd; border-left: 5px solid #ffc107;">
+        <div style="display: flex; align-items: flex-start;">
+            <span style="font-size: 24px; margin-right: 15px;">⚠️</span>
+            <div>
+                <strong>Внимание!</strong><br />
+                Это действие полностью заменит все текущие данные в базе.
+                <span style="color: #dc3545; font-weight: bold;">Операция необратима!</span>
+            </div>
+        </div>
     </div>
 
-    <button type="submit" class="btn btn-danger btn-lg">
-        <i class="fas fa-database"></i> Восстановить из бэкапа
-    </button>
-    
-    <a href="@Url.Action("Index", "UserWorkspace")" class="btn btn-secondary btn-lg">Отмена</a>
-</form>
+    <div class="alert alert-info" style="margin: 15px 0; padding: 15px; border-radius: 8px; background-color: #d1ecf1; border-left: 5px solid #0dcaf0;">
+        <span style="margin-right: 10px;">ℹ️</span>
+        <strong>Рекомендация:</strong> Перед восстановлением рекомендуется создать резервную копию текущих данных.
+    </div>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success mt-4">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger mt-4">@TempData["Error"]</div>
+    <form asp-action="RestoreFromBackup"
+          asp-controller="UserWorkspace"
+          method="post"
+          enctype="multipart/form-data"
+          id="restoreForm"
+          style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 20px 0;">
+
+        <div style="margin-bottom: 25px;">
+            <label for="file" style="font-weight: bold; font-size: 16px; display: block; margin-bottom: 10px;">
+                📁 Выберите файл бэкапа (.xlsx):
+            </label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="file"
+                       name="file"
+                       id="file"
+                       accept=".xlsx"
+                       required
+                       onchange="updateFileName(this)"
+                       style="flex: 1; padding: 10px; border: 2px solid #dee2e6; border-radius: 5px; font-size: 14px;" />
+            </div>
+            <div id="fileNameDisplay" style="margin-top: 10px; display: none;">
+                <span style="background-color: #28a745; color: white; padding: 5px 15px; border-radius: 5px; font-size: 14px;">
+                    ✓ <span id="selectedFileName"></span>
+                </span>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 25px;">
+            <label style="display: flex; align-items: center; cursor: pointer;">
+                <input type="checkbox" id="confirmRestore" required style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;" />
+                <span style="color: #dc3545; font-weight: bold; font-size: 16px;">
+                    Я понимаю, что все текущие данные будут удалены
+                </span>
+            </label>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+            <a href="@Url.Action("Index", "UserWorkspace")"
+                   style="padding: 12px 25px; border: 2px solid #6c757d; color: #6c757d; text-decoration: none; border-radius: 5px; font-weight: bold; transition: all 0.3s;"
+                   onmouseover="this.style.backgroundColor='#6c757d'; this.style.color='white';"
+                   onmouseout="this.style.backgroundColor='transparent'; this.style.color='#6c757d';">
+                ← Отмена
+            </a>
+            <button type="submit"
+                    id="restoreBtn"
+                    disabled
+                    style="padding: 12px 30px; background-color: #6c757d; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: not-allowed; transition: all 0.3s; font-size: 16px;">
+                💾 Восстановить из бэкапа
+            </button>
+        </div>
+    </form>
+
+    <div style="text-align: center; color: #6c757d; font-size: 14px; margin-top: 15px;">
+        💡 Для создания бэкапа используйте функцию "Экспорт полного бэкапа" на главной странице.
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div style="margin: 20px 0; padding: 15px; background-color: #d4edda; border-radius: 8px; border-left: 5px solid #28a745; display: flex; align-items: center;">
+            <span style="font-size: 24px; margin-right: 15px;">✅</span>
+            <div>
+                <strong>Успешно!</strong><br />
+                @TempData["Success"]
+            </div>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div style="margin: 20px 0; padding: 15px; background-color: #f8d7da; border-radius: 8px; border-left: 5px solid #dc3545; display: flex; align-items: center;">
+            <span style="font-size: 24px; margin-right: 15px;">❌</span>
+            <div>
+                <strong>Ошибка!</strong><br />
+                @Html.Raw(TempData["Error"])
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function updateFileName(input) {
+            const display = document.getElementById('fileNameDisplay');
+            const nameSpan = document.getElementById('selectedFileName');
+            
+            if (input.files.length > 0) {
+                nameSpan.textContent = input.files[0].name;
+                display.style.display = 'block';
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        document.getElementById('confirmRestore').addEventListener('change', function() {
+            const restoreBtn = document.getElementById('restoreBtn');
+            const confirmChecked = this.checked;
+            
+            restoreBtn.disabled = !confirmChecked;
+            
+            if (confirmChecked) {
+                restoreBtn.style.backgroundColor = '#dc3545';
+                restoreBtn.style.cursor = 'pointer';
+                restoreBtn.onmouseover = function() {
+                    this.style.backgroundColor = '#c82333';
+                };
+                restoreBtn.onmouseout = function() {
+                    this.style.backgroundColor = '#dc3545';
+                };
+            } else {
+                restoreBtn.style.backgroundColor = '#6c757d';
+                restoreBtn.style.cursor = 'not-allowed';
+                restoreBtn.onmouseover = null;
+                restoreBtn.onmouseout = null;
+            }
+        });
+
+        document.getElementById('restoreForm').addEventListener('submit', function(e) {
+            const fileInput = document.getElementById('file');
+            const confirmCheck = document.getElementById('confirmRestore');
+            
+            if (!fileInput.files.length) {
+                e.preventDefault();
+                alert('Пожалуйста, выберите файл бэкапа!');
+                return false;
+            }
+            
+            if (!confirmCheck.checked) {
+                e.preventDefault();
+                alert('Пожалуйста, подтвердите, что понимаете последствия!');
+                return false;
+            }
+            
+            const submitBtn = document.getElementById('restoreBtn');
+            submitBtn.disabled = true;
+            submitBtn.style.backgroundColor = '#6c757d';
+            submitBtn.style.cursor = 'not-allowed';
+            submitBtn.innerHTML = '⏳ Восстановление...';
+        });
+    </script>
 }

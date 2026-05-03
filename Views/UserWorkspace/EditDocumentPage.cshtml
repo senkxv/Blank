@@ -5,8 +5,19 @@
     ViewData["Title"] = "Редактирование документа";
 }
 
-<link rel="stylesheet" href="/css/UserWorkspace/EditDocumentPage.css"/>
+<link rel="stylesheet" href="/css/UserWorkspace/EditDocumentPage.css" />
 <script src="/js/UserWorkspace/EditDocumentPage.js"></script>
+
+<script>
+    // Исправляем все числовые поля с запятыми на точки
+    document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('input[type="number"]').forEach(function(input) {
+    if (input.value && input.value.includes(',')) {
+    input.value = input.value.replace(',', '.');
+    }
+    });
+    });
+</script>
 
 <div class="form-container">
     <h2>Редактирование документа</h2>
@@ -118,7 +129,6 @@
                 </select>
             </div>
 
-            <!-- ДОБАВЛЕННЫЕ ДВА ПОЛЯ -->
             <div class="form-group">
                 <label asp-for="отпуск_разрешил">Отпуск разрешил (ФИО, должность)</label>
                 <input asp-for="отпуск_разрешил" class="form-control" placeholder="Например: Иванов И.И., директор" />
@@ -132,68 +142,85 @@
 
         <div class="goods-section">
             <h3>Товары (позиции накладной)</h3>
-            <table class="goods-table" id="goodsTable">
-                <thead>
-                    <tr>
-                        <th>Товар</th>
-                        <th>Ед. изм.</th>
-                        <th>Кол-во</th>
-                        <th>Цена</th>
-                        <th>НДС,%</th>
-                        <th>Сумма</th>
-                        <th>Масса, кг</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="goodsTableBody">
-                    @if (ViewBag.ExistingPositions != null && ViewBag.ExistingPositions.Count > 0)
-                    {
-                        foreach (var pos in ViewBag.ExistingPositions)
-                        {
-                            decimal sum = (decimal)pos.количество * pos.цена_за_единицу;
-                            
-                            <tr data-id="@pos.ид_позиции" data-is-existing="true">
-                                <td>
-                                    <select class="goods-select" style="width:100%">
-                                        <option value="">-- Выберите товар --</option>
-                                        @foreach (var g in ViewBag.Goods)
-                                        {
-                                            if (g.ид_товара == pos.ид_товара)
-                                            {
-                                                <option value="@g.ид_товара" selected>@g.наименование</option>
-                                            }
-                                            else
-                                            {
-                                                <option value="@g.ид_товара">@g.наименование</option>
-                                            }
-                                        }
-                                    </select>
-                                 </td>
-                                 <td><input type="text" class="goods-unit" readonly value="@(pos.Товар?.единицы_измерения ?? "")" style="width:60px"></td>
-                                 <td><input type="number" class="goods-quantity" value="@pos.количество" step="0.001" style="width:90px"></td>
-                                 <td><input type="number" class="goods-price" value="@pos.цена_за_единицу" step="0.01" style="width:100px"></td>
-                                 <td><input type="number" class="goods-vat" value="@(pos.ставка_ндс ?? 0)" step="0.5" style="width:70px"></td>
-                                 <td class="goods-sum">@sum.ToString("F2")</td>
-                                 <td><input type="number" class="goods-weight" value="@(pos.масса_груза ?? 0)" step="0.001" style="width:80px"></td>
-                                 <td><button type="button" class="remove-goods" data-id="@pos.ид_позиции">✖</button></td>
-                             </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr id="noDataRow">
-                            <td colspan="8" style="text-align: center;">Нет добавленных товаров</td>
+            <div class="table-wrapper" style="overflow-x: auto;">
+                <table class="goods-table" id="goodsTable">
+                    <thead>
+                        <tr>
+                            <th>Товар</th>
+                            <th>Ед. изм.</th>
+                            <th>Кол-во</th>
+                            <th>Цена</th>
+                            <th>Скидка,%</th>
+                            <th>НДС,%</th>
+                            <th>Стоимость без НДС</th>
+                            <th>Сумма НДС</th>
+                            <th>Стоимость с НДС</th>
+                            <th>Масса, кг</th>
+                            <th></th>
                         </tr>
-                    }
-                </tbody>
-                <tfoot>
-                    <tr id="addRowBtn">
-                        <td colspan="8" style="text-align: center;">
-                            <button type="button" id="addGoodsBtn" class="btn-add">+ Добавить товар</button>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
+                    </thead>
+                    <tbody id="goodsTableBody">
+                        @if (ViewBag.ExistingPositions != null && ViewBag.ExistingPositions.Count > 0)
+                        {
+                            foreach (var pos in ViewBag.ExistingPositions)
+                            {
+                                decimal quantity = (decimal)pos.количество;
+                                decimal price = pos.цена_за_единицу;
+                                decimal discount = pos.скидка ?? 0;
+                                decimal vatRate = pos.ставка_ндс ?? 0;
+
+                                decimal costWithoutDiscount = quantity * price;
+                                decimal discountAmount = costWithoutDiscount * (discount / 100);
+                                decimal costAfterDiscount = costWithoutDiscount - discountAmount;
+                                decimal vatAmount = costAfterDiscount * (vatRate / 100);
+                                decimal totalWithVat = costAfterDiscount + vatAmount;
+
+                                <tr data-id="@pos.ид_позиции" data-is-existing="true">
+                                    <td>
+                                        <select class="goods-select">
+                                            <option value="">-- Выберите товар --</option>
+                                            @foreach (var g in ViewBag.Goods)
+                                            {
+                                                if (g.ид_товара == pos.ид_товара)
+                                                {
+                                                    <option value="@g.ид_товара" selected>@g.наименование</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@g.ид_товара">@g.наименование</option>
+                                                }
+                                            }
+                                        </select>
+                                    </td>
+                                    <td><input type="text" class="goods-unit" readonly value="@(pos.Товар?.единицы_измерения ?? "")"></td>
+                                    <td><input type="number" class="goods-quantity" value="@pos.количество.ToString().Replace(",", ".")" step="0.001"></td>
+                                    <td><input type="number" class="goods-price" value="@pos.цена_за_единицу.ToString().Replace(",", ".")" step="0.01"></td>
+                                    <td><input type="number" class="goods-discount" value="@discount.ToString().Replace(",", ".")" step="0.1"></td>
+                                    <td><input type="number" class="goods-vat" value="@vatRate.ToString().Replace(",", ".")" step="0.5"></td>
+                                    <td class="goods-sum-without-vat">@costAfterDiscount.ToString("F2")</td>
+                                    <td class="goods-vat-amount">@vatAmount.ToString("F2")</td>
+                                    <td class="goods-sum">@totalWithVat.ToString("F2")</td>
+                                    <td><input type="number" class="goods-weight" value="@((pos.масса_груза ?? 0).ToString().Replace(",", "."))" step="0.001"></td>
+                                    <td><button type="button" class="remove-goods" data-id="@pos.ид_позиции">✖</button></td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr id="noDataRow">
+                                <td colspan="11" style="text-align: center;">Нет добавленных товаров</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr id="addRowBtn">
+                            <td colspan="11" style="text-align: center;">
+                                <button type="button" id="addGoodsBtn" class="btn-add">+ Добавить товар</button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
             <div class="goods-summary">
                 <span>Итого масса: </span>
                 <span id="totalWeight">0</span> кг

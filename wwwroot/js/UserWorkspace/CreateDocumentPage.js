@@ -1,235 +1,158 @@
 ﻿const goodsList = window.goodsListData || [];
-
-let goodsRows = [];
-let nextId = 1;
-
-function generateGoodsOptions(selectedId) {
-    let html = '<option value="">-- Выберите товар --</option>';
-    if (goodsList && goodsList.length) {
-        goodsList.forEach(g => {
-            const selected = (selectedId == g.ид_товара) ? 'selected' : '';
-            html += `<option value="${g.ид_товара}" ${selected}>${g.наименование}</option>`;
-        });
-    }
-    return html;
-}
+let deletedIds = [];
 
 function getUnit(goodsId) {
     const goods = goodsList.find(g => g.ид_товара == goodsId);
     return goods ? goods.единицы_измерения : '';
 }
 
-function calculateRowAmounts(quantity, price, vatRate) {
-    const cost = quantity * price;
-    const vatAmount = cost * (vatRate / 100);
-    const totalWithVat = cost + vatAmount;
-    return { cost, vatAmount, totalWithVat };
+function updateRowCalculations(row) {
+    const qty = parseFloat(row.querySelector('.goods-quantity')?.value) || 0;
+    const price = parseFloat(row.querySelector('.goods-price')?.value) || 0;
+    const discount = parseFloat(row.querySelector('.goods-discount')?.value) || 0;
+    const vat = parseFloat(row.querySelector('.goods-vat')?.value) || 0;
+
+    const costWithoutDiscount = qty * price;
+    const discountAmount = costWithoutDiscount * (discount / 100);
+    const costAfterDiscount = costWithoutDiscount - discountAmount;
+    const vatAmount = costAfterDiscount * (vat / 100);
+    const totalWithVat = costAfterDiscount + vatAmount;
+
+    const sumWithoutVatCell = row.querySelector('.goods-sum-without-vat');
+    const vatAmountCell = row.querySelector('.goods-vat-amount');
+    const sumCell = row.querySelector('.goods-sum');
+
+    if (sumWithoutVatCell) sumWithoutVatCell.textContent = costAfterDiscount.toFixed(2);
+    if (vatAmountCell) vatAmountCell.textContent = vatAmount.toFixed(2);
+    if (sumCell) sumCell.textContent = totalWithVat.toFixed(2);
+
+    calculateTotalWeight();
 }
 
-function recalcTotal() {
+function calculateTotalWeight() {
     let totalWeight = 0;
-    goodsRows.forEach(row => {
-        totalWeight += parseFloat(row.weight) || 0;
+    document.querySelectorAll('.goods-weight').forEach(input => {
+        totalWeight += parseFloat(input.value) || 0;
     });
-    const totalWeightElement = document.getElementById('totalWeight');
-    if (totalWeightElement) {
-        totalWeightElement.textContent = totalWeight.toFixed(3);
-    }
+    document.getElementById('totalWeight').textContent = totalWeight.toFixed(3);
 }
 
-function updateRowDisplay(row) {
-    const quantity = parseFloat(row.quantity) || 0;
-    const price = parseFloat(row.price) || 0;
-    const vatRate = parseFloat(row.vatRate) || 0;
-
-    const { vatAmount, totalWithVat } = calculateRowAmounts(quantity, price, vatRate);
-
-    const vatElement = document.querySelector(`.vat-amount[data-id="${row.id}"]`);
-    const totalElement = document.querySelector(`.total-with-vat[data-id="${row.id}"]`);
-
-    if (vatElement) vatElement.textContent = vatAmount.toFixed(2);
-    if (totalElement) totalElement.textContent = totalWithVat.toFixed(2);
-
-    recalcTotal();
-}
-
-function renderGoodsTable() {
-    const tbody = document.getElementById('goodsTableBody');
-    if (!tbody) return;
-
-    tbody.innerHTML = '';
-
-    if (goodsRows.length === 0) {
-        tbody.innerHTML = '<tr id="noDataRow"><td colspan="9" style="text-align: center;">Нет добавленных товаров</td></tr>';
-        return;
-    }
-
-    goodsRows.forEach(row => {
-        const quantity = parseFloat(row.quantity) || 0;
-        const price = parseFloat(row.price) || 0;
-        const vatRate = parseFloat(row.vatRate) || 0;
-
-        const { vatAmount, totalWithVat } = calculateRowAmounts(quantity, price, vatRate);
-        const unit = getUnit(row.goodsId);
-
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-row-id', row.id);
-        tr.innerHTML = `
-            <td style="min-width: 150px;">
-                <select class="goods-select form-control" data-id="${row.id}" data-goods-id="${row.goodsId}">
-                    ${generateGoodsOptions(row.goodsId)}
-                </select>
-            </td>
-            <td class="unit-display" data-id="${row.id}">${unit}</td>
-            <td><input type="number" class="quantity form-control" data-id="${row.id}" value="${row.quantity}" step="0.001" style="width: 90px;"></td>
-            <td><input type="number" class="price form-control" data-id="${row.id}" value="${row.price}" step="0.01" style="width: 100px;"></td>
-            <td><input type="number" class="vat-rate form-control" data-id="${row.id}" value="${row.vatRate}" step="0.5" style="width: 70px;"></td>
-            <td class="vat-amount" data-id="${row.id}">${vatAmount.toFixed(2)}</td>
-            <td class="total-with-vat" data-id="${row.id}">${totalWithVat.toFixed(2)}</td>
-            <td><input type="number" class="weight form-control" data-id="${row.id}" value="${row.weight}" step="0.001" style="width: 90px;"></td>
-            <td><button type="button" class="remove-row" data-id="${row.id}">✖</button></td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    recalcTotal();
-}
-
-function addGoodsRow() {
+function addNewRow() {
     const noDataRow = document.getElementById('noDataRow');
     if (noDataRow) noDataRow.remove();
 
-    goodsRows.push({
-        id: nextId++,
-        goodsId: 0,
-        quantity: 0,
-        price: 0,
-        vatRate: 0,
-        weight: 0,
-        packages: 0,
-        note: '',
-        discount: 0
-    });
-    renderGoodsTable();
+    const tbody = document.getElementById('goodsTableBody');
+    const newRow = document.createElement('tr');
+    newRow.setAttribute('data-is-existing', 'false');
+
+    const goodsOptions = '<option value="">-- Выберите товар --</option>' +
+        goodsList.map(g => `<option value="${g.ид_товара}">${g.наименование}</option>`).join('');
+
+    newRow.innerHTML = `
+        <td><select class="goods-select">${goodsOptions}</select></td>
+        <td><input type="text" class="goods-unit" readonly></td>
+        <td><input type="number" class="goods-quantity" value="1" step="0.001" min="0"></td>
+        <td><input type="number" class="goods-price" value="1" step="0.01" min="0"></td>
+        <td><input type="number" class="goods-discount" value="0" step="0.1" min="0" max="100"></td>
+        <td><input type="number" class="goods-vat" value="20" step="0.5" min="0" max="100"></td>
+        <td class="goods-sum-without-vat">1.00</td>
+        <td class="goods-vat-amount">0.20</td>
+        <td class="goods-sum">1.20</td>
+        <td><input type="number" class="goods-weight" value="0" step="0.001" min="0"></td>
+        <td><button type="button" class="remove-goods">✖</button></td>
+    `;
+
+    tbody.appendChild(newRow);
+    updateRowCalculations(newRow);
 }
 
-function removeGoodsRow(id) {
-    goodsRows = goodsRows.filter(r => r.id != id);
-    renderGoodsTable();
+function collectPositions() {
+    const positions = [];
+    let hasValidPositions = false;
+
+    document.querySelectorAll('#goodsTableBody tr').forEach(row => {
+        if (row.id === 'noDataRow') return;
+
+        const goodsSelect = row.querySelector('.goods-select');
+        const goodsId = parseInt(goodsSelect?.value) || 0;
+        const quantity = parseFloat(row.querySelector('.goods-quantity')?.value) || 0;
+        const price = parseFloat(row.querySelector('.goods-price')?.value) || 0;
+
+        if (goodsId > 0 && quantity > 0 && price > 0) {
+            positions.push({
+                id: 0,
+                goodsId: goodsId,
+                quantity: quantity,
+                price: price,
+                vatRate: parseFloat(row.querySelector('.goods-vat')?.value) || 0,
+                discount: parseFloat(row.querySelector('.goods-discount')?.value) || 0,
+                weight: parseFloat(row.querySelector('.goods-weight')?.value) || 0,
+                packages: 0,
+                note: ''
+            });
+            hasValidPositions = true;
+        }
+    });
+
+    return { positions, hasValidPositions };
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    addGoodsRow();
+    document.getElementById('addGoodsBtn')?.addEventListener('click', addNewRow);
 
+    document.getElementById('goodsTableBody')?.addEventListener('change', function (e) {
+        if (e.target.classList.contains('goods-select')) {
+            const goodsId = parseInt(e.target.value);
+            const unit = getUnit(goodsId);
+            e.target.closest('tr').querySelector('.goods-unit').value = unit;
+            updateRowCalculations(e.target.closest('tr'));
+        }
+    });
 
-    const addButton = document.getElementById('addGoodsRow');
-    if (addButton) {
-        addButton.addEventListener('click', addGoodsRow);
-    }
+    document.getElementById('goodsTableBody')?.addEventListener('input', function (e) {
+        if (e.target.classList.contains('goods-quantity') ||
+            e.target.classList.contains('goods-price') ||
+            e.target.classList.contains('goods-discount') ||
+            e.target.classList.contains('goods-vat')) {
+            updateRowCalculations(e.target.closest('tr'));
+        }
+        if (e.target.classList.contains('goods-weight')) {
+            calculateTotalWeight();
+        }
+    });
 
-    const tbody = document.getElementById('goodsTableBody');
-    if (tbody) {
-        // Выбор товара
-        tbody.addEventListener('change', function (e) {
-            if (e.target.classList.contains('goods-select')) {
-                const id = parseInt(e.target.dataset.id);
-                const goodsId = parseInt(e.target.value);
-                const row = goodsRows.find(r => r.id == id);
-                if (row) {
-                    row.goodsId = goodsId;
-                    const unit = getUnit(goodsId);
-                    const unitDisplay = document.querySelector(`.unit-display[data-id="${id}"]`);
-                    if (unitDisplay) unitDisplay.textContent = unit;
-                }
+    document.getElementById('goodsTableBody')?.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-goods')) {
+            e.target.closest('tr').remove();
+            calculateTotalWeight();
+            if (document.querySelectorAll('#goodsTableBody tr').length === 0) {
+                document.getElementById('goodsTableBody').innerHTML = '<tr id="noDataRow"><td colspan="11" style="text-align: center;">Нет добавленных товаров</td></tr>';
             }
-        });
-
-        tbody.addEventListener('input', function (e) {
-            if (e.target.classList.contains('quantity')) {
-                const id = parseInt(e.target.dataset.id);
-                const value = parseFloat(e.target.value) || 0;
-                const row = goodsRows.find(r => r.id == id);
-                if (row) {
-                    row.quantity = value;
-                    updateRowDisplay(row);
-                }
-            }
-
-            if (e.target.classList.contains('price')) {
-                const id = parseInt(e.target.dataset.id);
-                const value = parseFloat(e.target.value) || 0;
-                const row = goodsRows.find(r => r.id == id);
-                if (row) {
-                    row.price = value;
-                    updateRowDisplay(row);
-                }
-            }
-
-            if (e.target.classList.contains('vat-rate')) {
-                const id = parseInt(e.target.dataset.id);
-                const value = parseFloat(e.target.value) || 0;
-                const row = goodsRows.find(r => r.id == id);
-                if (row) {
-                    row.vatRate = value;
-                    updateRowDisplay(row);
-                }
-            }
-
-            if (e.target.classList.contains('weight')) {
-                const id = parseInt(e.target.dataset.id);
-                const value = parseFloat(e.target.value) || 0;
-                const row = goodsRows.find(r => r.id == id);
-                if (row) {
-                    row.weight = value;
-                    recalcTotal();
-                }
-            }
-        });
-
-        tbody.addEventListener('click', function (e) {
-            if (e.target.classList.contains('remove-row')) {
-                const id = parseInt(e.target.dataset.id);
-                removeGoodsRow(id);
-            }
-        });
-    }
+        }
+    });
 
     const form = document.getElementById('documentForm');
     if (form) {
         form.addEventListener('submit', function (e) {
-            const validPositions = goodsRows.filter(row =>
-                row.goodsId > 0 &&
-                row.quantity > 0 &&
-                row.price > 0
-            );
+            const { positions, hasValidPositions } = collectPositions();
+            const hasRows = document.querySelectorAll('#goodsTableBody tr:not(#noDataRow)').length > 0;
 
-            const positions = validPositions.map(row => ({
-                id: 0,
-                goodsId: row.goodsId,
-                quantity: row.quantity,
-                price: row.price,
-                discount: row.discount || 0,
-                vatRate: row.vatRate || 0,
-                weight: row.weight || 0,
-                packages: row.packages || 0,
-                note: row.note || ''
-            }));
-
-            const positionsData = document.getElementById('positionsData');
-            if (positionsData) {
-                positionsData.value = JSON.stringify(positions);
-            }
-
-            console.log('Отправляемые позиции:', positions);
-            console.log('Количество позиций:', positions.length);
-
-            if (positions.length === 0) {
+            if (!hasRows) {
                 alert('Добавьте хотя бы одну позицию товара!');
                 e.preventDefault();
                 return false;
             }
 
-            return true;
+            if (!hasValidPositions) {
+                alert('Заполните все обязательные поля в позициях товаров (товар, количество, цена)!');
+                e.preventDefault();
+                return false;
+            }
+
+            document.getElementById('positionsData').value = JSON.stringify(positions);
+            console.log('Отправляемые позиции:', positions);
         });
     }
+
+    calculateTotalWeight();
 });

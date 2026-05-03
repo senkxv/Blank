@@ -122,17 +122,14 @@
                 <span asp-validation-for="ид_пункта_разгрузки" class="text-danger"></span>
             </div>
 
-            <!-- НОВЫЕ ДВА ПОЛЯ -->
             <div class="form-group">
                 <label asp-for="отпуск_разрешил">Отпуск разрешил (ФИО, должность)</label>
                 <input asp-for="отпуск_разрешил" class="form-control" placeholder="Например: Иванов И.И., директор" />
-                <span asp-validation-for="отпуск_разрешил" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="сдал_грузоотправитель">Сдал грузоотправитель (ФИО, должность)</label>
                 <input asp-for="сдал_грузоотправитель" class="form-control" placeholder="Например: Петров П.П., кладовщик" />
-                <span asp-validation-for="сдал_грузоотправитель" class="text-danger"></span>
             </div>
         </div>
 
@@ -146,28 +143,33 @@
                             <th>Ед. изм.</th>
                             <th>Кол-во</th>
                             <th>Цена</th>
-                            <th>Ставка НДС</th>
+                            <th>Скидка,%</th>
+                            <th>НДС,%</th>
+                            <th>Стоимость без НДС</th>
                             <th>Сумма НДС</th>
                             <th>Стоимость с НДС</th>
-                            <th>Масса</th>
-                            <th>Действия</th>
+                            <th>Масса, кг</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody id="goodsTableBody">
                         <tr id="noDataRow">
-                            <td colspan="9" style="text-align: center;">Нет добавленных товаров</td>
+                            <td colspan="11" style="text-align: center;">Нет добавленных товаров</td>
                         </tr>
                     </tbody>
                     <tfoot>
-                        <tr>
-                            <td colspan="7" class="right">Итого масса:</td>
-                            <td class="right" id="totalWeight">0</td>
-                            <td></td>
+                        <tr id="addRowBtn">
+                            <td colspan="11" style="text-align: center;">
+                                <button type="button" id="addGoodsBtn" class="btn-add">+ Добавить товар</button>
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
-            <button type="button" id="addGoodsRow" class="btn-add">+ Добавить товар</button>
+            <div class="goods-summary">
+                <span>Итого масса: </span>
+                <span id="totalWeight">0</span> кг
+            </div>
         </div>
 
         <div class="form-actions">
@@ -180,7 +182,6 @@
 </div>
 
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         window.goodsListData = @Html.Raw(Json.Serialize(ViewBag.Goods));
     </script>

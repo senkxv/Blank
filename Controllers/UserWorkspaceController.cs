@@ -13,8 +13,7 @@ using System.Text;
 using System.Text.Json;
 using Body = DocumentFormat.OpenXml.Wordprocessing.Body;
 using Text = DocumentFormat.OpenXml.Wordprocessing.Text;
-using MySql.Data.MySqlClient;
-// Псевдонимы для устранения конфликта имён
+
 using WordprocessingDocument = DocumentFormat.OpenXml.Packaging.WordprocessingDocument;
 
 namespace Blank.Controllers
@@ -93,8 +92,10 @@ namespace Blank.Controllers
 
                                 decimal quantityDecimal = (decimal)pos.quantity;
                                 decimal cost = pos.price * quantityDecimal;
-                                decimal vatAmount = cost * (pos.vatRate / 100);
-                                decimal totalWithVat = cost + vatAmount;
+                                decimal discountAmount = cost * (pos.discount / 100);         // Скидка в деньгах
+                                decimal costAfterDiscount = cost - discountAmount;             // База для НДС
+                                decimal vatAmount = costAfterDiscount * (pos.vatRate / 100);   // НДС от базы
+                                decimal totalWithVat = costAfterDiscount + vatAmount;          // Итого
 
                                 var position = new Positions
                                 {
@@ -102,9 +103,9 @@ namespace Blank.Controllers
                                     ид_товара = pos.goodsId,
                                     количество = pos.quantity,
                                     цена_за_единицу = pos.price,
-                                    ставка_ндс = pos.vatRate > 0 ? pos.vatRate : (decimal?)null,
-                                    скидка = pos.discount > 0 ? pos.discount : (decimal?)null,
-                                    масса_груза = pos.weight > 0 ? pos.weight : (decimal?)null,
+                                    ставка_ндс = pos.vatRate,                                    // ✅ ИСПРАВЛЕНО
+                                    скидка = pos.discount,                                       // ✅ ИСПРАВЛЕНО
+                                    масса_груза = pos.weight,                                    // ✅ ИСПРАВЛЕНО
                                     грузовых_мест = pos.packages > 0 ? pos.packages : (int?)null,
                                     примечание = string.IsNullOrEmpty(pos.note) ? null : pos.note,
                                     сумма_ндс = vatAmount,
@@ -228,8 +229,10 @@ namespace Blank.Controllers
 
                             decimal quantityDecimal = (decimal)pos.quantity;
                             decimal cost = pos.price * quantityDecimal;
-                            decimal vatAmount = cost * (pos.vatRate / 100);
-                            decimal totalWithVat = cost + vatAmount;
+                            decimal discountAmount = cost * (pos.discount / 100);         // Скидка в деньгах
+                            decimal costAfterDiscount = cost - discountAmount;             // База для НДС
+                            decimal vatAmount = costAfterDiscount * (pos.vatRate / 100);   // НДС от базы
+                            decimal totalWithVat = costAfterDiscount + vatAmount;          // Итого
 
                             if (pos.id > 0)
                             {
@@ -257,9 +260,9 @@ namespace Blank.Controllers
                                     ид_товара = pos.goodsId,
                                     количество = pos.quantity,
                                     цена_за_единицу = pos.price,
-                                    ставка_ндс = pos.vatRate > 0 ? pos.vatRate : (decimal?)null,
-                                    скидка = pos.discount > 0 ? pos.discount : (decimal?)null,
-                                    масса_груза = pos.weight > 0 ? pos.weight : (decimal?)null,
+                                    ставка_ндс = pos.vatRate,
+                                    скидка = pos.discount,
+                                    масса_груза = pos.weight,
                                     грузовых_мест = pos.packages > 0 ? pos.packages : (int?)null,
                                     примечание = string.IsNullOrEmpty(pos.note) ? null : pos.note,
                                     сумма_ндс = vatAmount,
@@ -332,7 +335,6 @@ namespace Blank.Controllers
         {
             using (var package = new ExcelPackage())
             {
-                // Лист 1: Документы (с ID)
                 var sheetDocuments = package.Workbook.Worksheets.Add("Документы");
                 sheetDocuments.Cells[1, 1].Value = "ид_документа";
                 sheetDocuments.Cells[1, 2].Value = "номер_документа";
@@ -369,7 +371,6 @@ namespace Blank.Controllers
                 }
                 sheetDocuments.Cells.AutoFitColumns();
 
-                // Лист 2: Позиции
                 var sheetPositions = package.Workbook.Worksheets.Add("Позиции");
                 sheetPositions.Cells[1, 1].Value = "ид_позиции";
                 sheetPositions.Cells[1, 2].Value = "ид_документа";
@@ -394,7 +395,7 @@ namespace Blank.Controllers
                     sheetPositions.Cells[row, 4].Value = pos.количество;
                     sheetPositions.Cells[row, 5].Value = pos.цена_за_единицу;
                     sheetPositions.Cells[row, 6].Value = pos.ставка_ндс;
-                    sheetPositions.Cells[row, 7].Value = pos.скидка;  // ДОБАВЛЕНО
+                    sheetPositions.Cells[row, 7].Value = pos.скидка;  
                     sheetPositions.Cells[row, 8].Value = pos.масса_груза;
                     sheetPositions.Cells[row, 9].Value = pos.грузовых_мест;
                     sheetPositions.Cells[row, 10].Value = pos.примечание ?? "";
@@ -404,7 +405,6 @@ namespace Blank.Controllers
                 }
                 sheetPositions.Cells.AutoFitColumns();
 
-                // Лист 3: Товары - С ОТЛАДКОЙ
                 var sheetGoods = package.Workbook.Worksheets.Add("Товары");
                 sheetGoods.Cells[1, 1].Value = "ид_товара";
                 sheetGoods.Cells[1, 2].Value = "код_товара";
@@ -413,13 +413,11 @@ namespace Blank.Controllers
 
                 var товары = _context.Товары.ToList();
 
-                // ДОБАВЬТЕ ЭТУ СТРОКУ ДЛЯ ОТЛАДКИ:
                 System.Diagnostics.Debug.WriteLine($"Количество товаров для экспорта: {товары.Count}");
 
                 row = 2;
                 foreach (var товар in товары)
                 {
-                    // ДОБАВЬТЕ ОТЛАДКУ:
                     System.Diagnostics.Debug.WriteLine($"Экспорт товара: ID={товар.ид_товара}, Название={товар.наименование}");
 
                     sheetGoods.Cells[row, 1].Value = товар.ид_товара;
@@ -430,10 +428,8 @@ namespace Blank.Controllers
                 }
                 sheetGoods.Cells.AutoFitColumns();
 
-                // ДОБАВЬТЕ ЭТУ СТРОКУ:
                 System.Diagnostics.Debug.WriteLine($"Экспортировано товаров: {row - 2}");
 
-                // Лист 4: Организации
                 var sheetOrganizations = package.Workbook.Worksheets.Add("Организации");
                 sheetOrganizations.Cells[1, 1].Value = "ид_организации";
                 sheetOrganizations.Cells[1, 2].Value = "название";
@@ -1308,11 +1304,14 @@ namespace Blank.Controllers
             foreach (var pos in позиции)
             {
                 decimal quantityDecimal = (decimal)pos.количество;
-                decimal cost = pos.цена_за_единицу * quantityDecimal;
-                decimal vatAmount = cost * ((pos.ставка_ндс ?? 0) / 100);
+                decimal costWithoutDiscount = pos.цена_за_единицу * quantityDecimal;
+                decimal discountAmount = costWithoutDiscount * ((pos.скидка ?? 0) / 100);
+                decimal costAfterDiscount = costWithoutDiscount - discountAmount;
+                decimal vatAmount = costAfterDiscount * ((pos.ставка_ндс ?? 0) / 100);
+                decimal totalWithVat = costAfterDiscount + vatAmount;
 
                 totalQuantity += quantityDecimal;
-                totalCost += cost;
+                totalCost += costAfterDiscount;  // Стоимость после скидки
                 totalVat += vatAmount;
                 totalWeight += pos.масса_груза ?? 0;
                 totalPackages += pos.грузовых_мест ?? 0;
@@ -1323,10 +1322,11 @@ namespace Blank.Controllers
                         <td class=""center"">{pos.Товар?.единицы_измерения ?? ""}</td>
                         <td class=""right"">{pos.количество:F3}</td>
                         <td class=""right"">{pos.цена_за_единицу:F2}</td>
-                        <td class=""right"">{cost:F2}</td>
+                        <td class=""right"">{pos.скидка ?? 0}</td>
                         <td class=""center"">{pos.ставка_ндс ?? 0}</td>
+                        <td class=""right"">{costAfterDiscount:F2}</td>
                         <td class=""right"">{vatAmount:F2}</td>
-                        <td class=""right"">{cost + vatAmount:F2}</td>
+                        <td class=""right"">{totalWithVat:F2}</td>
                         <td class=""right"">{pos.грузовых_мест ?? 0}</td>
                         <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
                         <td class=""right"">{pos.примечание ?? ""}</td>
@@ -1368,9 +1368,9 @@ namespace Blank.Controllers
                 .Replace("{{ВсегоСтоимостьСНДСПрописью}}", NumToTextHelper.SumInWords(totalCost + totalVat))
                 .Replace("{{ВсегоМассаПрописью}}", NumToTextHelper.WeightInWords(totalWeight))
                 .Replace("{{ВсегоМестПрописью}}", NumToTextHelper.PackagesInWords(totalPackages))
-                .Replace("{{ОтпускРазрешил}}", "")
+                .Replace("{{ОтпускРазрешил}}", документ.отпуск_разрешил ?? "")
+                .Replace("{{СдалГрузоотправитель}}", документ.сдал_грузоотправитель ?? "")
                 .Replace("{{ТоварПринял}}", "")
-                .Replace("{{СдалГрузоотправитель}}", "")
                 .Replace("{{НомерПломбы}}", "")
                 .Replace("{{Доверенность}}", "")
                 .Replace("{{ДатаДоверенности}}", "")
@@ -1475,7 +1475,11 @@ namespace Blank.Controllers
                 // 4. Считаем итоги
                 decimal totalWeight = позиции.Sum(p => p.weight);
                 int totalPackages = позиции.Sum(p => p.packages);
-                decimal totalAmount = позиции.Sum(p => p.price * (decimal)p.quantity);
+                decimal totalAmount = позиции.Sum(p => {
+                    var cost = p.price * (decimal)p.quantity;
+                    var discountAmount = cost * (p.discount / 100);
+                    return cost - discountAmount;
+                });
 
                 // 5. Путь к шаблону Word
                 string templatePath = Path.Combine(
@@ -1667,14 +1671,16 @@ namespace Blank.Controllers
                 var итоги = new DocumentTotals();
                 foreach (var pos in позиции)
                 {
-                    decimal cost = pos.price * (decimal)pos.quantity;
+                    decimal costWithoutDiscount = pos.price * (decimal)pos.quantity;
+                    decimal discountAmount = costWithoutDiscount * (pos.discount / 100);
+                    decimal costAfterDiscount = costWithoutDiscount - discountAmount;
                     decimal vatRate = pos.ставка_ндс ?? 0;
-                    decimal vatAmount = cost * (vatRate / 100);
+                    decimal vatAmount = costAfterDiscount * (vatRate / 100);
 
                     итоги.ВсегоКоличество += (decimal)pos.quantity;
-                    итоги.ВсегоСтоимость += cost;
+                    итоги.ВсегоСтоимость += costAfterDiscount;
                     итоги.ВсегоСуммаНДС += vatAmount;
-                    итоги.ВсегоСтоимостьСНДС += cost + vatAmount;
+                    итоги.ВсегоСтоимостьСНДС += costAfterDiscount + vatAmount;
                     итоги.ВсегоМасса += pos.weight;
                     итоги.ВсегоМест += pos.packages;
                 }
