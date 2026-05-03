@@ -84,17 +84,16 @@ namespace Blank.Controllers
                 }
 
                 int? orgId = null;
-                int? должностьId = 3; // По умолчанию обычный пользователь
+                int? должностьId = 3;
 
-                // Если включён режим администратора — создаём новую организацию
                 if (model.IsAdmin)
                 {
                     var newOrg = new Organization
                     {
-                        название = "Новая компания " + Guid.NewGuid().ToString("N").Substring(0, 8),
+                        название = "Компания " + Guid.NewGuid().ToString("N").Substring(0, 8),
                         унп = "",
                         адрес = "",
-                        почта = ""
+                        почта = model.Email ?? ""
                     };
                     _context.Организации.Add(newOrg);
                     await _context.SaveChangesAsync();
@@ -105,7 +104,7 @@ namespace Blank.Controllers
 
                 var user = new Users
                 {
-                    почта = model.Email,
+                    почта = model.Email ?? "",
                     хэш_пароль = HashPassword(model.Password ?? ""),
                     фамилия = фамилия,
                     имя = имя,
@@ -119,7 +118,7 @@ namespace Blank.Controllers
                 await _context.SaveChangesAsync();
 
                 HttpContext.Session.SetString("UserId", user.ид_пользователя.ToString());
-                HttpContext.Session.SetString("UserEmail", user.почта ?? "");
+                HttpContext.Session.SetString("UserEmail", user.почта);
                 HttpContext.Session.SetString("UserName", $"{user.фамилия} {user.имя}");
                 HttpContext.Session.SetString("UserOrgId", user.ид_организации?.ToString() ?? "");
                 HttpContext.Session.SetString("UserRoleId", user.ид_должности?.ToString() ?? "");
