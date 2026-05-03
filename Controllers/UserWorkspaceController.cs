@@ -2,19 +2,20 @@
 using Blank.Helpers;
 using Blank.Models.Tables;
 using Blank.Models.ViewModels;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 using OfficeOpenXml;
 using SelectPdf;
 using System.Text;
 using System.Text.Json;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
-
+using Body = DocumentFormat.OpenXml.Wordprocessing.Body;
+using Text = DocumentFormat.OpenXml.Wordprocessing.Text;
+using MySql.Data.MySqlClient;
 // Псевдонимы для устранения конфликта имён
 using WordprocessingDocument = DocumentFormat.OpenXml.Packaging.WordprocessingDocument;
-using Text = DocumentFormat.OpenXml.Wordprocessing.Text;
-using Body = DocumentFormat.OpenXml.Wordprocessing.Body;
 
 namespace Blank.Controllers
 {
@@ -344,6 +345,8 @@ namespace Blank.Controllers
                 sheetDocuments.Cells[1, 9].Value = "ид_пункта_разгрузки";
                 sheetDocuments.Cells[1, 10].Value = "ид_водителя";
                 sheetDocuments.Cells[1, 11].Value = "ид_транспорта";
+                sheetDocuments.Cells[1, 12].Value = "отпуск_разрешил";
+                sheetDocuments.Cells[1, 13].Value = "сдал_грузоотправитель";
 
                 var документы = _context.Документы.ToList();
                 int row = 2;
@@ -360,6 +363,8 @@ namespace Blank.Controllers
                     sheetDocuments.Cells[row, 9].Value = doc.ид_пункта_разгрузки;
                     sheetDocuments.Cells[row, 10].Value = doc.ид_водителя;
                     sheetDocuments.Cells[row, 11].Value = doc.ид_транспорта;
+                    sheetDocuments.Cells[row, 12].Value = doc.отпуск_разрешил ?? "";
+                    sheetDocuments.Cells[row, 13].Value = doc.сдал_грузоотправитель ?? "";
                     row++;
                 }
                 sheetDocuments.Cells.AutoFitColumns();
@@ -372,11 +377,12 @@ namespace Blank.Controllers
                 sheetPositions.Cells[1, 4].Value = "количество";
                 sheetPositions.Cells[1, 5].Value = "цена_за_единицу";
                 sheetPositions.Cells[1, 6].Value = "ставка_ндс";
-                sheetPositions.Cells[1, 7].Value = "масса_груза";
-                sheetPositions.Cells[1, 8].Value = "грузовых_мест";
-                sheetPositions.Cells[1, 9].Value = "примечание";
-                sheetPositions.Cells[1, 10].Value = "сумма_ндс";
-                sheetPositions.Cells[1, 11].Value = "стоимость_с_ндс";
+                sheetPositions.Cells[1, 7].Value = "скидка";
+                sheetPositions.Cells[1, 8].Value = "масса_груза";
+                sheetPositions.Cells[1, 9].Value = "грузовых_мест";
+                sheetPositions.Cells[1, 10].Value = "примечание";
+                sheetPositions.Cells[1, 11].Value = "сумма_ндс";
+                sheetPositions.Cells[1, 12].Value = "стоимость_с_ндс";
 
                 var позиции = _context.Позиции.ToList();
                 row = 2;
@@ -388,31 +394,44 @@ namespace Blank.Controllers
                     sheetPositions.Cells[row, 4].Value = pos.количество;
                     sheetPositions.Cells[row, 5].Value = pos.цена_за_единицу;
                     sheetPositions.Cells[row, 6].Value = pos.ставка_ндс;
-                    sheetPositions.Cells[row, 7].Value = pos.масса_груза;
-                    sheetPositions.Cells[row, 8].Value = pos.грузовых_мест;
-                    sheetPositions.Cells[row, 9].Value = pos.примечание;
-                    sheetPositions.Cells[row, 10].Value = pos.сумма_ндс;
-                    sheetPositions.Cells[row, 11].Value = pos.стоимость_с_ндс;
+                    sheetPositions.Cells[row, 7].Value = pos.скидка;  // ДОБАВЛЕНО
+                    sheetPositions.Cells[row, 8].Value = pos.масса_груза;
+                    sheetPositions.Cells[row, 9].Value = pos.грузовых_мест;
+                    sheetPositions.Cells[row, 10].Value = pos.примечание ?? "";
+                    sheetPositions.Cells[row, 11].Value = pos.сумма_ндс;
+                    sheetPositions.Cells[row, 12].Value = pos.стоимость_с_ндс;
                     row++;
                 }
                 sheetPositions.Cells.AutoFitColumns();
 
-                // Лист 3: Товары
+                // Лист 3: Товары - С ОТЛАДКОЙ
                 var sheetGoods = package.Workbook.Worksheets.Add("Товары");
                 sheetGoods.Cells[1, 1].Value = "ид_товара";
-                sheetGoods.Cells[1, 2].Value = "наименование";
-                sheetGoods.Cells[1, 3].Value = "единицы_измерения";
+                sheetGoods.Cells[1, 2].Value = "код_товара";
+                sheetGoods.Cells[1, 3].Value = "наименование";
+                sheetGoods.Cells[1, 4].Value = "единицы_измерения";
 
                 var товары = _context.Товары.ToList();
+
+                // ДОБАВЬТЕ ЭТУ СТРОКУ ДЛЯ ОТЛАДКИ:
+                System.Diagnostics.Debug.WriteLine($"Количество товаров для экспорта: {товары.Count}");
+
                 row = 2;
                 foreach (var товар in товары)
                 {
+                    // ДОБАВЬТЕ ОТЛАДКУ:
+                    System.Diagnostics.Debug.WriteLine($"Экспорт товара: ID={товар.ид_товара}, Название={товар.наименование}");
+
                     sheetGoods.Cells[row, 1].Value = товар.ид_товара;
-                    sheetGoods.Cells[row, 2].Value = товар.наименование;
-                    sheetGoods.Cells[row, 3].Value = товар.единицы_измерения;
+                    sheetGoods.Cells[row, 2].Value = товар.код_товара ?? "";
+                    sheetGoods.Cells[row, 3].Value = товар.наименование;
+                    sheetGoods.Cells[row, 4].Value = товар.единицы_измерения;
                     row++;
                 }
                 sheetGoods.Cells.AutoFitColumns();
+
+                // ДОБАВЬТЕ ЭТУ СТРОКУ:
+                System.Diagnostics.Debug.WriteLine($"Экспортировано товаров: {row - 2}");
 
                 // Лист 4: Организации
                 var sheetOrganizations = package.Workbook.Worksheets.Add("Организации");
@@ -574,8 +593,6 @@ namespace Blank.Controllers
                                 // ========== 1. ОЧИЩАЕМ ТАБЛИЦЫ ==========
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Позиции;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Документы;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Позиции;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Документы;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Пункт_Погрузки;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Пункт_Разгрузки;");
                                 await _context.Database.ExecuteSqlRawAsync("DELETE FROM Водители;");
@@ -654,20 +671,46 @@ namespace Blank.Controllers
                                     }
                                 }
 
-                                // ========== 6. ВОССТАНАВЛИВАЕМ ТОВАРЫ ==========
+                                // ========== 6. ВОССТАНАВЛИВАЕМ ТОВАРЫ (АВТООПРЕДЕЛЕНИЕ ФОРМАТА) ==========
                                 var sheetGoods = package.Workbook.Worksheets["Товары"];
                                 if (sheetGoods != null && sheetGoods.Dimension != null && sheetGoods.Dimension.Rows > 1)
                                 {
+                                    // Определяем формат файла по заголовкам
+                                    var header1 = sheetGoods.Cells[1, 1]?.Value?.ToString() ?? "";
+                                    var header2 = sheetGoods.Cells[1, 2]?.Value?.ToString() ?? "";
+                                    var header3 = sheetGoods.Cells[1, 3]?.Value?.ToString() ?? "";
+                                    var header4 = sheetGoods.Cells[1, 4]?.Value?.ToString() ?? "";
+
+                                    bool hasCodeColumn = header2 == "код_товара";  // Новый формат с кодом товара
+
                                     for (int row = 2; row <= sheetGoods.Dimension.Rows; row++)
                                     {
                                         var id = sheetGoods.Cells[row, 1]?.Value;
-                                        var name = sheetGoods.Cells[row, 2]?.Value?.ToString();
-                                        if (id == null || string.IsNullOrEmpty(name)) continue;
+                                        if (id == null) continue;
+
+                                        string code, name, unit;
+
+                                        if (hasCodeColumn)
+                                        {
+                                            // Новый формат: ид_товара, код_товара, наименование, единицы_измерения
+                                            code = sheetGoods.Cells[row, 2]?.Value?.ToString() ?? "";
+                                            name = sheetGoods.Cells[row, 3]?.Value?.ToString() ?? "";
+                                            unit = sheetGoods.Cells[row, 4]?.Value?.ToString() ?? "";
+                                        }
+                                        else
+                                        {
+                                            // Старый формат: ид_товара, наименование, единицы_измерения
+                                            code = "";  // В старом формате нет кода товара
+                                            name = sheetGoods.Cells[row, 2]?.Value?.ToString() ?? "";
+                                            unit = sheetGoods.Cells[row, 3]?.Value?.ToString() ?? "";
+                                        }
+
+                                        // Пропускаем только если нет ни названия, ни кода
+                                        if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(code)) continue;
 
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Товары (ид_товара, наименование, единицы_измерения) VALUES ({0}, {1}, {2})",
-                                            Convert.ToInt32(id), name,
-                                            sheetGoods.Cells[row, 3]?.Value?.ToString() ?? "");
+                                            "INSERT INTO Товары (ид_товара, код_товара, наименование, единицы_измерения) VALUES ({0}, {1}, {2}, {3})",
+                                            Convert.ToInt32(id), code, name, unit);
                                     }
                                 }
 
@@ -742,44 +785,79 @@ namespace Blank.Controllers
                                     }
                                 }
 
-                                // ========== 11. ВОССТАНАВЛИВАЕМ ДОКУМЕНТЫ ==========
+                                // ========== 11. ВОССТАНАВЛИВАЕМ ДОКУМЕНТЫ (С МАППИНГОМ ID) ==========
                                 var sheetDocs = package.Workbook.Worksheets["Документы"];
                                 int countDocs = 0;
+                                Dictionary<int, int> docIdMapping = new Dictionary<int, int>();
 
                                 if (sheetDocs != null && sheetDocs.Dimension != null && sheetDocs.Dimension.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetDocs.Dimension.Rows; row++)
                                     {
-                                        var docNumber = sheetDocs.Cells[row, 1]?.Value?.ToString();
+                                        var docNumberCell = sheetDocs.Cells[row, 2]?.Value;
+                                        if (docNumberCell == null) continue;
+
+                                        string docNumber = docNumberCell.ToString().Trim();
                                         if (string.IsNullOrEmpty(docNumber)) continue;
 
-                                        DateTime docDate = DateTime.Now;
-                                        var dateObj = sheetDocs.Cells[row, 2]?.Value;
-                                        if (dateObj != null && DateTime.TryParse(dateObj.ToString(), out DateTime parsedDate))
+                                        int originalDocId = 0;
+                                        var docIdObj = sheetDocs.Cells[row, 1]?.Value;
+                                        if (docIdObj != null)
                                         {
-                                            docDate = parsedDate;
+                                            int.TryParse(docIdObj.ToString(), out originalDocId);
                                         }
 
+                                        DateTime docDate = DateTime.Now;
+                                        var dateObj = sheetDocs.Cells[row, 3]?.Value;
+                                        if (dateObj != null)
+                                        {
+                                            DateTime.TryParse(dateObj.ToString(), out docDate);
+                                        }
+
+                                        int typeId = 1;
+                                        var typeObj = sheetDocs.Cells[row, 4]?.Value;
+                                        if (typeObj != null)
+                                        {
+                                            int.TryParse(typeObj.ToString(), out typeId);
+                                        }
+                                        if (typeId < 1) typeId = 1;
+
+                                        int senderId = GetIntValue(sheetDocs.Cells[row, 5]?.Value);
+                                        int carrierId = GetIntValue(sheetDocs.Cells[row, 6]?.Value);
+                                        int receiverId = GetIntValue(sheetDocs.Cells[row, 7]?.Value);
+                                        int loadingPointId = GetIntValue(sheetDocs.Cells[row, 8]?.Value);
+                                        int unloadingPointId = GetIntValue(sheetDocs.Cells[row, 9]?.Value);
+                                        int driverId = GetIntValue(sheetDocs.Cells[row, 10]?.Value);
+                                        int transportId = GetIntValue(sheetDocs.Cells[row, 11]?.Value);
+
+                                        string отпускРазрешил = sheetDocs.Cells[row, 12]?.Value?.ToString() ?? "";
+                                        string сдалГрузоотправитель = sheetDocs.Cells[row, 13]?.Value?.ToString() ?? "";
+
+                                        // Вставляем БЕЗ указания ID (автоинкремент)
                                         await _context.Database.ExecuteSqlRawAsync(@"
-                                    INSERT INTO Документы (номер_документа, дата_создания, 
-                                        ид_типа, ид_грузоотправителя, ид_перевозчика, ид_получателя,
-                                        ид_пункта_погрузки, ид_пункта_разгрузки, ид_водителя, ид_транспорта,
-                                        отпуск_разрешил, сдал_грузоотправитель, ид_пользователя) 
-                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, '', '', 1)",
-                                            docNumber, docDate,
-                                            sheetDocs.Cells[row, 3]?.Value ?? 1,
-                                            sheetDocs.Cells[row, 4]?.Value ?? 1,
-                                            sheetDocs.Cells[row, 5]?.Value ?? 1,
-                                            sheetDocs.Cells[row, 6]?.Value ?? 1,
-                                            sheetDocs.Cells[row, 7]?.Value ?? 1,
-                                            sheetDocs.Cells[row, 8]?.Value ?? 1,
-                                            sheetDocs.Cells[row, 9]?.Value ?? 1,
-                                            sheetDocs.Cells[row, 10]?.Value ?? 1);
+            INSERT INTO Документы (номер_документа, дата_создания, 
+                ид_типа, ид_грузоотправителя, ид_перевозчика, ид_получателя,
+                ид_пункта_погрузки, ид_пункта_разгрузки, ид_водителя, ид_транспорта,
+                отпуск_разрешил, сдал_грузоотправитель, ид_пользователя) 
+            VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, 1)",
+                                            docNumber, docDate, typeId,
+                                            senderId, carrierId, receiverId,
+                                            loadingPointId, unloadingPointId, driverId, transportId,
+                                            отпускРазрешил, сдалГрузоотправитель);
+
+                                        // Получаем новый ID документа
+                                        var newId = await _context.Документы
+                                            .Where(d => d.номер_документа == docNumber && d.дата_создания == docDate)
+                                            .OrderByDescending(d => d.ид_документа)
+                                            .Select(d => d.ид_документа)
+                                            .FirstOrDefaultAsync();
+
+                                        docIdMapping[originalDocId] = newId;
                                         countDocs++;
                                     }
                                 }
 
-                                // ========== 12. ВОССТАНАВЛИВАЕМ ПОЗИЦИИ ==========
+                                // ========== 12. ВОССТАНАВЛИВАЕМ ПОЗИЦИИ (С МАППИНГОМ ID ДОКУМЕНТОВ) ==========
                                 var sheetPositions = package.Workbook.Worksheets["Позиции"];
                                 int countPositions = 0;
 
@@ -787,23 +865,112 @@ namespace Blank.Controllers
                                 {
                                     for (int row = 2; row <= sheetPositions.Dimension.Rows; row++)
                                     {
-                                        var docId = sheetPositions.Cells[row, 1]?.Value;
-                                        if (docId == null) continue;
+                                        var docIdObj = sheetPositions.Cells[row, 2]?.Value;
+                                        if (docIdObj == null) continue;
+
+                                        int oldDocId = Convert.ToInt32(docIdObj);
+                                        if (oldDocId == 0) continue;
+
+                                        if (!docIdMapping.ContainsKey(oldDocId))
+                                        {
+                                            continue;
+                                        }
+                                        int docId = docIdMapping[oldDocId];
+
+                                        int goodsId = GetIntValue(sheetPositions.Cells[row, 3]?.Value);
+                                        if (goodsId == 0) goodsId = 1;
+
+                                        double quantity = 0;
+                                        if (sheetPositions.Cells[row, 4]?.Value != null)
+                                        {
+                                            double.TryParse(sheetPositions.Cells[row, 4].Value.ToString(), out quantity);
+                                        }
+
+                                        decimal price = 0;
+                                        if (sheetPositions.Cells[row, 5]?.Value != null)
+                                        {
+                                            decimal.TryParse(sheetPositions.Cells[row, 5].Value.ToString(), out price);
+                                        }
+
+                                        object vatRateParam = DBNull.Value;
+                                        if (sheetPositions.Cells[row, 6]?.Value != null)
+                                        {
+                                            if (decimal.TryParse(sheetPositions.Cells[row, 6].Value.ToString(), out decimal vat))
+                                            {
+                                                vatRateParam = vat;
+                                            }
+                                        }
+
+                                        object discountParam = DBNull.Value;
+                                        if (sheetPositions.Cells[row, 7]?.Value != null)
+                                        {
+                                            if (decimal.TryParse(sheetPositions.Cells[row, 7].Value.ToString(), out decimal disc))
+                                            {
+                                                discountParam = disc;
+                                            }
+                                        }
+
+                                        object weightParam = DBNull.Value;
+                                        if (sheetPositions.Cells[row, 8]?.Value != null)
+                                        {
+                                            if (decimal.TryParse(sheetPositions.Cells[row, 8].Value.ToString(), out decimal weight))
+                                            {
+                                                weightParam = weight;
+                                            }
+                                        }
+
+                                        object packagesParam = DBNull.Value;
+                                        if (sheetPositions.Cells[row, 9]?.Value != null)
+                                        {
+                                            if (int.TryParse(sheetPositions.Cells[row, 9].Value.ToString(), out int packages))
+                                            {
+                                                packagesParam = packages;
+                                            }
+                                        }
+
+                                        string примечание = sheetPositions.Cells[row, 10]?.Value?.ToString() ?? "";
+
+                                        object vatSumParam = DBNull.Value;
+                                        if (sheetPositions.Cells[row, 11]?.Value != null)
+                                        {
+                                            if (decimal.TryParse(sheetPositions.Cells[row, 11].Value.ToString(), out decimal vatSum))
+                                            {
+                                                vatSumParam = vatSum;
+                                            }
+                                        }
+
+                                        object totalWithVatParam = DBNull.Value;
+                                        if (sheetPositions.Cells[row, 12]?.Value != null)
+                                        {
+                                            if (decimal.TryParse(sheetPositions.Cells[row, 12].Value.ToString(), out decimal totalWithVat))
+                                            {
+                                                totalWithVatParam = totalWithVat;
+                                            }
+                                        }
+
+                                        var parameters = new List<MySqlParameter>
+                                {
+                                    new MySqlParameter("@docId", docId),
+                                    new MySqlParameter("@goodsId", goodsId),
+                                    new MySqlParameter("@quantity", quantity),
+                                    new MySqlParameter("@price", price),
+                                    new MySqlParameter("@vatRate", vatRateParam),
+                                    new MySqlParameter("@discount", discountParam),
+                                    new MySqlParameter("@weight", weightParam),
+                                    new MySqlParameter("@packages", packagesParam),
+                                    new MySqlParameter("@note", примечание),
+                                    new MySqlParameter("@vatSum", vatSumParam),
+                                    new MySqlParameter("@totalWithVat", totalWithVatParam)
+                                };
 
                                         await _context.Database.ExecuteSqlRawAsync(@"
                                     INSERT INTO Позиции (ид_документа, ид_товара, количество, цена_за_единицу,
-                                        ставка_ндс, масса_груза, грузовых_мест, примечание, сумма_ндс, стоимость_с_ндс) 
-                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})",
-                                            Convert.ToInt32(docId),
-                                            sheetPositions.Cells[row, 2]?.Value ?? 1,
-                                            sheetPositions.Cells[row, 3]?.Value ?? 0,
-                                            sheetPositions.Cells[row, 4]?.Value ?? 0,
-                                            sheetPositions.Cells[row, 5]?.Value,
-                                            sheetPositions.Cells[row, 6]?.Value,
-                                            sheetPositions.Cells[row, 7]?.Value,
-                                            sheetPositions.Cells[row, 8]?.Value?.ToString() ?? "",
-                                            sheetPositions.Cells[row, 9]?.Value,
-                                            sheetPositions.Cells[row, 10]?.Value);
+                                        ставка_ндс, скидка, масса_груза, грузовых_мест, примечание, 
+                                        сумма_ндс, стоимость_с_ндс) 
+                                    VALUES (@docId, @goodsId, @quantity, @price, @vatRate, @discount, 
+                                            @weight, @packages, @note, @vatSum, @totalWithVat)",
+                                            parameters.ToArray());
+
                                         countPositions++;
                                     }
                                 }
@@ -833,6 +1000,17 @@ namespace Blank.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        // Вспомогательный метод для безопасного получения int значения
+        private int GetIntValue(object value)
+        {
+            if (value == null) return 1;
+            if (int.TryParse(value.ToString(), out int result))
+            {
+                return result > 0 ? result : 1;
+            }
+            return 1;
         }
 
         [HttpGet]
