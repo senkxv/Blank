@@ -1,4 +1,16 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
+    // Восстановить активную вкладку после перезагрузки
+    const savedTab = sessionStorage.getItem('activeAdminTab');
+    if (savedTab) {
+        const tab = document.querySelector(`.tab[data-tab="${savedTab}"]`);
+        if (tab) {
+            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('tab-' + savedTab).classList.add('active');
+            sessionStorage.removeItem('activeAdminTab');
+        }
+    }
 
     // ============ ВКЛАДКИ ============
     document.querySelectorAll('.tab').forEach(button => {
@@ -39,6 +51,12 @@
         document.getElementById(formId)?.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = getRowData(this);
+
+            // Сохраняем активную вкладку
+            const activeTab = document.querySelector('.tab.active')?.dataset.tab;
+            if (activeTab) {
+                sessionStorage.setItem('activeAdminTab', activeTab);
+            }
 
             fetch(url, {
                 method: 'POST',
@@ -100,6 +118,27 @@
         });
     }
 
+    // ============ ОРГАНИЗАЦИИ ============
+    setupAddForm('addOrgForm', '/Admin/AddOrganization', function (form) {
+        return {
+            name: form.querySelector('[name="name"]').value,
+            unp: form.querySelector('[name="unp"]').value,
+            address: form.querySelector('[name="address"]').value,
+            email: form.querySelector('[name="email"]').value
+        };
+    }, 'orgTableBody');
+
+    setupDelete('orgTableBody', '/Admin/DeleteOrganization');
+
+    setupUpdate('orgTableBody', '/Admin/UpdateOrganization', function (row) {
+        return {
+            name: row.querySelector('.edit-name').value,
+            unp: row.querySelector('.edit-unp').value,
+            address: row.querySelector('.edit-address').value,
+            email: row.querySelector('.edit-email').value
+        };
+    });
+
     // ============ ВОДИТЕЛИ ============
     setupAddForm('addDriverForm', '/Admin/AddDriver', function (form) {
         return {
@@ -125,8 +164,8 @@
     setupAddForm('addTransportForm', '/Admin/AddTransport', function (form) {
         return {
             regNumber: form.querySelector('[name="regNumber"]').value,
-            brandId: form.querySelector('[name="brandId"]').value,
-            typeId: form.querySelector('[name="typeId"]').value
+            brandName: form.querySelector('[name="brandName"]').value,
+            typeName: form.querySelector('[name="typeName"]').value
         };
     }, 'transportTableBody');
 
@@ -135,8 +174,8 @@
     setupUpdate('transportTableBody', '/Admin/UpdateTransport', function (row) {
         return {
             regNumber: row.querySelector('.edit-regnumber').value,
-            brandId: row.querySelector('.edit-brand').value,
-            typeId: row.querySelector('.edit-type').value
+            brandName: row.querySelector('.edit-brand').value,
+            typeName: row.querySelector('.edit-type').value
         };
     });
 

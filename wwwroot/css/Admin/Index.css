@@ -204,3 +204,43 @@
         font-size: 11px;
     }
 }
+
+@media (max-width: 768px) {
+    .admin-panel {
+        padding: 0 10px;
+    }
+
+    .data-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .inline-form {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+        .inline-form input,
+        .inline-form select {
+            width: 100%;
+        }
+
+    .btn-update {
+        margin-bottom: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-panel h2 {
+        font-size: 18px;
+    }
+
+    .section-title {
+        font-size: 16px;
+    }
+
+    .data-table input,
+    .data-table select {
+        min-width: 60px;
+    }
+}

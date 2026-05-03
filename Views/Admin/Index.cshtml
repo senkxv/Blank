@@ -142,18 +142,8 @@
         <h4>Добавить транспорт</h4>
         <form id="addTransportForm" class="admin-form inline-form">
             <input type="text" name="regNumber" placeholder="Рег. номер" required />
-            <select name="brandId">
-                @foreach (var mark in ViewBag.TransportMarks)
-                {
-                    <option value="@mark.ид_марки">@mark.наименование_марки</option>
-                }
-            </select>
-            <select name="typeId">
-                @foreach (var type in ViewBag.TransportTypes)
-                {
-                    <option value="@type.ид_типа_транспорта">@type.наименование_типа</option>
-                }
-            </select>
+            <input type="text" name="brandName" placeholder="Марка (например: MAN)" required />
+            <input type="text" name="typeName" placeholder="Тип ТС (например: Фура)" required />
             <button type="submit" class="btn-add">Добавить</button>
         </form>
     </div>

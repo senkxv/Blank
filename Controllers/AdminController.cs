@@ -1,6 +1,5 @@
 ﻿using Blank.Data;
 using Blank.Models.Tables;
-using Blank.Models.Views;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -46,7 +45,7 @@ namespace Blank.Controllers
 
             var userOrgId = GetUserOrgId();
 
-            ViewBag.Organizations = _context.Организации.Where(o => o.ид_организации == userOrgId).ToList();
+            ViewBag.Organizations = _context.Организации.Where(o => o.ид_владельца == userOrgId).ToList();
             ViewBag.Drivers = _context.Водители.Where(d => d.ид_организации == userOrgId).ToList();
             ViewBag.TransportList = _context.Транспорт.Where(t => t.ид_организации == userOrgId).Include(t => t.Марка_Транспорта).ToList();
             ViewBag.TransportMarks = _context.Марка_Транспорта.ToList();
@@ -59,16 +58,41 @@ namespace Blank.Controllers
             return View();
         }
 
-        // ==================== ПРОФИЛЬ КОМПАНИИ ====================
+        // ==================== ОРГАНИЗАЦИИ ====================
         [HttpPost]
-        public async Task<IActionResult> UpdateCompany([FromBody] CompanyModel model)
+        public async Task<IActionResult> AddOrganization([FromBody] CompanyModel model)
         {
-            var org = await _context.Организации.FindAsync(GetUserOrgId());
+            _context.Организации.Add(new Organization
+            {
+                название = model.Name,
+                унп = model.Unp,
+                адрес = model.Address,
+                почта = model.Email,
+                ид_владельца = GetUserOrgId()
+            });
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateOrganization([FromBody] CompanyModel model)
+        {
+            var org = await _context.Организации.FindAsync(model.Id);
             if (org == null) return Json(new { success = false });
             org.название = model.Name;
             org.унп = model.Unp;
             org.адрес = model.Address;
             org.почта = model.Email;
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteOrganization(int id)
+        {
+            var org = await _context.Организации.FindAsync(id);
+            if (org == null) return Json(new { success = false });
+            _context.Организации.Remove(org);
             await _context.SaveChangesAsync();
             return Json(new { success = true });
         }
@@ -83,7 +107,7 @@ namespace Blank.Controllers
                 имя = model.FirstName,
                 отчество = model.MiddleName,
                 номер_лицензии = model.LicenseNumber,
-                ид_организации = GetUserOrgId()  // ✅
+                ид_организации = GetUserOrgId()
             });
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -116,12 +140,32 @@ namespace Blank.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTransport([FromBody] TransportModel model)
         {
+            // Найти или создать марку
+            var brand = await _context.Марка_Транспорта
+                .FirstOrDefaultAsync(m => m.наименование_марки == model.BrandName);
+            if (brand == null)
+            {
+                brand = new Transport_Mark { наименование_марки = model.BrandName };
+                _context.Марка_Транспорта.Add(brand);
+                await _context.SaveChangesAsync();
+            }
+
+            // Найти или создать тип
+            var type = await _context.Тип_Транспорта
+                .FirstOrDefaultAsync(t => t.наименование_типа == model.TypeName);
+            if (type == null)
+            {
+                type = new Transport_Type { наименование_типа = model.TypeName };
+                _context.Тип_Транспорта.Add(type);
+                await _context.SaveChangesAsync();
+            }
+
             _context.Транспорт.Add(new Transport
             {
                 регистрационный_номер = model.RegNumber,
-                ид_марки = model.BrandId,
-                ид_типа_транспорта = model.TypeId,
-                ид_организации = GetUserOrgId()  // ✅
+                ид_марки = brand.ид_марки,
+                ид_типа_транспорта = type.ид_типа_транспорта,
+                ид_организации = GetUserOrgId()
             });
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -132,9 +176,30 @@ namespace Blank.Controllers
         {
             var t = await _context.Транспорт.FindAsync(model.Id);
             if (t == null) return Json(new { success = false });
+
+            // Найти или создать марку
+            var brand = await _context.Марка_Транспорта
+                .FirstOrDefaultAsync(m => m.наименование_марки == model.BrandName);
+            if (brand == null)
+            {
+                brand = new Transport_Mark { наименование_марки = model.BrandName };
+                _context.Марка_Транспорта.Add(brand);
+                await _context.SaveChangesAsync();
+            }
+
+            // Найти или создать тип
+            var type = await _context.Тип_Транспорта
+                .FirstOrDefaultAsync(t => t.наименование_типа == model.TypeName);
+            if (type == null)
+            {
+                type = new Transport_Type { наименование_типа = model.TypeName };
+                _context.Тип_Транспорта.Add(type);
+                await _context.SaveChangesAsync();
+            }
+
             t.регистрационный_номер = model.RegNumber;
-            t.ид_марки = model.BrandId;
-            t.ид_типа_транспорта = model.TypeId;
+            t.ид_марки = brand.ид_марки;
+            t.ид_типа_транспорта = type.ид_типа_транспорта;
             await _context.SaveChangesAsync();
             return Json(new { success = true });
         }
@@ -158,7 +223,7 @@ namespace Blank.Controllers
                 код_товара = model.Code,
                 наименование = model.Name,
                 единицы_измерения = model.Unit,
-                ид_организации = GetUserOrgId()  // ✅
+                ид_организации = GetUserOrgId()
             });
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -194,7 +259,7 @@ namespace Blank.Controllers
             {
                 наименование = model.Name,
                 адрес = model.Address,
-                ид_организации = GetUserOrgId()  // ✅
+                ид_организации = GetUserOrgId()
             });
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -229,7 +294,7 @@ namespace Blank.Controllers
             {
                 наименование = model.Name,
                 адрес = model.Address,
-                ид_организации = GetUserOrgId()  // ✅
+                ид_организации = GetUserOrgId()
             });
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -299,6 +364,7 @@ namespace Blank.Controllers
     // ==================== МОДЕЛИ ДЛЯ AJAX ====================
     public class CompanyModel
     {
+        public int Id { get; set; }
         public string? Name { get; set; }
         public string? Unp { get; set; }
         public string? Address { get; set; }
@@ -318,8 +384,8 @@ namespace Blank.Controllers
     {
         public int Id { get; set; }
         public string? RegNumber { get; set; }
-        public int BrandId { get; set; }
-        public int TypeId { get; set; }
+        public string? BrandName { get; set; }  // Вместо BrandId
+        public string? TypeName { get; set; }   // Вместо TypeId
     }
 
     public class GoodsModel

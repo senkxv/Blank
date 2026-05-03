@@ -28,5 +28,8 @@ namespace Blank.Models.Tables
         [Column("Почта")]
         [MaxLength(150)]
         public string? почта { get; set; }
+
+        [Column("ид_владельца")]
+        public int? ид_владельца { get; set; }
     }
 }

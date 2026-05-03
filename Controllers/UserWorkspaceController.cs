@@ -121,7 +121,7 @@ namespace Blank.Controllers
             int? userOrgId = string.IsNullOrEmpty(userOrgIdStr) ? null : int.Parse(userOrgIdStr);
 
             ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
-            ViewBag.Organizations = _context.Организации.Where(o => o.ид_организации == userOrgId).ToList();
+            ViewBag.Organizations = _context.Организации.Where(o => o.ид_владельца == userOrgId).ToList();
             ViewBag.Drivers = _context.Водители.Where(d => d.ид_организации == userOrgId).ToList();
             ViewBag.Transport = _context.Транспорт.Where(t => t.ид_организации == userOrgId).ToList();
             ViewBag.LoadingPoints = _context.Пункт_Погрузки.Where(p => p.ид_организации == userOrgId).ToList();
@@ -140,6 +140,26 @@ namespace Blank.Controllers
             {
                 var userOrgIdStr = HttpContext.Session.GetString("UserOrgId");
                 int? userOrgId = string.IsNullOrEmpty(userOrgIdStr) ? null : int.Parse(userOrgIdStr);
+
+                // ✅ Проверка уникальности номера документа
+                var existingDoc = await _context.Документы
+    .FirstOrDefaultAsync(d => d.номер_документа == document.номер_документа
+                           && d.ид_грузоотправителя == userOrgId);
+                if (existingDoc != null)
+                {
+                    ModelState.AddModelError("номер_документа", "Документ с таким номером уже существует в вашей организации");
+
+                    ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
+                    ViewBag.Organizations = _context.Организации.Where(o => o.ид_владельца == userOrgId).ToList();
+                    ViewBag.Drivers = _context.Водители.Where(d => d.ид_организации == userOrgId).ToList();
+                    ViewBag.Transport = _context.Транспорт.Where(t => t.ид_организации == userOrgId).ToList();
+                    ViewBag.LoadingPoints = _context.Пункт_Погрузки.Where(p => p.ид_организации == userOrgId).ToList();
+                    ViewBag.UnloadingPoints = _context.Пункт_Разгрузки.Where(p => p.ид_организации == userOrgId).ToList();
+                    ViewBag.Goods = _context.Товары.Where(g => g.ид_организации == userOrgId).ToList();
+                    ViewBag.UserOrgId = userOrgId;
+
+                    return View(document);
+                }
 
                 // Принудительно устанавливаем организацию пользователя
                 if (userOrgId.HasValue)
@@ -220,12 +240,12 @@ namespace Blank.Controllers
                 ModelState.AddModelError("", $"Ошибка при сохранении: {ex.Message}");
             }
 
-            // ✅ БЛОК CATCH — тоже с фильтрацией
+            // БЛОК CATCH — с фильтрацией
             var userOrgIdStr2 = HttpContext.Session.GetString("UserOrgId");
             int? userOrgId2 = string.IsNullOrEmpty(userOrgIdStr2) ? null : int.Parse(userOrgIdStr2);
 
             ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
-            ViewBag.Organizations = _context.Организации.Where(o => o.ид_организации == userOrgId2).ToList();
+            ViewBag.Organizations = _context.Организации.Where(o => o.ид_владельца == userOrgId2).ToList();
             ViewBag.Drivers = _context.Водители.Where(d => d.ид_организации == userOrgId2).ToList();
             ViewBag.Transport = _context.Транспорт.Where(t => t.ид_организации == userOrgId2).ToList();
             ViewBag.LoadingPoints = _context.Пункт_Погрузки.Where(p => p.ид_организации == userOrgId2).ToList();
@@ -258,7 +278,16 @@ namespace Blank.Controllers
             }
 
             ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
-            ViewBag.Organizations = _context.Организации.ToList();
+
+            // ✅ Показываем организации владельца + организацию из документа
+            var orgs = _context.Организации.Where(o => o.ид_владельца == userOrgId).ToList();
+            var docOrg = _context.Организации.Find(document.ид_грузоотправителя);
+            if (docOrg != null && !orgs.Any(o => o.ид_организации == docOrg.ид_организации))
+            {
+                orgs.Add(docOrg);
+            }
+            ViewBag.Organizations = orgs;
+
             ViewBag.Drivers = _context.Водители.Where(d => d.ид_организации == userOrgId).ToList();
             ViewBag.Transport = _context.Транспорт.Where(t => t.ид_организации == userOrgId).ToList();
             ViewBag.LoadingPoints = _context.Пункт_Погрузки.Where(p => p.ид_организации == userOrgId).ToList();
@@ -352,10 +381,10 @@ namespace Blank.Controllers
 
                             decimal quantityDecimal = (decimal)pos.quantity;
                             decimal cost = pos.price * quantityDecimal;
-                            decimal discountAmount = cost * (pos.discount / 100);         // Скидка в деньгах
-                            decimal costAfterDiscount = cost - discountAmount;             // База для НДС
-                            decimal vatAmount = costAfterDiscount * (pos.vatRate / 100);   // НДС от базы
-                            decimal totalWithVat = costAfterDiscount + vatAmount;          // Итого
+                            decimal discountAmount = cost * (pos.discount / 100);
+                            decimal costAfterDiscount = cost - discountAmount;
+                            decimal vatAmount = costAfterDiscount * (pos.vatRate / 100);
+                            decimal totalWithVat = costAfterDiscount + vatAmount;
 
                             if (pos.id > 0)
                             {
@@ -365,9 +394,9 @@ namespace Blank.Controllers
                                     existing.ид_товара = pos.goodsId;
                                     existing.количество = pos.quantity;
                                     existing.цена_за_единицу = pos.price;
-                                    existing.ставка_ндс = pos.vatRate;  // было: pos.vatRate > 0 ? pos.vatRate : (decimal?)null
-                                    existing.скидка = pos.discount;     // было: pos.discount > 0 ? pos.discount : (decimal?)null
-                                    existing.масса_груза = pos.weight;  // было: pos.weight > 0 ? pos.weight : (decimal?)null
+                                    existing.ставка_ндс = pos.vatRate;
+                                    existing.скидка = pos.discount;
+                                    existing.масса_груза = pos.weight;
                                     existing.грузовых_мест = pos.packages > 0 ? pos.packages : (int?)null;
                                     existing.примечание = string.IsNullOrEmpty(pos.note) ? null : pos.note;
                                     existing.сумма_ндс = vatAmount;
@@ -408,12 +437,21 @@ namespace Blank.Controllers
                 ModelState.AddModelError("", $"Ошибка при сохранении: {ex.Message}");
             }
 
-            // ✅ БЛОК CATCH — с фильтрацией
+            // БЛОК CATCH — с фильтрацией
             var userOrgIdStr2 = HttpContext.Session.GetString("UserOrgId");
             int? userOrgId2 = string.IsNullOrEmpty(userOrgIdStr2) ? null : int.Parse(userOrgIdStr2);
 
             ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
-            ViewBag.Organizations = _context.Организации.Where(o => o.ид_организации == userOrgId2).ToList();
+
+            // Показываем организации владельца + организацию из документа
+            var orgs = _context.Организации.Where(o => o.ид_владельца == userOrgId2).ToList();
+            var docOrg = await _context.Организации.FindAsync(document.ид_грузоотправителя);
+            if (docOrg != null && !orgs.Any(o => o.ид_организации == docOrg.ид_организации))
+            {
+                orgs.Add(docOrg);
+            }
+            ViewBag.Organizations = orgs;
+
             ViewBag.Drivers = _context.Водители.Where(d => d.ид_организации == userOrgId2).ToList();
             ViewBag.Transport = _context.Транспорт.Where(t => t.ид_организации == userOrgId2).ToList();
             ViewBag.LoadingPoints = _context.Пункт_Погрузки.Where(p => p.ид_организации == userOrgId2).ToList();
@@ -1391,7 +1429,7 @@ namespace Blank.Controllers
             }
             else
             {
-                данные = await _context.Главная.ToListAsync();
+                данные = new List<MainPage>();
             }
 
             if (!string.IsNullOrEmpty(searchString))
