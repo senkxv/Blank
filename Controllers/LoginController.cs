@@ -46,8 +46,6 @@ namespace Blank.Controllers
                     HttpContext.Session.SetString("UserId", user.ид_пользователя.ToString());
                     HttpContext.Session.SetString("UserEmail", user.почта ?? "");
                     HttpContext.Session.SetString("UserName", $"{user.фамилия} {user.имя}");
-
-                    // ✅ ДОБАВИТЬ: сохраняем ID организации и должности
                     HttpContext.Session.SetString("UserOrgId", user.ид_организации?.ToString() ?? "");
                     HttpContext.Session.SetString("UserRoleId", user.ид_должности?.ToString() ?? "");
 
@@ -93,16 +91,16 @@ namespace Blank.Controllers
                 {
                     var newOrg = new Organization
                     {
-                        название = "",  // Пустое, админ заполнит сам
+                        название = "Новая компания " + Guid.NewGuid().ToString("N").Substring(0, 8),
                         унп = "",
                         адрес = "",
-                        почта = ""     // Пустое, админ заполнит сам
+                        почта = ""
                     };
                     _context.Организации.Add(newOrg);
                     await _context.SaveChangesAsync();
 
                     orgId = newOrg.ид_организации;
-                    должностьId = 1; 
+                    должностьId = 1;
                 }
 
                 var user = new Users
@@ -123,7 +121,6 @@ namespace Blank.Controllers
                 HttpContext.Session.SetString("UserId", user.ид_пользователя.ToString());
                 HttpContext.Session.SetString("UserEmail", user.почта ?? "");
                 HttpContext.Session.SetString("UserName", $"{user.фамилия} {user.имя}");
-
                 HttpContext.Session.SetString("UserOrgId", user.ид_организации?.ToString() ?? "");
                 HttpContext.Session.SetString("UserRoleId", user.ид_должности?.ToString() ?? "");
 
