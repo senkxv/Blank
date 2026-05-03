@@ -124,6 +124,9 @@ namespace Blank.Controllers
                 HttpContext.Session.SetString("UserEmail", user.почта ?? "");
                 HttpContext.Session.SetString("UserName", $"{user.фамилия} {user.имя}");
 
+                HttpContext.Session.SetString("UserOrgId", user.ид_организации?.ToString() ?? "");
+                HttpContext.Session.SetString("UserRoleId", user.ид_должности?.ToString() ?? "");
+
                 return RedirectToAction("Index", "UserWorkspace");
             }
             return View(model);
