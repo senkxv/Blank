@@ -42,26 +42,15 @@ namespace Blank.Controllers
         {
             try
             {
-                if (!IsCompanyAdmin())
-                    return RedirectToAction("Index", "UserWorkspace");
+                var userOrgIdStr = HttpContext.Session.GetString("UserOrgId");
+                var userRoleIdStr = HttpContext.Session.GetString("UserRoleId");
+                var userIdStr = HttpContext.Session.GetString("UserId");
 
-                var userOrgId = GetUserOrgId();
-
-                ViewBag.Organizations = _context.Организации.Where(o => o.ид_организации == userOrgId).ToList();
-                ViewBag.Drivers = _context.Водители.Where(d => d.ид_организации == userOrgId).ToList();
-                ViewBag.TransportList = _context.Транспорт.Where(t => t.ид_организации == userOrgId).Include(t => t.Марка_Транспорта).ToList();
-                ViewBag.TransportMarks = _context.Марка_Транспорта.ToList();
-                ViewBag.TransportTypes = _context.Тип_Транспорта.ToList();
-                ViewBag.Goods = _context.Товары.Where(g => g.ид_организации == userOrgId).ToList();
-                ViewBag.LoadingPoints = _context.Пункт_Погрузки.Where(p => p.ид_организации == userOrgId).ToList();
-                ViewBag.UnloadingPoints = _context.Пункт_Разгрузки.Where(p => p.ид_организации == userOrgId).ToList();
-                ViewBag.Users = _context.Пользователи.Where(u => u.ид_организации == userOrgId).ToList();
-
-                return View();
+                return Content($"UserId={userIdStr}<br>UserOrgId={userOrgIdStr}<br>UserRoleId={userRoleIdStr}");
             }
             catch (Exception ex)
             {
-                return Content($"Admin ERROR: {ex.Message}<br>Inner: {ex.InnerException?.Message}<br>Stack: {ex.StackTrace}", "text/html");
+                return Content($"ERROR: {ex.Message}");
             }
         }
 
