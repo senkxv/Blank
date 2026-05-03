@@ -1,0 +1,316 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Управление компанией";
+}
+
+<link rel="stylesheet" href="/css/Admin/Index.css" />
+
+<div class="admin-panel">
+    <h2>Управление компанией</h2>
+
+    <div class="tabs">
+        <button class="tab active" data-tab="organizations">Организации</button>
+        <button class="tab" data-tab="drivers">Водители</button>
+        <button class="tab" data-tab="transport">Транспорт</button>
+        <button class="tab" data-tab="goods">Товары</button>
+        <button class="tab" data-tab="points">Пункты погрузки/разгрузки</button>
+        <button class="tab" data-tab="users">Пользователи</button>
+    </div>
+
+    <!-- Вкладка: Организации -->
+    <div class="tab-content active" id="tab-organizations">
+        <h3 class="section-title">Организации</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>УНП</th>
+                    <th>Адрес</th>
+                    <th>Почта</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="orgTableBody">
+                @foreach (var org in ViewBag.Organizations)
+                {
+                    <tr data-id="@org.ид_организации">
+                        <td><input type="text" class="edit-name" value="@org.название" /></td>
+                        <td><input type="text" class="edit-unp" value="@org.унп" /></td>
+                        <td><input type="text" class="edit-address" value="@org.адрес" /></td>
+                        <td><input type="text" class="edit-email" value="@org.почта" /></td>
+                        <td>
+                            <button class="btn-update">Сохранить</button>
+                            <button class="btn-delete">Удалить</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h4>Добавить организацию</h4>
+        <form id="addOrgForm" class="admin-form inline-form">
+            <input type="text" name="name" placeholder="Название" required />
+            <input type="text" name="unp" placeholder="УНП" />
+            <input type="text" name="address" placeholder="Адрес" />
+            <input type="email" name="email" placeholder="Почта" />
+            <button type="submit" class="btn-add">Добавить</button>
+        </form>
+    </div>
+
+    <!-- Вкладка: Водители -->
+    <div class="tab-content" id="tab-drivers">
+        <h3 class="section-title">Водители</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Номер лицензии</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="driversTableBody">
+                @foreach (var driver in ViewBag.Drivers)
+                {
+                    <tr data-id="@driver.ид_водителя">
+                        <td><input type="text" class="edit-lastname" value="@driver.фамилия" /></td>
+                        <td><input type="text" class="edit-firstname" value="@driver.имя" /></td>
+                        <td><input type="text" class="edit-middlename" value="@driver.отчество" /></td>
+                        <td><input type="text" class="edit-license" value="@driver.номер_лицензии" /></td>
+                        <td>
+                            <button class="btn-update">Сохранить</button>
+                            <button class="btn-delete">Удалить</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        
+        <h4>Добавить водителя</h4>
+        <form id="addDriverForm" class="admin-form inline-form">
+            <input type="text" name="lastName" placeholder="Фамилия" required />
+            <input type="text" name="firstName" placeholder="Имя" required />
+            <input type="text" name="middleName" placeholder="Отчество" />
+            <input type="text" name="licenseNumber" placeholder="Номер лицензии" />
+            <button type="submit" class="btn-add">Добавить</button>
+        </form>
+    </div>
+
+    <!-- Вкладка: Транспорт -->
+    <div class="tab-content" id="tab-transport">
+        <h3 class="section-title">Транспорт</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Рег. номер</th>
+                    <th>Марка</th>
+                    <th>Тип ТС</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="transportTableBody">
+                @foreach (var t in ViewBag.TransportList)
+                {
+                    <tr data-id="@t.ид_транспорта">
+                        <td><input type="text" class="edit-regnumber" value="@t.регистрационный_номер" /></td>
+                        <td>
+                            <select class="edit-brand">
+                                @foreach (var mark in ViewBag.TransportMarks)
+                                {
+                                    <option value="@mark.ид_марки" selected="@(mark.ид_марки == t.ид_марки)">@mark.наименование_марки</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <select class="edit-type">
+                                @foreach (var type in ViewBag.TransportTypes)
+                                {
+                                    <option value="@type.ид_типа_транспорта" selected="@(type.ид_типа_транспорта == t.ид_типа_транспорта)">@type.наименование_типа</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn-update">Сохранить</button>
+                            <button class="btn-delete">Удалить</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h4>Добавить транспорт</h4>
+        <form id="addTransportForm" class="admin-form inline-form">
+            <input type="text" name="regNumber" placeholder="Рег. номер" required />
+            <select name="brandId">
+                @foreach (var mark in ViewBag.TransportMarks)
+                {
+                    <option value="@mark.ид_марки">@mark.наименование_марки</option>
+                }
+            </select>
+            <select name="typeId">
+                @foreach (var type in ViewBag.TransportTypes)
+                {
+                    <option value="@type.ид_типа_транспорта">@type.наименование_типа</option>
+                }
+            </select>
+            <button type="submit" class="btn-add">Добавить</button>
+        </form>
+    </div>
+
+    <!-- Вкладка: Товары -->
+    <div class="tab-content" id="tab-goods">
+        <h3 class="section-title">Товары</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Код товара</th>
+                    <th>Наименование</th>
+                    <th>Ед. измерения</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="goodsTableBody">
+                @foreach (var goods in ViewBag.Goods)
+                {
+                    <tr data-id="@goods.ид_товара">
+                        <td><input type="text" class="edit-code" value="@goods.код_товара" /></td>
+                        <td><input type="text" class="edit-name" value="@goods.наименование" /></td>
+                        <td><input type="text" class="edit-unit" value="@goods.единицы_измерения" /></td>
+                        <td>
+                            <button class="btn-update">Сохранить</button>
+                            <button class="btn-delete">Удалить</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h4>Добавить товар</h4>
+        <form id="addGoodsForm" class="admin-form inline-form">
+            <input type="text" name="code" placeholder="Код товара" />
+            <input type="text" name="name" placeholder="Наименование" required />
+            <input type="text" name="unit" placeholder="Ед. измерения" />
+            <button type="submit" class="btn-add">Добавить</button>
+        </form>
+    </div>
+
+    <!-- Вкладка: Пункты погрузки/разгрузки -->
+    <div class="tab-content" id="tab-points">
+        <h3 class="section-title">Пункты погрузки</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Наименование</th>
+                    <th>Адрес</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="loadingTableBody">
+                @foreach (var point in ViewBag.LoadingPoints)
+                {
+                    <tr data-id="@point.ид_пункта_погрузки">
+                        <td><input type="text" class="edit-name" value="@point.наименование" /></td>
+                        <td><input type="text" class="edit-address" value="@point.адрес" /></td>
+                        <td>
+                            <button class="btn-update">Сохранить</button>
+                            <button class="btn-delete">Удалить</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h4>Добавить пункт погрузки</h4>
+        <form id="addLoadingForm" class="admin-form inline-form">
+            <input type="text" name="name" placeholder="Наименование" required />
+            <input type="text" name="address" placeholder="Адрес" />
+            <button type="submit" class="btn-add">Добавить</button>
+        </form>
+
+        <h3 class="section-title" style="margin-top: 30px;">Пункты разгрузки</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Наименование</th>
+                    <th>Адрес</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="unloadingTableBody">
+                @foreach (var point in ViewBag.UnloadingPoints)
+                {
+                    <tr data-id="@point.ид_пункта_разгрузки">
+                        <td><input type="text" class="edit-name" value="@point.наименование" /></td>
+                        <td><input type="text" class="edit-address" value="@point.адрес" /></td>
+                        <td>
+                            <button class="btn-update">Сохранить</button>
+                            <button class="btn-delete">Удалить</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h4>Добавить пункт разгрузки</h4>
+        <form id="addUnloadingForm" class="admin-form inline-form">
+            <input type="text" name="name" placeholder="Наименование" required />
+            <input type="text" name="address" placeholder="Адрес" />
+            <button type="submit" class="btn-add">Добавить</button>
+        </form>
+    </div>
+
+    <!-- Вкладка: Пользователи -->
+    <div class="tab-content" id="tab-users">
+        <h3 class="section-title">Пользователи компании</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Должность</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody">
+                @foreach (var user in ViewBag.Users)
+                {
+                    <tr data-id="@user.ид_пользователя">
+                        <td>@user.почта</td>
+                        <td>@user.фамилия</td>
+                        <td>@user.имя</td>
+                        <td>@user.отчество</td>
+                        <td>
+                            <select class="edit-role">
+                                <option value="1" selected="@(user.ид_должности == 1)">Администратор</option>
+                                <option value="3" selected="@(user.ид_должности == 3)">Пользователь</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn-update-role">Сохранить</button>
+                            <button class="btn-delete">Удалить</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h4>Добавить пользователя</h4>
+        <form id="addUserForm" class="admin-form inline-form">
+            <input type="email" name="email" placeholder="Email" required />
+            <input type="text" name="lastName" placeholder="Фамилия" required />
+            <input type="text" name="firstName" placeholder="Имя" required />
+            <input type="text" name="middleName" placeholder="Отчество" />
+            <input type="password" name="password" placeholder="Пароль" required />
+            <select name="roleId">
+                <option value="3">Пользователь</option>
+                <option value="1">Администратор</option>
+            </select>
+            <button type="submit" class="btn-add">Добавить</button>
+        </form>
+    </div>
+</div>
+
+<script src="/js/Admin/Index.js"></script>

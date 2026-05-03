@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var userRoleId = Context.Session.GetString("UserRoleId");
+    bool isAdmin = userRoleId == "1";
+}
+
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
@@ -29,12 +34,19 @@
                     <li><a href="/UserWorkspace/CreateDocumentPage">Добавить</a></li>
                     <li><a href="#" onclick="editSelectedDocument()">Изменить</a></li>
                     <li><a href="#" onclick="deleteSelectedDocument()">Удалить</a></li>
-                    <li><a href="#" onclick="location.reload()">Обновить</a></li>
+                    @if (!isAdmin)
+                    {
+                        <li><a href="#" onclick="location.reload()">Обновить</a></li>
+                    }
                     <li><a href="#" onclick="previewSelectedDocument()">Предпросмотр</a></li>
                     <li><a href="/UserWorkspace/ExportFullBackup">Экспорт</a></li>
                     <li><a href="/UserWorkspace/RestoreFromBackup">Импорт</a></li>
                     <li><a href="#" id="searchLink">Поиск</a></li>
                     <li><a href="#" id="filterLink">Фильтр</a></li>
+                    @if (isAdmin)
+                    {
+                        <a href="/Admin/Index">Администрирование</a>
+                    }
                     <li><a href="/Login/Logout">Выход</a></li>
                 </ul>
             </nav>

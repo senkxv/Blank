@@ -21,5 +21,8 @@ namespace Blank.Models.Tables
         [Column("единицы_измерения")]
         [MaxLength(45)]
         public string? единицы_измерения { get; set; }  // Убрал [Required]
+
+        [Column("ид_организации")]
+        public int? ид_организации { get; set; }
     }
 }

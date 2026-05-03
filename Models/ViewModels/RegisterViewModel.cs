@@ -20,5 +20,7 @@ namespace Blank.Models.ViewModels
 
         [Required(ErrorMessage = "Введите ФИО")]
         public string? ФИО { get; set; }
+
+        public bool IsAdmin { get; set; }  
     }
 }

@@ -20,5 +20,8 @@ namespace Blank.Models.Tables
         [Required]
         [MaxLength(255)]
         public string? адрес { get; set; }
+
+        [Column("ид_организации")]
+        public int? ид_организации { get; set; }
     }
 }

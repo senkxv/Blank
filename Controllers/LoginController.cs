@@ -47,6 +47,10 @@ namespace Blank.Controllers
                     HttpContext.Session.SetString("UserEmail", user.почта ?? "");
                     HttpContext.Session.SetString("UserName", $"{user.фамилия} {user.имя}");
 
+                    // ✅ ДОБАВИТЬ: сохраняем ID организации и должности
+                    HttpContext.Session.SetString("UserOrgId", user.ид_организации?.ToString() ?? "");
+                    HttpContext.Session.SetString("UserRoleId", user.ид_должности?.ToString() ?? "");
+
                     return RedirectToAction("Index", "UserWorkspace");
                 }
 
@@ -63,7 +67,6 @@ namespace Blank.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-
         public async Task<IActionResult> Registration(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -82,6 +85,26 @@ namespace Blank.Controllers
                     return View(model);
                 }
 
+                int? orgId = null;
+                int? должностьId = 3; // По умолчанию обычный пользователь
+
+                // Если включён режим администратора — создаём новую организацию
+                if (model.IsAdmin)
+                {
+                    var newOrg = new Organization
+                    {
+                        название = "",  // Пустое, админ заполнит сам
+                        унп = "",
+                        адрес = "",
+                        почта = ""     // Пустое, админ заполнит сам
+                    };
+                    _context.Организации.Add(newOrg);
+                    await _context.SaveChangesAsync();
+
+                    orgId = newOrg.ид_организации;
+                    должностьId = 1; 
+                }
+
                 var user = new Users
                 {
                     почта = model.Email,
@@ -90,8 +113,8 @@ namespace Blank.Controllers
                     имя = имя,
                     отчество = отчество,
                     активность = true,
-                    ид_должности = 3,
-                    ид_организации = 1
+                    ид_должности = должностьId,
+                    ид_организации = orgId
                 };
 
                 _context.Пользователи.Add(user);

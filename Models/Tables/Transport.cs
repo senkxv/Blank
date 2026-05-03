@@ -29,5 +29,8 @@ namespace Blank.Models.Tables
 
         [ForeignKey("ид_марки")]
         public virtual Transport_Mark? Марка_Транспорта { get; set; }
+
+        [Column("ид_организации")]
+        public int? ид_организации { get; set; }
     }
 }

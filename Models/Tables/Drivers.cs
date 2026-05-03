@@ -29,5 +29,8 @@ namespace Blank.Models.Tables
         [Column("номер_телефона")]
         [MaxLength(45)]
         public string? номер_телефона { get; set; }
+
+        [Column("ид_организации")]
+        public int? ид_организации { get; set; }
     }
 }
