@@ -45,7 +45,9 @@ namespace Blank.Controllers
 
             var userOrgId = GetUserOrgId();
 
-            ViewBag.Organizations = _context.Организации.Where(o => o.ид_владельца == userOrgId).ToList();
+            ViewBag.Organizations = _context.Организации
+    .Where(o => o.ид_организации == userOrgId || o.ид_владельца == userOrgId)
+    .ToList();
             ViewBag.Drivers = _context.Водители.Where(d => d.ид_организации == userOrgId).ToList();
             ViewBag.TransportList = _context.Транспорт.Where(t => t.ид_организации == userOrgId).Include(t => t.Марка_Транспорта).ToList();
             ViewBag.TransportMarks = _context.Марка_Транспорта.ToList();

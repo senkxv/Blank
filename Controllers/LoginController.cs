@@ -93,7 +93,8 @@ namespace Blank.Controllers
                         название = "Компания " + Guid.NewGuid().ToString("N").Substring(0, 8),
                         унп = "",
                         адрес = "",
-                        почта = model.Email ?? ""
+                        почта = model.Email ?? "",
+                        ид_владельца = null
                     };
                     _context.Организации.Add(newOrg);
                     await _context.SaveChangesAsync();
