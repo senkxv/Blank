@@ -1481,10 +1481,15 @@ namespace Blank.Controllers
 
             if (userOrgId.HasValue)
             {
+                var userOrgIds = _context.Организации
+                    .Where(o => o.ид_организации == userOrgId || o.ид_владельца == userOrgId)
+                    .Select(o => o.ид_организации)
+                    .ToList();
+
                 данные = await _context.Документы
-                    .Where(d => d.ид_грузоотправителя == userOrgId
-                             || d.ид_перевозчика == userOrgId
-                             || d.ид_получателя == userOrgId)
+                    .Where(d => userOrgIds.Contains(d.ид_грузоотправителя)
+                             || userOrgIds.Contains(d.ид_перевозчика)
+                             || userOrgIds.Contains(d.ид_получателя))
                     .Select(d => new MainPage
                     {
                         ид_документа = d.ид_документа,
