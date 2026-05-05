@@ -176,8 +176,10 @@ namespace Blank.Controllers
                     document.дата_создания = DateTime.Now;
                 }
 
+                await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 0;");
                 _context.Документы.Add(document);
                 await _context.SaveChangesAsync();
+                await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 1;");
 
                 int documentId = document.ид_документа;
 
@@ -380,8 +382,10 @@ namespace Blank.Controllers
                     }
                 }
 
+                await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 0;");
                 _context.Update(document);
                 await _context.SaveChangesAsync();
+                await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 1;");
 
                 if (!string.IsNullOrEmpty(deletedPositions))
                 {
