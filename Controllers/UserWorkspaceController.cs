@@ -248,7 +248,17 @@ namespace Blank.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", $"Ошибка при сохранении: {ex.Message}");
+                var fullError = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    fullError += " | Inner: " + ex.InnerException.Message;
+                    if (ex.InnerException.InnerException != null)
+                    {
+                        fullError += " | Nested: " + ex.InnerException.InnerException.Message;
+                    }
+                }
+
+                ModelState.AddModelError("", fullError);
             }
 
             // БЛОК CATCH — с фильтрацией
