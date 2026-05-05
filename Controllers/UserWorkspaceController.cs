@@ -124,6 +124,7 @@ namespace Blank.Controllers
             var userOrgIdStr = HttpContext.Session.GetString("UserOrgId");
             int? userOrgId = string.IsNullOrEmpty(userOrgIdStr) ? null : int.Parse(userOrgIdStr);
 
+
             ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
             ViewBag.Organizations = _context.Организации.Where(o => o.ид_владельца == userOrgId).ToList();
             ViewBag.Drivers = _context.Водители.Where(d => d.ид_организации == userOrgId).ToList();
@@ -144,6 +145,10 @@ namespace Blank.Controllers
             {
                 var userOrgIdStr = HttpContext.Session.GetString("UserOrgId");
                 int? userOrgId = string.IsNullOrEmpty(userOrgIdStr) ? null : int.Parse(userOrgIdStr);
+
+                var userIdStr = HttpContext.Session.GetString("UserId");
+                var userId = int.Parse(userIdStr ?? "1"); // По умолчанию 1
+                document.ид_пользователя = userId;
 
                 // ✅ Проверка уникальности номера документа
                 var existingDoc = await _context.Документы
