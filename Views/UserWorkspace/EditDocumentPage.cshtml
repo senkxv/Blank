@@ -6,6 +6,9 @@
 }
 
 <link rel="stylesheet" href="/css/UserWorkspace/EditDocumentPage.css" />
+<script>
+    window.goodsListData = @Html.Raw(ViewBag.GoodsJson);
+</script>
 <script src="/js/UserWorkspace/EditDocumentPage.js"></script>
 
 <script>
@@ -21,11 +24,6 @@
 
 <div class="form-container">
     <h2>Редактирование документа</h2>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert-info">@TempData["Success"]</div>
-    }
 
     <form method="post" asp-action="EditDocumentPage" asp-route-id="@Model.ид_документа" id="documentForm">
         <input type="hidden" asp-for="ид_документа" />
@@ -236,3 +234,4 @@
         <input type="hidden" name="deletedPositions" id="deletedPositions" />
     </form>
 </div>
+

@@ -323,6 +323,16 @@ namespace Blank.Controllers
             ViewBag.UnloadingPoints = _context.Пункт_Разгрузки.Where(p => p.ид_организации == userOrgId).ToList();
             ViewBag.Goods = _context.Товары.Where(g => g.ид_организации == userOrgId).ToList();
 
+            var goodsForJs = _context.Товары
+        .Where(g => g.ид_организации == userOrgId)
+        .Select(g => new {
+            ид_товара = g.ид_товара,
+            наименование = g.наименование,
+            единицы_измерения = g.единицы_измерения
+        })
+        .ToList();
+            ViewBag.GoodsJson = JsonSerializer.Serialize(goodsForJs);
+
             var existingPositions = _context.Позиции
                 .Include(p => p.Товар)
                 .Where(p => p.ид_документа == id)
