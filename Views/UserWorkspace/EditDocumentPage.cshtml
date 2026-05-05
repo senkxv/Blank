@@ -6,31 +6,16 @@
 }
 
 <link rel="stylesheet" href="/css/UserWorkspace/EditDocumentPage.css" />
-
-<script>
-    // ПЕРЕДАЁМ ДАННЫЕ О ТОВАРАХ ДО ЗАГРУЗКИ ОСНОВНОГО СКРИПТА
-    window.goodsListData = @Html.Raw(Json.Serialize(ViewBag.Goods.Select(g => new {
-        ид_товара = g.ид_товара,
-        наименование = g.наименование,
-        единицы_измерения = g.единицы_измерения
-    })));
-    
-    console.log('Goods loaded for JS:', window.goodsListData);
-</script>
-
 <script src="/js/UserWorkspace/EditDocumentPage.js"></script>
 
 <script>
     // Исправляем все числовые поля с запятыми на точки
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('input[type="number"]').forEach(function(input) {
-            if (input.value && input.value.includes(',')) {
-                input.value = input.value.replace(',', '.');
-            }
-        });
-        
-        // Проверяем, что goodsListData загрузился
-        console.log('DOM loaded. Goods data:', window.goodsListData);
+    document.querySelectorAll('input[type="number"]').forEach(function(input) {
+    if (input.value && input.value.includes(',')) {
+    input.value = input.value.replace(',', '.');
+    }
+    });
     });
 </script>
 
