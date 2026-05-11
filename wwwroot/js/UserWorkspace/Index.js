@@ -37,11 +37,7 @@ window.previewSelectedDocument = function () {
     if (id) {
         window.open('/UserWorkspace/PreviewDocument/' + id, '_blank');
     } else {
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('Сначала выберите документ в таблице');
-        } else {
-            alert('Сначала выберите документ в таблице');
-        }
+        showNotification('Сначала выберите документ в таблице');
     }
 }
 

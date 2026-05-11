@@ -31,9 +31,10 @@
     });
 
     function clearErrors() {
-        document.querySelectorAll('.error-message').forEach(el => el.remove());
+        document.querySelectorAll('.field-error').forEach(el => el.remove());
         document.querySelectorAll('input').forEach(input => {
-            input.style.borderColor = '#999999';
+            input.classList.remove('error-border');
+            input.style.borderColor = '';
         });
         const checkboxError = document.querySelector('.checkbox-error');
         if (checkboxError) checkboxError.remove();
@@ -42,17 +43,21 @@
     function showError(inputId, message) {
         const input = document.getElementById(inputId);
         if (!input) return;
-        input.style.borderColor = 'red';
 
-        const oldError = input.parentNode.querySelector(`.error-message[data-for="${inputId}"]`);
+        input.style.borderColor = 'red';
+        input.classList.add('error-border');
+
+        const wrapper = input.closest('.password-wrapper') || input;
+
+        const oldError = document.querySelector(`.field-error[data-for="${inputId}"]`);
         if (oldError) oldError.remove();
 
         const error = document.createElement('div');
-        error.className = 'error-message';
+        error.className = 'field-error';
         error.setAttribute('data-for', inputId);
-        error.style.cssText = 'color: #990000; font-size: 12px; margin-top: -10px; margin-bottom: 10px;';
-        error.innerHTML = message;
-        input.parentNode.insertBefore(error, input.nextSibling);
+        error.textContent = message;
+
+        wrapper.after(error);
     }
 
     form.addEventListener('submit', function (e) {
@@ -112,10 +117,9 @@
             if (!error) {
                 error = document.createElement('div');
                 error.className = 'checkbox-error';
-                error.style.cssText = 'color: #990000; font-size: 12px; margin-top: 5px;';
                 wrapper.appendChild(error);
             }
-            error.innerHTML = 'Подтвердите согласие на обработку персональных данных';
+            error.textContent = 'Подтвердите согласие на обработку персональных данных';
             isValid = false;
         }
 

@@ -21,24 +21,13 @@
     padding: 20px;
 }
 
-.filter-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    padding: 15px 20px;
-    border-top: 1px solid #e0e0e0;
-    background: white;
-    flex-shrink: 0;
-    border-radius: 0 0 10px 10px;
-}
-
 .filter-section {
     margin-bottom: 20px;
 }
 
-.filter-section:last-child {
-    margin-bottom: 0;
-}
+    .filter-section:last-child {
+        margin-bottom: 0;
+    }
 
 .columns-grid {
     display: grid;
@@ -67,9 +56,9 @@
     font-family: inherit;
 }
 
-#filterModal select:last-of-type {
-    margin-bottom: 0;
-}
+    #filterModal select:last-of-type {
+        margin-bottom: 0;
+    }
 
 #filterModal label {
     display: block;
@@ -83,34 +72,51 @@
     cursor: pointer;
 }
 
-#applyFilterBtn {
-    padding: 8px 16px;
-    background-color: #990000;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+/* Кнопки */
+.filter-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+    background: white;
+    flex-shrink: 0;
+    border-radius: 0 0 10px 10px;
 }
 
-#applyFilterBtn:hover {
-    background-color: #660000;
+#applyFilterBtn {
+    border-radius: 10px;
+    color: white;
+    background: black;
+    border: none;
+    transition: .2s linear;
+    height: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 25px;
 }
+
+    #applyFilterBtn:hover {
+        box-shadow: 0 0 0 2px white, 0 0 0 4px black;
+    }
 
 #closeFilterBtn {
-    padding: 8px 16px;
-    background-color: #666;
-    color: white;
-    border: none;
-    border-radius: 5px;
+    border-radius: 10px;
+    color: black;
+    background: white;
+    border: 2px solid black;
+    transition: .2s linear;
+    height: 40px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    font-size: 16px;
+    padding: 0 25px;
 }
 
-#closeFilterBtn:hover {
-    background-color: #444;
-}
+    #closeFilterBtn:hover {
+        box-shadow: 0 0 0 2px black, 0 0 0 4px white;
+    }
 
+/* Адаптивность */
 @media (max-width: 768px) {
     #filterModal {
         width: 80vw;
@@ -147,14 +153,13 @@
 
     .filter-buttons {
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
         padding: 12px;
     }
 
     #applyFilterBtn,
     #closeFilterBtn {
         width: 100%;
-        padding: 10px;
     }
 
     .columns-grid {
@@ -225,8 +230,8 @@
 
     #applyFilterBtn,
     #closeFilterBtn {
-        padding: 8px;
-        font-size: 12px;
+        font-size: 14px;
+        padding: 8px 20px;
     }
 }
 
@@ -275,8 +280,9 @@
 
     #applyFilterBtn,
     #closeFilterBtn {
-        padding: 4px 10px;
-        font-size: 10px;
+        height: 32px;
+        font-size: 12px;
+        padding: 0 15px;
     }
 }
 
@@ -326,8 +332,9 @@
 
     #applyFilterBtn,
     #closeFilterBtn {
-        padding: 4px 8px;
-        font-size: 9px;
+        height: 28px;
+        font-size: 10px;
+        padding: 0 10px;
     }
 }
 
@@ -371,8 +378,9 @@
 
     #applyFilterBtn,
     #closeFilterBtn {
-        padding: 5px 8px;
-        font-size: 10px;
+        height: 30px;
+        font-size: 11px;
+        padding: 0 12px;
     }
 }
 
@@ -411,7 +419,7 @@
 
     #applyFilterBtn,
     #closeFilterBtn {
-        font-size: 11px;
-        padding: 6px;
+        font-size: 13px;
+        padding: 0 18px;
     }
 }

@@ -1,8 +1,9 @@
-﻿document.addEventListener('DOMContentLoaded', function() {
+﻿document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('.main-section-form');
 
+    // Переключение видимости пароля
     document.querySelectorAll('.toggle-password').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const targetId = this.getAttribute('data-target');
             const input = document.getElementById(targetId);
             const svg = this.querySelector('svg');
@@ -31,36 +32,44 @@
     });
 
     function clearErrors() {
-        document.querySelectorAll('.error-message').forEach(el => el.remove());
+        document.querySelectorAll('.field-error').forEach(el => el.remove());
         document.querySelectorAll('input').forEach(input => {
-        input.classList.remove('error-border');
-        input.style.borderColor = '';
-    });
+            input.classList.remove('error-border');
+            input.style.borderColor = '';
+        });
     }
 
     function showError(inputId, message) {
         const input = document.getElementById(inputId);
         if (!input) return;
+
         input.style.borderColor = 'red';
         input.classList.add('error-border');
 
-        const oldError = input.parentNode.querySelector(`.error-message[data-for="${inputId}"]`);
+        // Находим контейнер (password-wrapper или сам input)
+        const wrapper = input.closest('.password-wrapper') || input;
+
+        // Удаляем старую ошибку
+        const oldError = document.querySelector(`.field-error[data-for="${inputId}"]`);
         if (oldError) oldError.remove();
 
+        // Создаём новую ошибку
         const error = document.createElement('div');
-        error.className = 'error-message';
+        error.className = 'field-error';
         error.setAttribute('data-for', inputId);
-        error.innerHTML = message;
-        input.parentNode.insertBefore(error, input.nextSibling);
+        error.textContent = message;
+
+        // Вставляем ПОСЛЕ контейнера
+        wrapper.after(error);
     }
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         clearErrors();
 
         let isValid = true;
 
-        const email = document.getElementById('Email');    
-        const password = document.getElementById('Password'); 
+        const email = document.getElementById('Email');
+        const password = document.getElementById('Password');
 
         if (email.value.trim() === '') {
             showError('Email', 'Введите email');

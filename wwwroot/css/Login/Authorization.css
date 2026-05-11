@@ -45,18 +45,18 @@ a {
     color: var(--dark-gray-color);
 }
 
-a:hover {
-    color: var(--light-gray-color);
-}
+    a:hover {
+        color: var(--light-gray-color);
+    }
 
 #registration-link {
     color: black;
     font-weight: bold;
 }
 
-#registration-link:hover {
-    color: var(--dark-gray-color);
-}
+    #registration-link:hover {
+        color: var(--dark-gray-color);
+    }
 
 .header-welcome-text {
     font-family: 'SN Pro', 'Comfortaa', sans-serif;
@@ -80,7 +80,7 @@ a:hover {
     box-shadow: 15px 15px 15px rgba(0,0,0,0.2);
     backdrop-filter: blur(10px);
     border-color: var(--light-gray-color);
-    overflow: hidden;
+    overflow: visible;
 }
 
 .main-section-form {
@@ -90,17 +90,19 @@ a:hover {
     width: 100%;
 }
 
-.main-section-form > label,
-.main-section-form > input,
-.main-section-form > div,
-.main-section-form > ul {
-    width: 100%;
-    max-width: 600px;
-}
+    .main-section-form > label,
+    .main-section-form > input,
+    .main-section-form > div,
+    .main-section-form > ul {
+        width: 100%;
+        max-width: 600px;
+    }
 
 label {
     color: var(--dark-gray-color);
     align-self: flex-start;
+    margin-bottom: 6px;
+    padding-top: 5px;
 }
 
 [type="password"], [type="text"], [type="email"] {
@@ -108,12 +110,13 @@ label {
     min-width: 0;
     width: 100%;
     height: 45px;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     border-radius: 10px;
     border: 1px solid var(--light-gray-color);
-    padding-left: 15px;
+    padding: 0 15px;
     background: transparent;
     font-size: 16px;
+    line-height: 45px;
 }
 
 [type="submit"] {
@@ -129,11 +132,66 @@ label {
     cursor: pointer;
     font-size: 16px;
     padding: 0 30px;
+    line-height: 40px;
 }
 
-[type="submit"]:hover {
-    box-shadow: 0 0 0 2px white, 0 0 0 4px black;
+    [type="submit"]:hover {
+        box-shadow: 0 0 0 2px white, 0 0 0 4px black;
+    }
+
+/* Ошибки */
+.error-message {
+    color: #990000;
+    font-size: 12px;
+    margin-top: 4px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    min-height: 18px;
 }
+
+    .error-message p {
+        margin: 2px 0;
+    }
+
+input.error-border {
+    border-color: red !important;
+    margin-bottom: 2px;
+}
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 2px;
+}
+
+    .password-wrapper input {
+        padding: 0 40px 0 15px;
+        margin-bottom: 0;
+        line-height: 45px;
+    }
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .toggle-password:hover svg path,
+    .toggle-password:hover svg circle {
+        stroke: #990000;
+    }
+
+    .toggle-password:focus {
+        outline: none;
+    }
 
 @media (max-width: 1024px) {
     .form {
@@ -171,12 +229,14 @@ label {
     [type="password"], [type="text"], [type="email"] {
         font-size: 14px;
         height: 42px;
+        line-height: 42px;
     }
 
     [type="submit"] {
         min-width: 200px;
         width: auto;
         height: 38px;
+        line-height: 38px;
     }
 
     .form-list-password {
@@ -200,12 +260,14 @@ label {
         min-width: 0;
         width: 100%;
         height: 40px;
+        line-height: 40px;
     }
 
     [type="submit"] {
         min-width: 100%;
         width: 100%;
         height: 42px;
+        line-height: 42px;
     }
 
     .form-list-password {
@@ -254,11 +316,13 @@ label {
     [type="password"], [type="text"], [type="email"] {
         font-size: 13px;
         height: 38px;
+        line-height: 38px;
     }
 
     [type="submit"] {
         font-size: 14px;
         height: 40px;
+        line-height: 40px;
     }
 
     .form-list-password {
@@ -283,11 +347,13 @@ label {
     [type="password"], [type="text"], [type="email"] {
         font-size: 12px;
         height: 36px;
+        line-height: 36px;
     }
 
     [type="submit"] {
         font-size: 13px;
         height: 38px;
+        line-height: 38px;
     }
 
     .form-list-password {
@@ -299,45 +365,10 @@ label {
         font-size: 10px;
     }
 }
-
-.error-message {
+.field-error {
     color: #990000;
     font-size: 12px;
-    margin-top: -10px;
-    margin-bottom: 10px;
-}
-
-input.error-border {
-    border-color: red !important;
-}
-
-.password-wrapper {
-    position: relative;
-}
-
-.password-wrapper input {
-    padding-right: 40px;
-}
-
-.toggle-password {
-    position: absolute;
-    right: 10px;
-    top: 45%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.toggle-password:hover svg path,
-.toggle-password:hover svg circle {
-    stroke: #990000;
-}
-
-.toggle-password:focus {
-    outline: none;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    line-height: 1.5;
 }

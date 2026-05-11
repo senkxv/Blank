@@ -3,7 +3,17 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Добавление документа";
+    
+    var routesList = ViewBag.AvailableRoutes as IEnumerable<dynamic>;
+    var hasRoutes = routesList != null && routesList.Any();
 }
+
+<div id="notificationModal" class="notification-modal" style="display:none;">
+    <div class="notification-content">
+        <p id="notificationMessage"></p>
+        <button id="closeNotificationBtn" class="btn-cancel">Закрыть</button>
+    </div>
+</div>
 
 <link rel="stylesheet" href="/css/UserWorkspace/CreateDocumentPage.css" asp-append-version="true" />
 
@@ -21,15 +31,15 @@
     }
 
     @* ✅ Выбор маршрута — ВЫПАДАЮЩИЙ СПИСОК *@
-    <div class="route-selection" style="margin-bottom: 20px; padding: 15px; background: #f0f8ff; border-radius: 8px; border: 1px solid #b8daff;">
-        <h3 style="margin-top: 0;">Выберите маршрут (опционально):</h3>
+    <div class="route-selection">
+        <h3>Выберите маршрут (опционально):</h3>
         
-        <select id="routeSelect" style="padding: 12px; font-size: 16px; width: 100%; max-width: 500px; border: 2px solid #007bff; border-radius: 6px;"
+        <select id="routeSelect" class="route-select"
                 onchange="if(this.value) window.location.href='@Url.Action("CreateDocumentPage")?routeId=' + this.value;">
             <option value="">-- Без маршрута --</option>
-            @if (ViewBag.AvailableRoutes != null)
+            @if (hasRoutes)
             {
-                foreach (var route in ViewBag.AvailableRoutes)
+                foreach (var route in routesList)
                 {
                     <option value="@route.ид_маршрута" selected="@(ViewBag.RouteId == route.ид_маршрута ? "selected" : null)">
                         @route.название
@@ -37,38 +47,38 @@
                 }
             }
         </select>
-        
-        @if (ViewBag.AvailableRoutes == null || ViewBag.AvailableRoutes.Count == 0)
-        {
-            <p style="color: #856404; background: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 10px;">
-                Нет доступных маршрутов. <a href="/Admin/Index#tab-routes" style="font-weight: bold;">Создайте маршрут в админ-панели</a>.
-            </p>
-        }
     </div>
 
     @* Прогресс по маршруту *@
     @if (ViewBag.SelectedRoute != null)
     {
-        <div class="route-progress" style="margin-bottom: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; border: 1px solid #c8e6c9;">
-            <h4 style="margin-top: 0;">Маршрут: @ViewBag.SelectedRoute.название</h4>
-            <div class="progress-bar" style="display: flex; align-items: center; gap: 5px; margin: 10px 0;">
+        <div class="route-progress">
+            <h4>Маршрут: @ViewBag.SelectedRoute.название</h4>
+            <div class="progress-bar">
                 @for (int i = 0; i < ViewBag.TotalPoints; i++)
                 {
-                    <span style="padding: 5px 12px; border-radius: 20px; font-size: 14px;
-                        @(i < ViewBag.CurrentPointIndex ? "background: black; color: white;" : "")
-                        @(i == ViewBag.CurrentPointIndex ? "background: #e9ecef; border: 3px solid black; font-weight: bold;" : "")
-                        @(i > ViewBag.CurrentPointIndex ? "background: #e9ecef; border: 0.5px solid gray; color: #6c757d;" : "")">
+                    <span class="progress-point @(i < ViewBag.CurrentPointIndex ? "completed" : i == ViewBag.CurrentPointIndex ? "current" : "pending")">
                         Точка @(i + 1)
                     </span>
                     @if (i < ViewBag.TotalPoints - 1)
                     {
-                        <span style="color: #6c757d;">→</span>
+                        <span class="progress-arrow">→</span>
                     }
                 }
             </div>
-            <p>Текущая точка: @(ViewBag.CurrentPointIndex + 1) из @ViewBag.TotalPoints</p>
+            <p class="route-info">Текущая точка: @(ViewBag.CurrentPointIndex + 1) из @ViewBag.TotalPoints</p>
         </div>
     }
+
+    <div id="skipPointModal" class="notification-modal" style="display:none;">
+        <div class="notification-content">
+            <p id="skipPointMessage"></p>
+            <div class="notification-buttons">
+                <button id="skipPointConfirmBtn" class="btn-save">Да, пропустить</button>
+                <button id="skipPointCancelBtn" class="btn-cancel">Отмена</button>
+            </div>
+        </div>
+    </div>
 
     <form method="post" asp-action="CreateDocumentPage" class="document-form" id="documentForm">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -260,12 +270,10 @@
             @if (ViewBag.RouteId != null && !(bool)(ViewBag.IsLastPoint ?? true))
             {
                 <button type="submit" name="action" value="next" class="btn-save">
-                    Сохранить и следующая точка ➡️
+                    Сохранить и следующая точка 
                 </button>
-                <button type="submit" name="action" value="skip" class="btn-skip"
-                        style="background: #ffc107; color: #000; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;"
-                        onclick="return confirm('Пропустить эту точку? Накладная не будет создана.');">
-                    Пропустить точку ⏭️
+                <button type="button" id="skipPointBtn" class="btn-skip">
+                    Пропустить точку
                 </button>
             }
             else
@@ -274,7 +282,7 @@
                     Сохранить
                 </button>
             }
-            <a href="@Url.Action("Index", "UserWorkspace")" class="btn-cancel">Отмена</a>
+            <a href="@Url.Action("Index", "UserWorkspace")" class="btn-cancel-route">Отмена</a>
         </div>
 
         <input type="hidden" name="positionsData" id="positionsData" />
@@ -295,5 +303,5 @@
     <script>
         window.goodsListData = @Html.Raw(ViewBag.GoodsJson);
     </script>
-    <script src="~/js/UserWorkspace/CreateDocumentPage.js"></script>
+    <script src="/js/UserWorkspace/CreateDocumentPage.js"></script>
 }

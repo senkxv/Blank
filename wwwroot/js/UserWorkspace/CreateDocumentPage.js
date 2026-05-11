@@ -1,6 +1,18 @@
 ﻿const goodsList = window.goodsListData || [];
 let deletedIds = [];
 
+function showNotification(message) {
+    const modal = document.getElementById('notificationModal');
+    const messageElement = document.getElementById('notificationMessage');
+
+    if (modal && messageElement) {
+        messageElement.textContent = message;
+        modal.style.display = 'block';
+    } else {
+        alert(message);
+    }
+}
+
 function getUnit(goodsId) {
     const goods = goodsList.find(g => g.ид_товара == goodsId);
     return goods ? goods.единицы_измерения : '';
@@ -101,8 +113,51 @@ function collectPositions() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Закрытие модального окна уведомлений
+    document.getElementById('closeNotificationBtn')?.addEventListener('click', function () {
+        document.getElementById('notificationModal').style.display = 'none';
+    });
+
+    document.getElementById('notificationModal')?.addEventListener('click', function (e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
+
+    // ============ КНОПКА ПРОПУСКА ТОЧКИ ============
+    document.getElementById('skipPointBtn')?.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const modal = document.getElementById('skipPointModal');
+        const message = document.getElementById('skipPointMessage');
+        const confirmBtn = document.getElementById('skipPointConfirmBtn');
+        const cancelBtn = document.getElementById('skipPointCancelBtn');
+
+        if (!modal || !message || !confirmBtn || !cancelBtn) return;
+
+        message.textContent = 'Пропустить эту точку? Накладная не будет создана.';
+        modal.style.display = 'block';
+
+        confirmBtn.onclick = function () {
+            modal.style.display = 'none';
+            const form = document.getElementById('documentForm');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'action';
+            input.value = 'skip';
+            form.appendChild(input);
+            form.submit();
+        };
+
+        cancelBtn.onclick = function () {
+            modal.style.display = 'none';
+        };
+    });
+
+    // ============ ДОБАВЛЕНИЕ ТОВАРА ============
     document.getElementById('addGoodsBtn')?.addEventListener('click', addNewRow);
 
+    // ============ ИЗМЕНЕНИЕ ТОВАРА В SELECT ============
     document.getElementById('goodsTableBody')?.addEventListener('change', function (e) {
         if (e.target.classList.contains('goods-select')) {
             const goodsId = parseInt(e.target.value);
@@ -112,6 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // ============ ВВОД ЧИСЕЛ ============
     document.getElementById('goodsTableBody')?.addEventListener('input', function (e) {
         if (e.target.classList.contains('goods-quantity') ||
             e.target.classList.contains('goods-price') ||
@@ -124,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // ============ УДАЛЕНИЕ ТОВАРА ============
     document.getElementById('goodsTableBody')?.addEventListener('click', function (e) {
         if (e.target.classList.contains('remove-goods')) {
             e.target.closest('tr').remove();
@@ -134,10 +191,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // ============ ОТПРАВКА ФОРМЫ ============
     const form = document.getElementById('documentForm');
     if (form) {
         form.addEventListener('submit', function (e) {
-            // Если нажата кнопка "Пропустить" — пропускаем проверку позиций
             const submitter = e.submitter;
             if (submitter && submitter.getAttribute('value') === 'skip') {
                 return true;
@@ -147,14 +204,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const hasRows = document.querySelectorAll('#goodsTableBody tr:not(#noDataRow)').length > 0;
 
             if (!hasRows) {
-                alert('Добавьте хотя бы одну позицию товара!');
                 e.preventDefault();
+                showNotification('Добавьте хотя бы одну позицию товара!');
                 return false;
             }
 
             if (!hasValidPositions) {
-                alert('Заполните все обязательные поля в позициях товаров (товар, количество, цена)!');
                 e.preventDefault();
+                showNotification('Заполните все обязательные поля в позициях товаров (товар, количество, цена)!');
                 return false;
             }
 
@@ -163,5 +220,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // ============ ПЕРВИЧНЫЙ РАСЧЁТ ============
     calculateTotalWeight();
 });

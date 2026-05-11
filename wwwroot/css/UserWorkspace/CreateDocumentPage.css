@@ -1,19 +1,20 @@
 ﻿.form-container {
-    max-width: 1000px;
+    max-width: 1400px;
+    width: 95%;
     margin: 30px auto;
     padding: 0 20px;
 }
 
-    .form-container h2 {
-        margin-bottom: 25px;
-        color: #333;
-        font-family: Comfortaa;
-        font-size: 24px;
-    }
+.form-container h2 {
+    margin-bottom: 25px;
+    color: #333;
+    font-family: Comfortaa;
+    font-size: 24px;
+}
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 20px 30px;
     background: white;
     padding: 25px;
@@ -63,9 +64,10 @@ select.form-control {
     gap: 15px;
     justify-content: center;
     margin-top: 25px;
+    flex-wrap: wrap;
 }
 
-.btn-save, .btn-cancel {
+.btn-save, .btn-cancel, .btn-skip {
     padding: 10px 30px;
     border-radius: 8px;
     font-size: 16px;
@@ -74,28 +76,80 @@ select.form-control {
     display: inline-block;
     text-align: center;
     transition: all 0.2s;
+    border: none;
 }
 
 .btn-save {
-    background-color: #990000;
+    margin-top: 30px;
+    border-radius: 10px;
     color: white;
+    transition: .2s linear;
+    background: black;
     border: none;
+    min-width: 250px;
+    width: auto;
+    height: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 30px;
 }
 
     .btn-save:hover {
-        background-color: #660000;
+        box-shadow: 0 0 0 2px white, 0 0 0 4px black;
     }
 
-.btn-cancel {
-    background-color: #666;
-    color: white;
-    border: none;
+/* Пропустить точку — серая */
+.btn-skip {
+    margin-top: 30px;
+    border-radius: 10px;
+    color: #666;
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    transition: .2s linear;
+    min-width: 150px;
+    width: auto;
+    height: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-sizing: border-box;
+    line-height: 1.2;
 }
 
-    .btn-cancel:hover {
-        background-color: #444;
+    .btn-skip:hover {
+        color: #333;
+        background: #e0e0e0;
+        border-color: #999;
     }
 
+/* Отмена — белая с чёрной обводкой */
+.btn-cancel-route {
+    margin-top: 30px;
+    border-radius: 10px;
+    color: black;
+    background: white;
+    border: 2px solid black;
+    transition: .2s linear;
+    min-width: 250px;
+    width: auto;
+    height: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+    .btn-cancel-route:hover {
+        box-shadow: 0 0 0 2px black, 0 0 0 4px white;
+    }
 .goods-section {
     margin-top: 30px;
     padding: 20px;
@@ -114,13 +168,13 @@ select.form-control {
 .table-wrapper {
     overflow-x: auto;
     width: 100%;
-    -webkit-overflow-scrolling: touch;
 }
 
 .goods-table {
     width: 100%;
-    min-width: 800px;
+    min-width: 1100px;
     border-collapse: collapse;
+    border-block-color: #ddd;
     margin-bottom: 15px;
     font-size: 13px;
 }
@@ -128,36 +182,100 @@ select.form-control {
     .goods-table th,
     .goods-table td {
         border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-        vertical-align: top;
+        padding: 8px 6px;
+        text-align: center;
+        vertical-align: middle;
+        height: 46px;
     }
 
     .goods-table th {
-        background-color: #f5f5f5;
+        background-color: black;
+        color: white;
         font-weight: bold;
-        text-align: center;
+        border: none;
     }
 
     .goods-table td {
-        background-color: white;
+        border: 1px solid #ddd;
     }
 
-    .goods-table input,
-    .goods-table select {
-        width: 100%;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
+    /* Убрать линии между заголовками */
+    .goods-table thead th {
+        border: none;
     }
 
-        .goods-table input[type="number"] {
-            text-align: right;
+        .goods-table th:first-child,
+        .goods-table td:first-child {
+            width: 200px;
         }
 
+        .goods-table th:nth-child(2),
+        .goods-table td:nth-child(2) {
+            width: 75px;
+        }
+
+        .goods-table td:nth-child(3) input {
+            width: 85px;
+        }
+
+        .goods-table td:nth-child(4) input {
+            width: 105px;
+        }
+
+        .goods-table td:nth-child(5) input {
+            width: 75px;
+        }
+
+        .goods-table td:nth-child(6) input {
+            width: 70px;
+        }
+
+        .goods-table td:nth-child(7),
+        .goods-table td:nth-child(8),
+        .goods-table td:nth-child(9) {
+            width: 115px;
+        }
+
+        .goods-table td:nth-child(10) input {
+            width: 85px;
+        }
+
+        .goods-table td:nth-child(11) {
+            width: 45px;
+        }
+
+    .goods-table input[type="number"] {
+        width: 100%;
+        height: 38px;
+        padding: 6px;
+        font-size: 14px;
+        text-align: right;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .goods-table select {
+        width: 100%;
+        height: 38px;
+        padding: 6px;
+        font-size: 14px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+.goods-unit {
+    width: 65px !important;
+    height: 38px !important;
+    text-align: center !important;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
 .btn-add {
-    background-color: #990000;
+    background-color: black;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -165,110 +283,132 @@ select.form-control {
     cursor: pointer;
     font-size: 14px;
     margin-top: 10px;
-    display: inline-block;
 }
 
     .btn-add:hover {
-        background-color: #660000;
+        background-color: black;
     }
 
-.remove-row,
-.remove-existing {
-    background-color: #dc3545;
+.remove-goods {
+    background: #dc3545;
     color: white;
     border: none;
-    padding: 4px 8px;
-    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin: 0 auto;
 }
 
-    .remove-row:hover,
-    .remove-existing:hover {
-        background-color: #c82333;
+    .remove-goods:hover {
+        background: #c82333;
     }
 
-.right {
-    text-align: right;
+.route-selection {
+    box-shadow: 15px 15px 15px rgba(0,0,0,0.1);
+    backdrop-filter: blur(5px);
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid gray;
 }
 
-.center {
-    text-align: center;
+    .route-selection h3 {
+        margin-top: 0;
+    }
+
+.route-select {
+    backdrop-filter: blur(10px);
+    padding: 12px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid gray;
+    border-radius: 6px;
+    box-sizing: border-box;
 }
 
-/* ========== УНИФИЦИРОВАННЫЙ АДАПТИВ ========== */
+.no-routes-warning {
+    color: #856404;
+    background: #fff3cd;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
 
-/* До 1024px */
-@media (max-width: 1024px) {
+.route-progress {
+    box-shadow: 15px 15px 15px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    padding: 15px;
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    border: 1px solid gray;
+}
+
+    .route-progress h4 {
+        margin-top: 0;
+    }
+
+.progress-bar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.progress-point {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+    .progress-point.completed {
+        background: black;
+        color: white;
+    }
+
+    .progress-point.current {
+        background: #e9ecef;
+        border: 3px solid black;
+        font-weight: bold;
+    }
+
+    .progress-point.pending {
+        background: #e9ecef;
+        border: 0.5px solid gray;
+        color: #6c757d;
+    }
+
+.progress-arrow {
+    color: #6c757d;
+    font-size: 18px;
+}
+
+.route-info {
+    font-size: 14px;
+    color: #555;
+}
+
+
+
+@media (max-width: 1400px) {
     .form-container {
-        margin: 25px auto;
-        padding: 0 15px;
-    }
-
-    .form-grid {
-        gap: 15px 20px;
-        padding: 20px;
+        max-width: 100%;
+        padding: 10px;
     }
 }
 
-/* До 900px */
-@media (max-width: 900px) {
-    .goods-table {
-        min-width: 700px;
-    }
-}
-
-/* До 768px */
 @media (max-width: 768px) {
     .form-container {
         margin: 20px auto;
-    }
-
-        .form-container h2 {
-            font-size: 22px;
-            margin-bottom: 20px;
-        }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-        padding: 20px;
-    }
-
-    .goods-section {
-        padding: 15px;
-    }
-
-        .goods-section h3 {
-            font-size: 18px;
-        }
-
-    .goods-table {
-        min-width: 650px;
-        font-size: 12px;
-    }
-
-        .goods-table th,
-        .goods-table td {
-            padding: 6px;
-        }
-
-    .btn-save, .btn-cancel {
-        padding: 8px 20px;
-        font-size: 14px;
-    }
-}
-
-/* До 650px */
-@media (max-width: 650px) {
-    .goods-table {
-        min-width: 550px;
-    }
-}
-
-/* До 600px */
-@media (max-width: 600px) {
-    .form-container {
         padding: 0 12px;
     }
 
@@ -277,104 +417,83 @@ select.form-control {
         }
 
     .form-grid {
-        gap: 12px;
+        grid-template-columns: 1fr;
+        gap: 15px;
         padding: 15px;
     }
 
-    .form-group label {
-        font-size: 13px;
-    }
-
-    .form-control {
-        padding: 8px 10px;
-        font-size: 13px;
-    }
-
-    .goods-section {
-        margin-top: 20px;
-        padding: 12px;
-    }
-
-        .goods-section h3 {
-            font-size: 16px;
-        }
-
     .goods-table {
-        min-width: 500px;
+        min-width: 900px;
         font-size: 11px;
     }
 
-        .goods-table th,
-        .goods-table td {
-            padding: 5px;
-        }
-
-        .goods-table input,
+        .goods-table input[type="number"],
         .goods-table select {
-            padding: 3px;
-            font-size: 11px;
+            height: 32px;
+            font-size: 12px;
         }
 
-    .btn-add {
-        padding: 6px 12px;
-        font-size: 12px;
+    .goods-unit {
+        height: 32px !important;
     }
 
-    .remove-row,
-    .remove-existing {
-        padding: 3px 6px;
+    .goods-table td {
+        height: 38px;
+    }
+
+    .btn-save, .btn-cancel, .btn-skip {
+        padding: 8px 20px;
+        font-size: 14px;
+    }
+
+    .route-selection,
+    .route-progress {
+        padding: 10px;
+        backdrop-filter: blur(10px);
+    }
+
+    .route-select {
+        backdrop-filter: blur(10px);
+        font-size: 14px;
+        padding: 10px;
+        max-width: 100%;
+    }
+
+    .progress-bar {
+        gap: 3px;
+    }
+
+    .progress-point {
         font-size: 11px;
+        padding: 4px 8px;
     }
 
-    .form-actions {
-        gap: 12px;
-    }
-
-    .btn-save, .btn-cancel {
-        padding: 7px 16px;
-        font-size: 13px;
+    .progress-arrow {
+        font-size: 14px;
     }
 }
 
-/* До 500px */
-@media (max-width: 500px) {
-    .goods-table {
-        min-width: 450px;
-        font-size: 10px;
-    }
-}
-
-/* До 480px */
 @media (max-width: 480px) {
-    .form-container h2 {
-        font-size: 18px;
+    .form-container {
+        padding: 0 8px;
     }
+
+        .form-container h2 {
+            font-size: 18px;
+        }
 
     .form-grid {
         gap: 10px;
-        padding: 12px;
-    }
-
-    .form-group label {
-        font-size: 12px;
-    }
-
-    .form-control {
-        padding: 6px 8px;
-        font-size: 12px;
+        padding: 10px;
     }
 
     .goods-section {
         padding: 10px;
     }
 
-        .goods-section h3 {
-            font-size: 15px;
-        }
-
     .goods-table {
-        min-width: 400px;
-        font-size: 9px;
+        min-width: 750px;
+        font-size: 10px;
     }
 
         .goods-table th,
@@ -382,17 +501,34 @@ select.form-control {
             padding: 4px;
         }
 
-        .goods-table input,
+        .goods-table input[type="number"],
         .goods-table select {
-            min-width: 50px;
-            font-size: 9px;
+            height: 28px;
+            font-size: 10px;
+            padding: 3px;
         }
 
-    .btn-add {
+    .goods-unit {
+        height: 28px !important;
+    }
+
+    .goods-table td {
+        height: 34px;
+    }
+
+    .progress-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .progress-arrow {
+        display: none;
+    }
+
+    .progress-point {
         width: 100%;
         text-align: center;
-        padding: 8px;
-        font-size: 12px;
     }
 
     .form-actions {
@@ -400,172 +536,189 @@ select.form-control {
         gap: 8px;
     }
 
-    .btn-save, .btn-cancel {
+    .btn-save, .btn-cancel, .btn-skip {
         width: 100%;
         padding: 8px;
         font-size: 14px;
     }
 
-    .right {
-        font-size: 10px;
+    .btn-skip {
+        margin-left: 0;
+    }
+
+    .remove-goods {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
     }
 }
 
-/* До 400px */
-@media (max-width: 400px) {
-    .form-container {
-        margin: 15px auto;
-        padding: 0 10px;
-    }
-
-        .form-container h2 {
-            font-size: 16px;
-            margin-bottom: 12px;
-        }
-
-    .form-grid {
-        gap: 8px;
-        padding: 10px;
-    }
-
-    .form-group label {
-        font-size: 11px;
-        margin-bottom: 4px;
-    }
-
-    .form-control {
-        padding: 5px 6px;
-        font-size: 11px;
-    }
-
-    .text-danger {
-        font-size: 10px;
-    }
-
-    .goods-section {
-        padding: 8px;
-    }
-
-        .goods-section h3 {
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-    .goods-table {
-        min-width: 350px;
-        font-size: 8px;
-    }
-
-        .goods-table th,
-        .goods-table td {
-            padding: 3px;
-        }
-
-        .goods-table input,
-        .goods-table select {
-            min-width: 45px;
-            font-size: 8px;
-            padding: 2px;
-        }
-
-    .btn-add {
-        padding: 6px;
-        font-size: 11px;
-    }
-
-    .remove-row,
-    .remove-existing {
-        padding: 2px 4px;
-        font-size: 10px;
-    }
-
-    .btn-save, .btn-cancel {
-        padding: 6px;
-        font-size: 12px;
-    }
+.notification-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
 }
 
-/* До 350px */
-@media (max-width: 350px) {
-    .form-container {
-        margin: 10px auto;
-        padding: 0 8px;
+.notification-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 350px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+    .notification-content p {
+        font-size: 16px;
+        margin-bottom: 20px;
+        color: #333;
     }
 
-        .form-container h2 {
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
+/* Кнопка Отмена в модальном окне — белая с чёрной обводкой */
+.notification-buttons .btn-cancel {
+    margin-top: 30px;
+    border-radius: 10px;
+    color: black;
+    background: white;
+    border: 2px solid black;
+    transition: .2s linear;
+    min-width: 150px;
+    width: auto;
+    height: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    line-height: 1.2;
+}
 
-    .form-grid {
-        gap: 6px;
-        padding: 8px;
+    .notification-buttons .btn-cancel:hover {
+        box-shadow: 0 0 0 2px black, 0 0 0 4px white;
     }
 
-    .form-group label {
-        font-size: 10px;
-        margin-bottom: 3px;
+/* Кнопка Да, пропустить в модальном окне — чёрная */
+.notification-buttons .btn-save {
+    margin-top: 30px;
+    border-radius: 10px;
+    color: white;
+    background: black;
+    border: none;
+    transition: .2s linear;
+    min-width: 150px;
+    width: auto;
+    height: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    line-height: 1.2;
+}
+
+    .notification-buttons .btn-save:hover {
+        box-shadow: 0 0 0 2px white, 0 0 0 4px black;
     }
 
-    .form-control {
-        padding: 4px 5px;
-        font-size: 10px;
+.remove-goods {
+    background: black;
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin: 0 auto;
+}
+
+    .remove-goods:hover {
+        background: #333;
     }
 
-    .goods-section {
-        padding: 6px;
-    }
-
-        .goods-section h3 {
-            font-size: 12px;
-            margin-bottom: 8px;
-        }
-
-    .goods-table {
+/* Адаптивность модальных окон */
+@media (max-width: 768px) {
+    .notification-content {
         min-width: 300px;
-        font-size: 7px;
+        padding: 25px;
     }
 
-        .goods-table th,
-        .goods-table td {
-            padding: 2px;
+        .notification-content p {
+            font-size: 15px;
         }
 
-        .goods-table input,
-        .goods-table select {
-            min-width: 40px;
-            font-size: 7px;
-            padding: 1px;
+    .notification-buttons {
+        flex-direction: row;
+        gap: 10px;
+    }
+
+        .notification-buttons .btn-save,
+        .notification-buttons .btn-cancel {
+            min-width: 120px;
+            padding: 0 20px;
+            font-size: 14px;
+            height: 36px;
+        }
+}
+
+@media (max-width: 480px) {
+    .notification-content {
+        min-width: auto;
+        width: 90vw;
+        padding: 20px;
+    }
+
+        .notification-content p {
+            font-size: 14px;
+            margin-bottom: 15px;
         }
 
-    .btn-add {
-        padding: 5px;
-        font-size: 10px;
+    .notification-buttons {
+        flex-direction: column;
+        gap: 10px;
     }
 
-    .remove-row,
-    .remove-existing {
-        padding: 2px 3px;
-        font-size: 9px;
-    }
-
-    .btn-save, .btn-cancel {
-        padding: 5px;
-        font-size: 11px;
-    }
-
-    .form-actions {
-        gap: 6px;
-        margin-top: 12px;
-    }
+        .notification-buttons .btn-save,
+        .notification-buttons .btn-cancel {
+            width: 100%;
+            min-width: auto;
+            padding: 0 20px;
+            font-size: 14px;
+            height: 36px;
+            margin-top: 0;
+        }
 }
 
-.goods-table .goods-select {
-    min-width: 180px;
-}
+@media (max-width: 350px) {
+    .notification-content {
+        width: 95vw;
+        padding: 15px;
+    }
 
-/* Или если не работает — задайте ширину для первой колонки */
-.goods-table td:first-child,
-.goods-table th:first-child {
-    min-width: 200px;
+        .notification-content p {
+            font-size: 13px;
+        }
+
+    .notification-buttons .btn-save,
+    .notification-buttons .btn-cancel {
+        font-size: 13px;
+        height: 34px;
+    }
 }

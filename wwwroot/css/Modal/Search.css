@@ -13,54 +13,62 @@
     width: auto;
 }
 
-#searchModal .search-form {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin: 0;
-}
+    #searchModal .search-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 0;
+    }
 
-#searchModal input[type="text"] {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    width: 250px;
-    font-size: 14px;
-    font-family: inherit;
-}
+    #searchModal input[type="text"] {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        width: 250px;
+        height: 40px;
+        font-size: 14px;
+        font-family: inherit;
+        box-sizing: border-box;
+    }
 
-#searchModal input[type="text"]:focus {
-    outline: none;
-    border-color: #990000;
-}
+        #searchModal input[type="text"]:focus {
+            outline: none;
+            border-color: black;
+        }
 
-#searchModal button[type="submit"] {
-    padding: 8px 16px;
-    background-color: #990000;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
+    /* Кнопка Найти — чёрная */
+    #searchModal button[type="submit"] {
+        border-radius: 10px;
+        color: white;
+        background: black;
+        border: none;
+        transition: .2s linear;
+        height: 40px;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 0 25px;
+    }
 
-#searchModal button[type="submit"]:hover {
-    background-color: #660000;
-}
+        #searchModal button[type="submit"]:hover {
+            box-shadow: 0 0 0 2px white, 0 0 0 4px black;
+        }
 
+/* Кнопка Отмена — белая с обводкой */
 #closeSearchBtn {
-    padding: 8px 16px;
-    background-color: #666;
-    color: white;
-    border: none;
-    border-radius: 8px;
+    border-radius: 10px;
+    color: black;
+    background: white;
+    border: 2px solid black;
+    transition: .2s linear;
+    height: 40px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    font-size: 16px;
+    padding: 0 25px;
 }
 
-#closeSearchBtn:hover {
-    background-color: #444;
-}
+    #closeSearchBtn:hover {
+        box-shadow: 0 0 0 2px black, 0 0 0 4px white;
+    }
 
 @media (max-width: 480px) {
     #searchModal {
@@ -69,21 +77,19 @@
         padding: 15px;
     }
 
-    #searchModal .search-form {
-        flex-direction: column;
-        width: 100%;
-    }
+        #searchModal .search-form {
+            flex-direction: column;
+            width: 100%;
+        }
 
-    #searchModal input[type="text"] {
-        width: 100%;
-        padding: 8px;
-    }
+        #searchModal input[type="text"] {
+            width: 100%;
+        }
 
-    #searchModal button[type="submit"],
-    #closeSearchBtn {
-        width: 100%;
-        padding: 8px;
-    }
+        #searchModal button[type="submit"],
+        #closeSearchBtn {
+            width: 100%;
+        }
 }
 
 @media (max-width: 350px) {
@@ -91,15 +97,17 @@
         padding: 12px;
     }
 
-    #searchModal input[type="text"] {
-        font-size: 12px;
-    }
+        #searchModal input[type="text"] {
+            font-size: 12px;
+            height: 36px;
+        }
 
-    #searchModal button[type="submit"],
-    #closeSearchBtn {
-        font-size: 12px;
-        padding: 6px;
-    }
+        #searchModal button[type="submit"],
+        #closeSearchBtn {
+            font-size: 14px;
+            height: 36px;
+            padding: 0 20px;
+        }
 }
 
 @media (max-height: 450px) {

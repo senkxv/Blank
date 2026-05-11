@@ -3,8 +3,6 @@ using Blank.Helpers;
 using Blank.Models.Tables;
 using Blank.Models.ViewModels;
 using Blank.Models.Views;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
@@ -13,8 +11,6 @@ using SelectPdf;
 using System.Text;
 using System.Text.Json;
 using Body = DocumentFormat.OpenXml.Wordprocessing.Body;
-using Text = DocumentFormat.OpenXml.Wordprocessing.Text;
-
 using WordprocessingDocument = DocumentFormat.OpenXml.Packaging.WordprocessingDocument;
 
 namespace Blank.Controllers
@@ -28,7 +24,7 @@ namespace Blank.Controllers
             _context = context;
         }
 
-/*        public IActionResult Error404()
+        public IActionResult Error404()
         {
             return View();
         }
@@ -36,7 +32,7 @@ namespace Blank.Controllers
         public IActionResult Error500()
         {
             return View();
-        }*/
+        }
 
         public IActionResult Index()
         {
@@ -2275,7 +2271,7 @@ namespace Blank.Controllers
                     templateName = "TTN1";
                 }
 
-                return View($"~/Views/Shared/DocumentTemplates/{templateName}.cshtml", model);
+                return View($"/Views/Shared/DocumentTemplates/{templateName}.cshtml", model);
             }
             catch (Exception ex)
             {
@@ -2486,4 +2482,3 @@ namespace Blank.Controllers
         }
     }
 }
-

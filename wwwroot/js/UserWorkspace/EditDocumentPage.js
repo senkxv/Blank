@@ -1,5 +1,18 @@
 ﻿const goodsList = window.goodsListData || [];
 let deletedIds = [];
+let rowToDelete = null;
+
+function showNotification(message) {
+    const modal = document.getElementById('notificationModal');
+    const messageElement = document.getElementById('notificationMessage');
+
+    if (modal && messageElement) {
+        messageElement.textContent = message;
+        modal.style.display = 'block';
+    } else {
+        alert(message);
+    }
+}
 
 function getUnit(goodsId) {
     const goods = goodsList.find(g => g.ид_товара == goodsId);
@@ -12,22 +25,12 @@ function updateRowCalculations(row) {
     const discount = parseFloat(row.querySelector('.goods-discount')?.value) || 0;
     const vat = parseFloat(row.querySelector('.goods-vat')?.value) || 0;
 
-    // Стоимость без скидки
     const costWithoutDiscount = qty * price;
-
-    // Скидка в деньгах
     const discountAmount = costWithoutDiscount * (discount / 100);
-
-    // Стоимость после скидки (база для НДС)
     const costAfterDiscount = costWithoutDiscount - discountAmount;
-
-    // НДС от стоимости после скидки
     const vatAmount = costAfterDiscount * (vat / 100);
-
-    // Итого с НДС
     const totalWithVat = costAfterDiscount + vatAmount;
 
-    // Заполняем ячейки (проверяем их наличие)
     const sumWithoutVatCell = row.querySelector('.goods-sum-without-vat');
     const vatAmountCell = row.querySelector('.goods-vat-amount');
     const sumCell = row.querySelector('.goods-sum');
@@ -79,8 +82,7 @@ function addNewRow() {
     updateRowCalculations(newRow);
 }
 
-function removeGoodsRow(button) {
-    const row = button.closest('tr');
+function removeGoodsRow(row) {
     const id = row.getAttribute('data-id');
     const isExisting = row.getAttribute('data-is-existing') === 'true';
 
@@ -92,7 +94,6 @@ function removeGoodsRow(button) {
     row.remove();
     calculateTotalWeight();
 
-    // Если все строки удалены - показываем заглушку
     const tbody = document.getElementById('goodsTableBody');
     if (tbody && tbody.querySelectorAll('tr').length === 0) {
         tbody.innerHTML = '<tr id="noDataRow"><td colspan="11" style="text-align: center;">Нет добавленных товаров</td></tr>';
@@ -111,7 +112,6 @@ function collectPositions() {
         const quantity = parseFloat(row.querySelector('.goods-quantity')?.value) || 0;
         const price = parseFloat(row.querySelector('.goods-price')?.value) || 0;
 
-        // ✅ Разрешаем quantity = 0 и price = 0 для существующих позиций
         const isExisting = row.getAttribute('data-is-existing') === 'true';
 
         if (goodsId > 0 && (quantity > 0 || isExisting) && (price > 0 || isExisting)) {
@@ -130,17 +130,23 @@ function collectPositions() {
         }
     });
 
-    console.log('Собраны позиции:', positions);  // ✅ Для отладки
     return { positions, hasValidPositions };
 }
 
-// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function () {
+    // Закрытие модального окна уведомлений
+    document.getElementById('closeNotificationBtn')?.addEventListener('click', function () {
+        document.getElementById('notificationModal').style.display = 'none';
+    });
+
+    document.getElementById('notificationModal')?.addEventListener('click', function (e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
+
     // Кнопка добавления товара
-    const addBtn = document.getElementById('addGoodsBtn');
-    if (addBtn) {
-        addBtn.addEventListener('click', addNewRow);
-    }
+    document.getElementById('addGoodsBtn')?.addEventListener('click', addNewRow);
 
     // Изменение товара в select
     document.getElementById('goodsTableBody')?.addEventListener('change', function (e) {
@@ -156,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Ввод чисел (количество, цена, скидка, НДС)
+    // Ввод чисел
     document.getElementById('goodsTableBody')?.addEventListener('input', function (e) {
         if (e.target.classList.contains('goods-quantity') ||
             e.target.classList.contains('goods-price') ||
@@ -169,12 +175,40 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Удаление товара
+    // Удаление товара — открываем модальное окно
     document.getElementById('goodsTableBody')?.addEventListener('click', function (e) {
         if (e.target.classList.contains('remove-goods')) {
-            if (confirm('Удалить эту позицию?')) {
-                removeGoodsRow(e.target);
+            rowToDelete = e.target.closest('tr');
+            const modal = document.getElementById('confirmDeleteModal');
+            if (modal) {
+                modal.style.display = 'block';
+            } else {
+                removeGoodsRow(rowToDelete);
+                rowToDelete = null;
             }
+        }
+    });
+
+    // Подтверждение удаления в модальном окне
+    document.getElementById('confirmDeleteYes')?.addEventListener('click', function () {
+        if (rowToDelete) {
+            removeGoodsRow(rowToDelete);
+            rowToDelete = null;
+        }
+        document.getElementById('confirmDeleteModal').style.display = 'none';
+    });
+
+    // Отмена удаления
+    document.getElementById('confirmDeleteNo')?.addEventListener('click', function () {
+        rowToDelete = null;
+        document.getElementById('confirmDeleteModal').style.display = 'none';
+    });
+
+    // Закрытие модального окна удаления по клику на фон
+    document.getElementById('confirmDeleteModal')?.addEventListener('click', function (e) {
+        if (e.target === this) {
+            rowToDelete = null;
+            this.style.display = 'none';
         }
     });
 
@@ -183,25 +217,21 @@ document.addEventListener('DOMContentLoaded', function () {
     if (form) {
         form.addEventListener('submit', function (e) {
             const { positions, hasValidPositions } = collectPositions();
-
-            // Проверяем, есть ли товары в таблице вообще
             const hasRows = document.querySelectorAll('#goodsTableBody tr:not(#noDataRow)').length > 0;
 
             if (!hasRows) {
-                alert('Добавьте хотя бы одну позицию товара!');
                 e.preventDefault();
+                showNotification('Добавьте хотя бы одну позицию товара!');
                 return false;
             }
 
             if (!hasValidPositions) {
-                alert('Заполните все обязательные поля в позициях товаров (товар, количество, цена)!');
                 e.preventDefault();
+                showNotification('Заполните все обязательные поля в позициях товаров (товар, количество, цена)!');
                 return false;
             }
 
             document.getElementById('positionsData').value = JSON.stringify(positions);
-
-            // Для отладки можно посмотреть что отправляется
             console.log('Отправляемые позиции:', positions);
         });
     }
@@ -211,6 +241,5 @@ document.addEventListener('DOMContentLoaded', function () {
         updateRowCalculations(row);
     });
 
-    // Первоначальный расчёт общей массы
     calculateTotalWeight();
 });

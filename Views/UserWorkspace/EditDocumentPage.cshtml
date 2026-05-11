@@ -22,26 +22,32 @@
     });
 </script>
 
+<div id="notificationModal" class="notification-modal" style="display:none;">
+    <div class="notification-content">
+        <p id="notificationMessage"></p>
+        <button id="closeNotificationBtn" class="btn-cancel">Закрыть</button>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления позиции -->
+<div id="confirmDeleteModal" class="notification-modal" style="display:none;">
+    <div class="notification-content">
+        <p id="confirmDeleteMessage">Удалить эту позицию?</p>
+        <div class="notification-buttons">
+            <button id="confirmDeleteYes" class="btn-save">Да, удалить</button>
+            <button id="confirmDeleteNo" class="btn-cancel">Отмена</button>
+        </div>
+    </div>
+</div>
+
 <div class="form-container">
     <h2>Редактирование документа</h2>
 
     @if (ViewBag.DocumentRoute != null)
     {
-        <div style="padding: 12px 15px; background: #e8f5e9; border-radius: 8px; border: 1px solid #c8e6c9; margin-bottom: 20px;">
+        <div style="padding: 12px 15px; box-shadow: 15px 15px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px); border-radius: 8px;border: 1px solid gray; margin-bottom: 20px;">
             <strong style="font-size: 15px;">Маршрут:</strong> @ViewBag.DocumentRoute.название
-            @if (ViewBag.RoutePointInfo != null)
-            {
-                <span style="margin-left: 15px; color: #555;">
-                    | Точка @ViewBag.RoutePointInfo.порядковый_номер из @ViewBag.TotalRoutePoints
-                </span>
-                <br />
-                <span style="font-size: 13px; color: #666;">
-                    @(ViewBag.RoutePointInfo.Грузоотправитель?.название ?? "—")
-                    → @(ViewBag.RoutePointInfo.ПунктПогрузки?.наименование ?? "—")
-                    → @(ViewBag.RoutePointInfo.ПунктРазгрузки?.наименование ?? "—")
-                    → @(ViewBag.RoutePointInfo.Грузополучатель?.название ?? "—")
-                </span>
-            }
         </div>
     }
 
