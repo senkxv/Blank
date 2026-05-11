@@ -47,6 +47,9 @@ namespace Blank.Models.Tables
         [Required]
         public int ид_пользователя { get; set; }
 
+        [Column("ид_маршрута")]
+        public int? ид_маршрута { get; set; }
+
         [Column("ид_пункта_погрузки")]
         public int? ид_пункта_погрузки { get; set; }
 

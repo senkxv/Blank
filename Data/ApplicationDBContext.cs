@@ -94,7 +94,7 @@ namespace Blank.Data
 
             modelBuilder.Entity<Users>(entity =>
             {
-                entity.HasKey(e => e.ид_пользователя);           // предположительное название ключа
+                entity.HasKey(e => e.ид_пользователя);
                 entity.Property(e => e.ид_пользователя).ValueGeneratedOnAdd();
             });
 
@@ -104,7 +104,54 @@ namespace Blank.Data
                 entity.Property(e => e.ид_должности).ValueGeneratedOnAdd();
             });
 
-            // Если у вас есть другие сущности — добавьте их сюда аналогично
+            // Настройка Маршруты
+            modelBuilder.Entity<DeliveryRoute>(entity =>
+            {
+                entity.ToTable("маршруты");
+                entity.HasKey(e => e.ид_маршрута);
+
+                entity.HasOne(e => e.Организация)
+                    .WithMany()
+                    .HasForeignKey(e => e.ид_организации)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Водитель)
+                    .WithMany()
+                    .HasForeignKey(e => e.ид_водителя)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.Транспорт)
+                    .WithMany()
+                    .HasForeignKey(e => e.ид_транспорта)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.Перевозчик)
+                    .WithMany()
+                    .HasForeignKey(e => e.ид_перевозчика)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Настройка Точки_Маршрута
+            modelBuilder.Entity<RoutePoint>(entity =>
+            {
+                entity.ToTable("точки_маршрута");
+                entity.HasKey(e => e.ид_точки);
+
+                entity.HasOne(e => e.Маршрут)
+                    .WithMany(r => r.ТочкиМаршрута)
+                    .HasForeignKey(e => e.ид_маршрута)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.ПунктПогрузки)
+                    .WithMany()
+                    .HasForeignKey(e => e.ид_пункта_погрузки)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.ПунктРазгрузки)
+                    .WithMany()
+                    .HasForeignKey(e => e.ид_пункта_разгрузки)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
         }
 
         public DbSet<MainPage> Главная { get; set; }
@@ -121,5 +168,7 @@ namespace Blank.Data
         public DbSet<Loading_Point> Пункт_Погрузки { get; set; }
         public DbSet<Transport_Type> Тип_Транспорта { get; set; }
         public DbSet<Transport_Mark> Марка_Транспорта { get; set; }
+        public DbSet<DeliveryRoute> Маршруты { get; set; }
+        public DbSet<RoutePoint> Точки_Маршрута { get; set; }
     }
 }

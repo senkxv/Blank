@@ -12,9 +12,8 @@
             <thead>
                 <tr>
                     <th>Выбрать</th>
-                    <th class="col-ид_документа">№ п/п</th>
-                    <th class="col-тип">Тип документа</th>
                     <th class="col-номер_документа">Номер документа</th>
+                    <th class="col-тип">Тип документа</th>
                     <th class="col-дата_создания">Дата создания</th>
                     <th class="col-грузоотправитель">Грузоотправитель</th>
                     <th class="col-перевозчик">Перевозчик</th>
@@ -32,9 +31,8 @@
                 {
                     <tr onclick="selectDocument(@doc.ид_документа)">
                         <td style="text-align: center;"><input type="radio" name="selectedId" value="@doc.ид_документа"></td>
-                        <td class="col-ид_документа">@doc.ид_документа</td>
-                        <td class="col-тип">@doc.тип</td>
                         <td class="col-номер_документа">@doc.номер_документа</td>
+                        <td class="col-тип">@doc.тип</td>
                         <td class="col-дата_создания">@doc.дата_создания.ToShortDateString()</td>
                         <td class="col-грузоотправитель">@doc.грузоотправитель</td>
                         <td class="col-перевозчик">@doc.перевозчик</td>

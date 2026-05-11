@@ -10,8 +10,75 @@
 <div class="form-container">
     <h2>Добавление документа</h2>
 
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <p>@error.ErrorMessage</p>
+            }
+        </div>
+    }
+
+    @* ✅ Выбор маршрута — ВЫПАДАЮЩИЙ СПИСОК *@
+    <div class="route-selection" style="margin-bottom: 20px; padding: 15px; background: #f0f8ff; border-radius: 8px; border: 1px solid #b8daff;">
+        <h3 style="margin-top: 0;">Выберите маршрут (опционально):</h3>
+        
+        <select id="routeSelect" style="padding: 12px; font-size: 16px; width: 100%; max-width: 500px; border: 2px solid #007bff; border-radius: 6px;"
+                onchange="if(this.value) window.location.href='@Url.Action("CreateDocumentPage")?routeId=' + this.value;">
+            <option value="">-- Без маршрута --</option>
+            @if (ViewBag.AvailableRoutes != null)
+            {
+                foreach (var route in ViewBag.AvailableRoutes)
+                {
+                    <option value="@route.ид_маршрута" selected="@(ViewBag.RouteId == route.ид_маршрута ? "selected" : null)">
+                        @route.название
+                    </option>
+                }
+            }
+        </select>
+        
+        @if (ViewBag.AvailableRoutes == null || ViewBag.AvailableRoutes.Count == 0)
+        {
+            <p style="color: #856404; background: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                Нет доступных маршрутов. <a href="/Admin/Index#tab-routes" style="font-weight: bold;">Создайте маршрут в админ-панели</a>.
+            </p>
+        }
+    </div>
+
+    @* Прогресс по маршруту *@
+    @if (ViewBag.SelectedRoute != null)
+    {
+        <div class="route-progress" style="margin-bottom: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; border: 1px solid #c8e6c9;">
+            <h4 style="margin-top: 0;">Маршрут: @ViewBag.SelectedRoute.название</h4>
+            <div class="progress-bar" style="display: flex; align-items: center; gap: 5px; margin: 10px 0;">
+                @for (int i = 0; i < ViewBag.TotalPoints; i++)
+                {
+                    <span style="padding: 5px 12px; border-radius: 20px; font-size: 14px;
+                        @(i < ViewBag.CurrentPointIndex ? "background: black; color: white;" : "")
+                        @(i == ViewBag.CurrentPointIndex ? "background: #e9ecef; border: 3px solid black; font-weight: bold;" : "")
+                        @(i > ViewBag.CurrentPointIndex ? "background: #e9ecef; border: 0.5px solid gray; color: #6c757d;" : "")">
+                        Точка @(i + 1)
+                    </span>
+                    @if (i < ViewBag.TotalPoints - 1)
+                    {
+                        <span style="color: #6c757d;">→</span>
+                    }
+                }
+            </div>
+            <p>Текущая точка: @(ViewBag.CurrentPointIndex + 1) из @ViewBag.TotalPoints</p>
+        </div>
+    }
+
     <form method="post" asp-action="CreateDocumentPage" class="document-form" id="documentForm">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        @* Скрытые поля для маршрута *@
+        @if (ViewBag.RouteId != null)
+        {
+            <input type="hidden" name="routeId" value="@ViewBag.RouteId" />
+            <input type="hidden" name="currentPointIndex" value="@ViewBag.CurrentPointIndex" />
+        }
 
         <div class="form-grid">
             <div class="form-group">
@@ -20,22 +87,24 @@
                     <option value="">-- Выберите тип --</option>
                     @foreach (var type in ViewBag.DocumentTypes)
                     {
-                        <option value="@type.ид_типа">@type.краткое_наименование</option>
+                        <option value="@type.ид_типа"
+                                selected="@(ViewBag.DefaultDocumentType == type.ид_типа)">
+                            @type.краткое_наименование
+                        </option>
                     }
                 </select>
-                <span asp-validation-for="ид_типа" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="номер_документа">Номер документа</label>
-                <input asp-for="номер_документа" class="form-control" required />
-                <span asp-validation-for="номер_документа" class="text-danger"></span>
+                <input asp-for="номер_документа" class="form-control" required
+                       value="@(ViewBag.NextDocumentNumber ?? "")" />
             </div>
 
             <div class="form-group">
                 <label asp-for="дата_создания">Дата создания</label>
-                <input asp-for="дата_создания" type="date" class="form-control" required />
-                <span asp-validation-for="дата_создания" class="text-danger"></span>
+                <input asp-for="дата_создания" type="date" class="form-control" required
+                       value="@DateTime.Now.ToString("yyyy-MM-dd")" />
             </div>
 
             <div class="form-group">
@@ -44,10 +113,12 @@
                     <option value="">-- Выберите организацию --</option>
                     @foreach (var org in ViewBag.Organizations)
                     {
-                        <option value="@org.ид_организации">@org.название</option>
+                        <option value="@org.ид_организации"
+                                selected="@(ViewBag.DefaultSenderId == org.ид_организации)">
+                            @org.название
+                        </option>
                     }
                 </select>
-                <span asp-validation-for="ид_грузоотправителя" class="text-danger"></span>
             </div>
 
             <div class="form-group">
@@ -56,10 +127,12 @@
                     <option value="">-- Выберите организацию --</option>
                     @foreach (var org in ViewBag.Organizations)
                     {
-                        <option value="@org.ид_организации">@org.название</option>
+                        <option value="@org.ид_организации"
+                                selected="@(ViewBag.SelectedRoute?.ид_перевозчика == org.ид_организации)">
+                            @org.название
+                        </option>
                     }
                 </select>
-                <span asp-validation-for="ид_перевозчика" class="text-danger"></span>
             </div>
 
             <div class="form-group">
@@ -68,10 +141,12 @@
                     <option value="">-- Выберите организацию --</option>
                     @foreach (var org in ViewBag.Organizations)
                     {
-                        <option value="@org.ид_организации">@org.название</option>
+                        <option value="@org.ид_организации"
+                                selected="@(ViewBag.DefaultReceiverId == org.ид_организации)">
+                            @org.название
+                        </option>
                     }
                 </select>
-                <span asp-validation-for="ид_получателя" class="text-danger"></span>
             </div>
 
             <div class="form-group">
@@ -80,10 +155,12 @@
                     <option value="">-- Выберите водителя --</option>
                     @foreach (var driver in ViewBag.Drivers)
                     {
-                        <option value="@driver.ид_водителя">@driver.фамилия @driver.имя @driver.отчество</option>
+                        <option value="@driver.ид_водителя"
+                                selected="@(ViewBag.SelectedRoute?.ид_водителя == driver.ид_водителя)">
+                            @driver.фамилия @driver.имя @driver.отчество
+                        </option>
                     }
                 </select>
-                <span asp-validation-for="ид_водителя" class="text-danger"></span>
             </div>
 
             <div class="form-group">
@@ -92,47 +169,54 @@
                     <option value="">-- Выберите транспорт --</option>
                     @foreach (var t in ViewBag.Transport)
                     {
-                        <option value="@t.ид_транспорта">@t.регистрационный_номер</option>
+                        <option value="@t.ид_транспорта"
+                                selected="@(ViewBag.SelectedRoute?.ид_транспорта == t.ид_транспорта)">
+                            @t.регистрационный_номер
+                        </option>
                     }
                 </select>
-                <span asp-validation-for="ид_транспорта" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="ид_пункта_погрузки">Пункт погрузки</label>
-                <select asp-for="ид_пункта_погрузки" class="form-control" required>
+                <select asp-for="ид_пункта_погрузки" class="form-control">
                     <option value="">-- Выберите пункт погрузки --</option>
                     @foreach (var point in ViewBag.LoadingPoints)
                     {
-                        <option value="@point.ид_пункта_погрузки">@point.наименование</option>
+                        <option value="@point.ид_пункта_погрузки"
+                                selected="@(ViewBag.CurrentPoint?.ид_пункта_погрузки == point.ид_пункта_погрузки)">
+                            @point.наименование
+                        </option>
                     }
                 </select>
-                <span asp-validation-for="ид_пункта_погрузки" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="ид_пункта_разгрузки">Пункт разгрузки</label>
-                <select asp-for="ид_пункта_разгрузки" class="form-control" required>
+                <select asp-for="ид_пункта_разгрузки" class="form-control">
                     <option value="">-- Выберите пункт разгрузки --</option>
                     @foreach (var point in ViewBag.UnloadingPoints)
                     {
-                        <option value="@point.ид_пункта_разгрузки">@point.наименование</option>
+                        <option value="@point.ид_пункта_разгрузки"
+                                selected="@(ViewBag.CurrentPoint?.ид_пункта_разгрузки == point.ид_пункта_разгрузки)">
+                            @point.наименование
+                        </option>
                     }
                 </select>
-                <span asp-validation-for="ид_пункта_разгрузки" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="отпуск_разрешил">Отпуск разрешил (ФИО, должность)</label>
-                <input asp-for="отпуск_разрешил" class="form-control" placeholder="Например: Иванов И.И., директор" />
+                <input asp-for="отпуск_разрешил" class="form-control" />
             </div>
 
             <div class="form-group">
                 <label asp-for="сдал_грузоотправитель">Сдал грузоотправитель (ФИО, должность)</label>
-                <input asp-for="сдал_грузоотправитель" class="form-control" placeholder="Например: Петров П.П., кладовщик" />
+                <input asp-for="сдал_грузоотправитель" class="form-control" />
             </div>
         </div>
 
+        @* Таблица товаров *@
         <div class="goods-section">
             <h3>Товары (позиции накладной)</h3>
             <div class="table-wrapper">
@@ -158,7 +242,7 @@
                         </tr>
                     </tbody>
                     <tfoot>
-                        <tr id="addRowBtn">
+                        <tr>
                             <td colspan="11" style="text-align: center;">
                                 <button type="button" id="addGoodsBtn" class="btn-add">+ Добавить товар</button>
                             </td>
@@ -173,23 +257,29 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn-save">Сохранить</button>
+            @if (ViewBag.RouteId != null && !(bool)(ViewBag.IsLastPoint ?? true))
+            {
+                <button type="submit" name="action" value="next" class="btn-save">
+                    Сохранить и следующая точка ➡️
+                </button>
+                <button type="submit" name="action" value="skip" class="btn-skip"
+                        style="background: #ffc107; color: #000; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;"
+                        onclick="return confirm('Пропустить эту точку? Накладная не будет создана.');">
+                    Пропустить точку ⏭️
+                </button>
+            }
+            else
+            {
+                <button type="submit" name="action" value="save" class="btn-save">
+                    Сохранить
+                </button>
+            }
             <a href="@Url.Action("Index", "UserWorkspace")" class="btn-cancel">Отмена</a>
         </div>
 
         <input type="hidden" name="positionsData" id="positionsData" />
     </form>
 </div>
-
-@section Scripts {
-    <script>
-        window.goodsListData = @Html.Raw(Json.Serialize(ViewBag.Goods));
-    </script>
-    <script src="~/js/UserWorkspace/CreateDocumentPage.js"></script>
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
 
 @if (!ViewData.ModelState.IsValid)
 {
@@ -199,4 +289,11 @@
             <p>@error.ErrorMessage</p>
         }
     </div>
+}
+
+@section Scripts {
+    <script>
+        window.goodsListData = @Html.Raw(ViewBag.GoodsJson);
+    </script>
+    <script src="~/js/UserWorkspace/CreateDocumentPage.js"></script>
 }

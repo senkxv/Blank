@@ -23,36 +23,14 @@
         });
     });
 
-    // ============ ПРОФИЛЬ КОМПАНИИ ============
-    document.getElementById('companyForm')?.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const data = {
-            name: document.getElementById('companyName').value,
-            unp: document.getElementById('companyUnp').value,
-            address: document.getElementById('companyAddress').value,
-            email: document.getElementById('companyEmail').value
-        };
-
-        fetch('/Admin/UpdateCompany', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-            .then(r => r.json())
-            .then(res => {
-                alert(res.success ? 'Профиль обновлён' : 'Ошибка');
-            });
-    });
-
     // ============ УНИВЕРСАЛЬНЫЕ ФУНКЦИИ ДЛЯ ТАБЛИЦ ============
 
     // Добавление записи
-    function setupAddForm(formId, url, getRowData, tableBodyId) {
+    function setupAddForm(formId, url, getRowData) {
         document.getElementById(formId)?.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = getRowData(this);
 
-            // Сохраняем активную вкладку
             const activeTab = document.querySelector('.tab.active')?.dataset.tab;
             if (activeTab) {
                 sessionStorage.setItem('activeAdminTab', activeTab);
@@ -69,7 +47,7 @@
                         alert('Добавлено');
                         location.reload();
                     } else {
-                        alert('Ошибка');
+                        alert('Ошибка: ' + (res.error || ''));
                     }
                 });
         });
@@ -126,7 +104,7 @@
             address: form.querySelector('[name="address"]').value,
             email: form.querySelector('[name="email"]').value
         };
-    }, 'orgTableBody');
+    });
 
     setupDelete('orgTableBody', '/Admin/DeleteOrganization');
 
@@ -147,7 +125,7 @@
             middleName: form.querySelector('[name="middleName"]').value,
             licenseNumber: form.querySelector('[name="licenseNumber"]').value
         };
-    }, 'driversTableBody');
+    });
 
     setupDelete('driversTableBody', '/Admin/DeleteDriver');
 
@@ -167,15 +145,15 @@
             brandName: form.querySelector('[name="brandName"]').value,
             typeName: form.querySelector('[name="typeName"]').value
         };
-    }, 'transportTableBody');
+    });
 
     setupDelete('transportTableBody', '/Admin/DeleteTransport');
 
     setupUpdate('transportTableBody', '/Admin/UpdateTransport', function (row) {
         return {
             regNumber: row.querySelector('.edit-regnumber').value,
-            brandName: row.querySelector('.edit-brand').value,
-            typeName: row.querySelector('.edit-type').value
+            brandId: row.querySelector('.edit-brand').value,
+            typeId: row.querySelector('.edit-type').value
         };
     });
 
@@ -186,7 +164,7 @@
             name: form.querySelector('[name="name"]').value,
             unit: form.querySelector('[name="unit"]').value
         };
-    }, 'goodsTableBody');
+    });
 
     setupDelete('goodsTableBody', '/Admin/DeleteGoods');
 
@@ -204,7 +182,7 @@
             name: form.querySelector('[name="name"]').value,
             address: form.querySelector('[name="address"]').value
         };
-    }, 'loadingTableBody');
+    });
 
     setupDelete('loadingTableBody', '/Admin/DeleteLoadingPoint');
 
@@ -221,7 +199,7 @@
             name: form.querySelector('[name="name"]').value,
             address: form.querySelector('[name="address"]').value
         };
-    }, 'unloadingTableBody');
+    });
 
     setupDelete('unloadingTableBody', '/Admin/DeleteUnloadingPoint');
 
@@ -242,7 +220,7 @@
             password: form.querySelector('[name="password"]').value,
             roleId: form.querySelector('[name="roleId"]').value
         };
-    }, 'usersTableBody');
+    });
 
     setupDelete('usersTableBody', '/Admin/DeleteUser');
 
@@ -251,4 +229,249 @@
             roleId: row.querySelector('.edit-role').value
         };
     });
+
+    // ============ МАРШРУТЫ ============
+
+    // Добавление точки маршрута (создание)
+    let pointCounter = 1;
+
+    document.getElementById('addPointBtn')?.addEventListener('click', function () {
+        pointCounter++;
+        const container = document.getElementById('routePointsContainer');
+
+        const firstRow = container.querySelector('.route-point-row');
+        const newRow = firstRow.cloneNode(true);
+
+        newRow.querySelector('.point-number').textContent = pointCounter;
+        newRow.querySelectorAll('select').forEach(select => {
+            select.selectedIndex = 0;
+        });
+
+        const removeBtn = newRow.querySelector('.btn-remove-point');
+        removeBtn.style.display = 'inline-block';
+        removeBtn.addEventListener('click', function () {
+            newRow.remove();
+            updatePointNumbers();
+        });
+
+        container.appendChild(newRow);
+    });
+
+    function updatePointNumbers() {
+        const rows = document.querySelectorAll('#routePointsContainer .route-point-row');
+        rows.forEach((row, index) => {
+            row.querySelector('.point-number').textContent = index + 1;
+        });
+    }
+
+    // Отправка формы создания маршрута
+    document.getElementById('addRouteForm')?.addEventListener('submit', function (e) {
+        const senders = Array.from(this.querySelectorAll('[name="senderId[]"]')).map(s => s.value);
+        const loadingPoints = Array.from(this.querySelectorAll('[name="loadingPointId[]"]')).map(s => s.value);
+        const unloadingPoints = Array.from(this.querySelectorAll('[name="unloadingPointId[]"]')).map(s => s.value);
+        const receivers = Array.from(this.querySelectorAll('[name="receiverId[]"]')).map(s => s.value);
+
+        const routePointsData = loadingPoints.map((lp, index) => ({
+            ид_грузоотправителя: senders[index] ? parseInt(senders[index]) : null,
+            ид_пункта_погрузки: lp ? parseInt(lp) : null,
+            ид_пункта_разгрузки: unloadingPoints[index] ? parseInt(unloadingPoints[index]) : null,
+            ид_грузополучателя: receivers[index] ? parseInt(receivers[index]) : null,
+            тип_точки: "погрузка"
+        }));
+
+        let hiddenField = this.querySelector('[name="routePointsData"]');
+        if (!hiddenField) {
+            hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = 'routePointsData';
+            this.appendChild(hiddenField);
+        }
+        hiddenField.value = JSON.stringify(routePointsData);
+    });
+
+    // ============ РЕДАКТИРОВАНИЕ МАРШРУТА ============
+
+    // Добавление точки в режиме редактирования
+    document.getElementById('addEditPointBtn')?.addEventListener('click', function () {
+        const container = document.getElementById('editRoutePointsContainer');
+        const rows = container.querySelectorAll('.route-point-row');
+        addEditPointRow(container, null, rows.length + 1);
+    });
+
+    // Отправка формы редактирования
+    document.getElementById('editRouteForm')?.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const points = [];
+        document.querySelectorAll('#editRoutePointsContainer .route-point-row').forEach((row, index) => {
+            points.push({
+                ид_точки: row.querySelector('.point-id')?.value || null,
+                ид_грузоотправителя: row.querySelector('.edit-sender')?.value || null,
+                ид_пункта_погрузки: row.querySelector('.edit-loading')?.value || null,
+                ид_пункта_разгрузки: row.querySelector('.edit-unloading')?.value || null,
+                ид_грузополучателя: row.querySelector('.edit-receiver')?.value || null,
+                порядковый_номер: index + 1
+            });
+        });
+
+        const data = {
+            id: document.getElementById('editRouteId').value,
+            routeName: document.getElementById('editRouteName').value,
+            driverId: document.getElementById('editDriverId').value || null,
+            transportId: document.getElementById('editTransportId').value || null,
+            carrierId: document.getElementById('editCarrierId').value || null,
+            status: document.getElementById('editStatus').value,
+            routePointsData: JSON.stringify(points)
+        };
+
+        try {
+            const response = await fetch('/Admin/UpdateRoute', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('Маршрут обновлён!');
+                location.reload();
+            } else {
+                const result = await response.json();
+                alert('Ошибка: ' + (result.error || ''));
+            }
+        } catch (error) {
+            alert('Ошибка: ' + error.message);
+        }
+    });
 });
+
+// ============ ГЛОБАЛЬНЫЕ ФУНКЦИИ ============
+
+// Редактирование маршрута
+async function editRoute(routeId) {
+    try {
+        const response = await fetch(`/Admin/GetRoute/${routeId}`);
+        const route = await response.json();
+
+        document.getElementById('editRouteId').value = route.ид_маршрута;
+        document.getElementById('editRouteName').value = route.название;
+        document.getElementById('editDriverId').value = route.ид_водителя || '';
+        document.getElementById('editTransportId').value = route.ид_транспорта || '';
+        document.getElementById('editCarrierId').value = route.ид_перевозчика || '';
+        document.getElementById('editStatus').value = route.статус || 'активен';
+
+        // Загружаем точки
+        const container = document.getElementById('editRoutePointsContainer');
+        container.innerHTML = '';
+
+        if (route.точки && route.точки.length > 0) {
+            route.точки.forEach((point, index) => {
+                addEditPointRow(container, point, index + 1);
+            });
+        } else {
+            addEditPointRow(container, null, 1);
+        }
+
+        document.getElementById('editRouteModal').style.display = 'block';
+    } catch (error) {
+        alert('Ошибка загрузки маршрута: ' + error.message);
+    }
+}
+
+function addEditPointRow(container, point, number) {
+    const row = document.createElement('div');
+    row.className = 'route-point-row';
+    row.style.cssText = 'display:flex; gap:10px; align-items:center; margin-bottom:10px; flex-wrap:wrap;';
+    row.innerHTML = `
+        <span class="point-number">${number}</span>
+        <input type="hidden" class="point-id" value="${point?.ид_точки || ''}" />
+        <select class="edit-sender" style="flex:1; min-width:120px;">
+            <option value="">-- Грузоотправитель --</option>
+            ${getOrganizationsOptions(point?.ид_грузоотправителя)}
+        </select>
+        <select class="edit-loading" style="flex:1; min-width:120px;">
+            <option value="">-- Пункт погрузки --</option>
+            ${getLoadingPointsOptions(point?.ид_пункта_погрузки)}
+        </select>
+        <span>→</span>
+        <select class="edit-unloading" style="flex:1; min-width:120px;">
+            <option value="">-- Пункт разгрузки --</option>
+            ${getUnloadingPointsOptions(point?.ид_пункта_разгрузки)}
+        </select>
+        <select class="edit-receiver" style="flex:1; min-width:120px;">
+            <option value="">-- Грузополучатель --</option>
+            ${getOrganizationsOptions(point?.ид_грузополучателя)}
+        </select>
+        <button type="button" class="btn-remove-point" onclick="this.closest('.route-point-row').remove();">✖</button>
+    `;
+    container.appendChild(row);
+}
+
+function getOrganizationsOptions(selectedId) {
+    const orgsElement = document.querySelector('#editRouteModal select[name="organizations"]');
+    // Получаем организации из первого селекта в форме создания
+    const firstSenderSelect = document.querySelector('[name="senderId[]"]');
+    if (!firstSenderSelect) return '';
+
+    let options = '';
+    const allOptions = firstSenderSelect.querySelectorAll('option');
+    allOptions.forEach(opt => {
+        if (opt.value) {
+            options += `<option value="${opt.value}" ${opt.value == selectedId ? 'selected' : ''}>${opt.textContent}</option>`;
+        }
+    });
+    return options;
+}
+
+function getLoadingPointsOptions(selectedId) {
+    const firstLoadingSelect = document.querySelector('[name="loadingPointId[]"]');
+    if (!firstLoadingSelect) return '';
+
+    let options = '';
+    firstLoadingSelect.querySelectorAll('option').forEach(opt => {
+        if (opt.value) {
+            options += `<option value="${opt.value}" ${opt.value == selectedId ? 'selected' : ''}>${opt.textContent}</option>`;
+        }
+    });
+    return options;
+}
+
+function getUnloadingPointsOptions(selectedId) {
+    const firstUnloadingSelect = document.querySelector('[name="unloadingPointId[]"]');
+    if (!firstUnloadingSelect) return '';
+
+    let options = '';
+    firstUnloadingSelect.querySelectorAll('option').forEach(opt => {
+        if (opt.value) {
+            options += `<option value="${opt.value}" ${opt.value == selectedId ? 'selected' : ''}>${opt.textContent}</option>`;
+        }
+    });
+    return options;
+}
+
+// Удаление маршрута (глобальная функция, вызывается из onclick)
+async function deleteRoute(routeId) {
+    if (!confirm('Удалить маршрут?')) return;
+
+    try {
+        const response = await fetch(`/Admin/DeleteRoute/${routeId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            location.reload();
+        } else {
+            const text = await response.text();
+            let result;
+            if (text) {
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    result = { error: text };
+                }
+            }
+            alert('Ошибка: ' + (result?.error || 'Неизвестная ошибка'));
+        }
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
+    }
+}

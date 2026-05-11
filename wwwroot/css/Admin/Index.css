@@ -15,7 +15,7 @@
 .tabs {
     display: flex;
     gap: 5px;
-    border-bottom: 2px solid #990000;
+    border-bottom: 2px solid black;
     margin-bottom: 25px;
     flex-wrap: wrap;
 }
@@ -36,7 +36,7 @@
     }
 
     .tab.active {
-        background: #990000;
+        background: black;
         color: white;
     }
 

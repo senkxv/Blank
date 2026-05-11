@@ -407,11 +407,11 @@ footer ul a {
     width: 100%;
     min-width: 1300px;
     border-collapse: collapse;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px black;
 }
 
 .rounded-table thead tr {
-    background-color: gray;
+    background-color: black;
     color: white;
     font-weight: bold;
 }
@@ -452,7 +452,7 @@ footer ul a {
 
 .rounded-table th:first-child,
 .rounded-table th:nth-child(2) {
-    background-color: gray;
+    background-color: black;
 }
 
 .rounded-table tbody tr:hover td:first-child,

@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="/css/Admin/Index.css" />
 
 <div class="admin-panel">
-    <h2>Управление компанией</h2>
+    <h2>Управление</h2>
 
     <div class="tabs">
         <button class="tab active" data-tab="organizations">Организации</button>
@@ -14,8 +14,28 @@
         <button class="tab" data-tab="transport">Транспорт</button>
         <button class="tab" data-tab="goods">Товары</button>
         <button class="tab" data-tab="points">Пункты погрузки/разгрузки</button>
+        <button class="tab" data-tab="routes">Маршруты</button>
         <button class="tab" data-tab="users">Пользователи</button>
     </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div style="background: #d4edda; color: #155724; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+            @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div style="background: #f8d7da; color: #721c24; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+            @TempData["Error"]
+        </div>
+    }
+    @if (TempData["Debug"] != null)
+    {
+        <div style="background: #fff3cd; color: #856404; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+            @TempData["Debug"]
+        </div>
+    }
 
     <!-- Вкладка: Организации -->
     <div class="tab-content active" id="tab-organizations">
@@ -250,6 +270,216 @@
         </form>
     </div>
 
+    <!-- Вкладка: Маршруты -->
+    <div class="tab-content" id="tab-routes">
+        <h3 class="section-title">Маршруты</h3>
+
+        <!-- Модальное окно редактирования маршрута -->
+        <!-- Модальное окно редактирования маршрута -->
+        <div id="editRouteModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:30px; border-radius:10px; width:700px; max-height:80vh; overflow-y:auto;">
+                <h3>Редактирование маршрута</h3>
+                <form id="editRouteForm">
+                    <input type="hidden" id="editRouteId" />
+            
+                    <div class="form-group">
+                        <label>Название маршрута</label>
+                        <input type="text" id="editRouteName" class="form-control" required />
+                    </div>
+            
+                    <div class="form-group">
+                        <label>Водитель</label>
+                        <select id="editDriverId" class="form-control">
+                            <option value="">-- Не назначен --</option>
+                            @foreach (var driver in ViewBag.Drivers)
+                            {
+                                <option value="@driver.ид_водителя">@driver.фамилия @driver.имя</option>
+                            }
+                        </select>
+                    </div>
+            
+                    <div class="form-group">
+                        <label>Транспорт</label>
+                        <select id="editTransportId" class="form-control">
+                            <option value="">-- Не назначен --</option>
+                            @foreach (var t in ViewBag.Transport)
+                            {
+                                <option value="@t.ид_транспорта">@t.регистрационный_номер</option>
+                            }
+                        </select>
+                    </div>
+            
+                    <div class="form-group">
+                        <label>Перевозчик</label>
+                        <select id="editCarrierId" class="form-control">
+                            <option value="">-- Не назначен --</option>
+                            @foreach (var org in ViewBag.Organizations)
+                            {
+                                <option value="@org.ид_организации">@org.название</option>
+                            }
+                        </select>
+                    </div>
+            
+                    <div class="form-group">
+                        <label>Статус</label>
+                        <select id="editStatus" class="form-control">
+                            <option value="активен">Активен</option>
+                            <option value="завершен">Завершён</option>
+                        </select>
+                    </div>
+            
+                    <h4 style="margin-top: 20px;">Точки маршрута</h4>
+                    <div id="editRoutePointsContainer"></div>
+                    <button type="button" id="addEditPointBtn" class="btn-add" style="margin-top:10px;">+ Добавить точку</button>
+            
+                    <div style="margin-top:20px; display:flex; gap:10px;">
+                        <button type="submit" class="btn-save">Сохранить</button>
+                        <button type="button" onclick="document.getElementById('editRouteModal').style.display='none'" class="btn-cancel">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Список существующих маршрутов -->
+        <div id="routesList">
+            @if (ViewBag.Routes != null)
+            {
+                foreach (var route in ViewBag.Routes)
+                {
+                    <div class="route-card" data-id="@route.ид_маршрута">
+                        <div class="route-header">
+                            <h4>@route.название</h4>
+                            <span class="route-status @route.статус">@route.статус</span>
+                        </div>
+                        <div class="route-info">
+                            <p>Водитель: @(route.Водитель != null ? $"{route.Водитель.фамилия} {route.Водитель.имя}" : "Не назначен")</p>
+                            <p>Транспорт: @(route.Транспорт?.регистрационный_номер ?? "Не назначен")</p>
+                            <p>Перевозчик: @(route.Перевозчик?.название ?? "Не назначен")</p>
+                        </div>
+                        <div class="route-points">
+                            <h5>Точки маршрута:</h5>
+                            <ol>
+                                @if (route.ТочкиМаршрута != null)
+                                {
+                                    foreach (var point in route.ТочкиМаршрута)
+                                    {
+                                        <li>
+                                            @(point.ПунктПогрузки?.наименование ?? "—")
+                                            →
+                                            @(point.ПунктРазгрузки?.наименование ?? "—")
+                                            <span class="point-type">(@point.тип_точки)</span>
+                                        </li>
+                                    }
+                                }
+                            </ol>
+                        </div>
+                        <div class="route-actions">
+                            <button class="btn-edit" onclick="editRoute(@route.ид_маршрута)">Редактировать</button>
+                            <button class="btn-delete" onclick="deleteRoute(@route.ид_маршрута)">Удалить</button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <h4>Создать новый маршрут</h4>
+        <form id="addRouteForm" class="admin-form" method="post" action="/Admin/CreateRoute">
+            <div class="form-group">
+                <label>Название маршрута</label>
+                <input type="text" name="routeName" placeholder="Например: Минск-Гомель-Могилев" required />
+            </div>
+            
+            <div class="form-group">
+                <label>Водитель (по умолчанию)</label>
+                <select name="driverId">
+                    <option value="">-- Не назначен --</option>
+                    @if (ViewBag.Drivers != null)
+                    {
+                        foreach (var driver in ViewBag.Drivers)
+                        {
+                            <option value="@driver.ид_водителя">@driver.фамилия @driver.имя @driver.отчество</option>
+                        }
+                    }
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Транспорт (по умолчанию)</label>
+                <select name="transportId">
+                    <option value="">-- Не назначен --</option>
+                    @if (ViewBag.Transport != null)
+                    {
+                        foreach (var t in ViewBag.Transport)
+                        {
+                            <option value="@t.ид_транспорта">@t.регистрационный_номер</option>
+                        }
+                    }
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Перевозчик (по умолчанию)</label>
+                <select name="carrierId">
+                    <option value="">-- Не назначен --</option>
+                    @if (ViewBag.Organizations != null)
+                    {
+                        foreach (var org in ViewBag.Organizations)
+                        {
+                            <option value="@org.ид_организации">@org.название</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <h5>Точки маршрута</h5>
+            <div id="routePointsContainer">
+                <div class="route-point-row">
+                    <span class="point-number">1</span>
+        
+                    <select name="senderId[]" class="sender-select">
+                        <option value="">-- Грузоотправитель --</option>
+                        @foreach (var org in ViewBag.Organizations)
+                        {
+                            <option value="@org.ид_организации">@org.название</option>
+                        }
+                    </select>
+        
+                    <select name="loadingPointId[]" class="loading-point-select">
+                        <option value="">-- Пункт погрузки --</option>
+                        @foreach (var point in ViewBag.LoadingPoints)
+                        {
+                            <option value="@point.ид_пункта_погрузки">@point.наименование</option>
+                        }
+                    </select>
+        
+                    <span>→</span>
+        
+                    <select name="unloadingPointId[]" class="unloading-point-select">
+                        <option value="">-- Пункт разгрузки --</option>
+                        @foreach (var point in ViewBag.UnloadingPoints)
+                        {
+                            <option value="@point.ид_пункта_разгрузки">@point.наименование</option>
+                        }
+                    </select>
+        
+                    <select name="receiverId[]" class="receiver-select">
+                        <option value="">-- Грузополучатель --</option>
+                        @foreach (var org in ViewBag.Organizations)
+                        {
+                            <option value="@org.ид_организации">@org.название</option>
+                        }
+                    </select>
+        
+                    <button type="button" class="btn-remove-point" style="display:none;">✖</button>
+                </div>
+            </div>
+
+            <button type="button" id="addPointBtn" class="btn-add">Добавить точку</button>
+            <button type="submit" class="btn-save">Создать маршрут</button>
+
+        </form>
+    </div>
+
     <!-- Вкладка: Пользователи -->
     <div class="tab-content" id="tab-users">
         <h3 class="section-title">Пользователи компании</h3>
@@ -265,24 +495,27 @@
                 </tr>
             </thead>
             <tbody id="usersTableBody">
-                @foreach (var user in ViewBag.Users)
+                @if (ViewBag.Users != null)
                 {
-                    <tr data-id="@user.ид_пользователя">
-                        <td>@user.почта</td>
-                        <td>@user.фамилия</td>
-                        <td>@user.имя</td>
-                        <td>@user.отчество</td>
-                        <td>
-                            <select class="edit-role">
-                                <option value="1" selected="@(user.ид_должности == 1)">Администратор</option>
-                                <option value="3" selected="@(user.ид_должности == 3)">Пользователь</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button class="btn-update-role">Сохранить</button>
-                            <button class="btn-delete">Удалить</button>
-                        </td>
-                    </tr>
+                    foreach (var user in ViewBag.Users)
+                    {
+                        <tr data-id="@user.ид_пользователя">
+                            <td>@user.почта</td>
+                            <td>@user.фамилия</td>
+                            <td>@user.имя</td>
+                            <td>@user.отчество</td>
+                            <td>
+                                <select class="edit-role">
+                                    <option value="1" selected="@(user.ид_должности == 1)">Администратор</option>
+                                    <option value="3" selected="@(user.ид_должности == 3)">Пользователь</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn-update-role">Сохранить</button>
+                                <button class="btn-delete">Удалить</button>
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

@@ -25,6 +25,26 @@
 <div class="form-container">
     <h2>Редактирование документа</h2>
 
+    @if (ViewBag.DocumentRoute != null)
+    {
+        <div style="padding: 12px 15px; background: #e8f5e9; border-radius: 8px; border: 1px solid #c8e6c9; margin-bottom: 20px;">
+            <strong style="font-size: 15px;">Маршрут:</strong> @ViewBag.DocumentRoute.название
+            @if (ViewBag.RoutePointInfo != null)
+            {
+                <span style="margin-left: 15px; color: #555;">
+                    | Точка @ViewBag.RoutePointInfo.порядковый_номер из @ViewBag.TotalRoutePoints
+                </span>
+                <br />
+                <span style="font-size: 13px; color: #666;">
+                    @(ViewBag.RoutePointInfo.Грузоотправитель?.название ?? "—")
+                    → @(ViewBag.RoutePointInfo.ПунктПогрузки?.наименование ?? "—")
+                    → @(ViewBag.RoutePointInfo.ПунктРазгрузки?.наименование ?? "—")
+                    → @(ViewBag.RoutePointInfo.Грузополучатель?.название ?? "—")
+                </span>
+            }
+        </div>
+    }
+
     <form method="post" asp-action="EditDocumentPage" asp-route-id="@Model.ид_документа" id="documentForm">
         <input type="hidden" asp-for="ид_документа" />
                

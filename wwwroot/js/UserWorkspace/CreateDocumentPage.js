@@ -34,7 +34,10 @@ function calculateTotalWeight() {
     document.querySelectorAll('.goods-weight').forEach(input => {
         totalWeight += parseFloat(input.value) || 0;
     });
-    document.getElementById('totalWeight').textContent = totalWeight.toFixed(3);
+    const totalWeightElement = document.getElementById('totalWeight');
+    if (totalWeightElement) {
+        totalWeightElement.textContent = totalWeight.toFixed(3);
+    }
 }
 
 function addNewRow() {
@@ -134,6 +137,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('documentForm');
     if (form) {
         form.addEventListener('submit', function (e) {
+            // Если нажата кнопка "Пропустить" — пропускаем проверку позиций
+            const submitter = e.submitter;
+            if (submitter && submitter.getAttribute('value') === 'skip') {
+                return true;
+            }
+
             const { positions, hasValidPositions } = collectPositions();
             const hasRows = document.querySelectorAll('#goodsTableBody tr:not(#noDataRow)').length > 0;
 
