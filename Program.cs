@@ -41,6 +41,18 @@ app.UseStatusCodePages(async context =>
     {
         response.Redirect("/UserWorkspace/Error500");
     }
+    else if (response.StatusCode == 403)
+    {
+        response.Redirect("/UserWorkspace/Error403");
+    }
+    else if (response.StatusCode == 401)
+    {
+        response.Redirect("/UserWorkspace/Error401");
+    }
+    else if (response.StatusCode == 400)
+    {
+        response.Redirect("/UserWorkspace/Error400");
+    }
 });
 
 app.UseHttpsRedirection();
