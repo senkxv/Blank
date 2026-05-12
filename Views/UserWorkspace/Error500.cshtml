@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>@ViewData["Title"] - Ошибка сервера</title>
+    <title>@ViewData["Title"] - Внутренняя ошибка сервера</title>
     <link rel="stylesheet" href="/css/UserWorkspace/Error500.css" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,28 +56,13 @@
                     </svg>
                     Обновить страницу
                 </button>
-                <button onclick="toggleDetails()" class="btn btn-text">Показать детали</button>
             </div>
 
             <div class="error-footer">
                 <p>Если проблема повторяется, пожалуйста, свяжитесь с администратором:</p>
-                <a href="mailto:senkxv@gmail.com" class="support-link">senkxv@gmail.com</a>
+                <a href="mailto:sxnkxv@gmail.com" class="support-link">sxnkxv@gmail.com</a>
             </div>
         </div>
     </div>
-
-    <script>
-            function toggleDetails() {
-                const details = document.getElementById('errorDetails');
-                const btn = event.target;
-                if (details.style.display === 'none') {
-                    details.style.display = 'block';
-                    btn.textContent = 'Скрыть детали';
-                } else {
-                    details.style.display = 'none';
-                    btn.textContent = 'Показать детали';
-                }
-            }
-    </script>
 </body>
 </html>
