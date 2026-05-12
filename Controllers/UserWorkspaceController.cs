@@ -34,6 +34,21 @@ namespace Blank.Controllers
             return View();
         }
 
+        public IActionResult Error403()
+        {
+            return View();
+        }
+
+        public IActionResult Error401()
+        {
+            return View();
+        }
+
+        public IActionResult Error400()
+        {
+            return View();
+        }
+
         public IActionResult Index()
         {
             var userOrgIdStr = HttpContext.Session.GetString("UserOrgId");

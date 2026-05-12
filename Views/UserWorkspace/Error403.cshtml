@@ -7,8 +7,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>@ViewData["Title"] - Внутренняя ошибка сервера</title>
-    <link rel="stylesheet" href="/css/UserWorkspace/Error500.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - Доступ запрещён</title>
+    <link rel="stylesheet" href="/css/UserWorkspace/Error403.css" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -24,12 +24,11 @@
                 </svg>
             </div>
 
-            <h1 class="error-code">500</h1>
-            <h2 class="error-title">Упс... Что-то пошло не так...</h2>
+            <h1 class="error-code">403</h1>
+            <h2 class="error-title">Доступ запрещен</h2>
             
             <p class="error-message">
-                Извините, на сервере произошла непредвиденная ошибка.
-                Наша команда уже работает над её устранением.
+                У вас нет прав для просмотра этой страницы. Обратитесь к администратору
             </p>
 
             <div class="error-details" id="errorDetails" style="display: none;">
