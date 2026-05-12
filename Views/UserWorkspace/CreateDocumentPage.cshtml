@@ -36,7 +36,7 @@
         
         <select id="routeSelect" class="route-select"
                 onchange="if(this.value) window.location.href='@Url.Action("CreateDocumentPage")?routeId=' + this.value;">
-            <option value="">-- Без маршрута --</option>
+            <option value="">-Без маршрута-</option>
             @if (hasRoutes)
             {
                 foreach (var route in routesList)
@@ -94,7 +94,7 @@
             <div class="form-group">
                 <label asp-for="ид_типа">Тип документа</label>
                 <select asp-for="ид_типа" class="form-control" required>
-                    <option value="">-- Выберите тип --</option>
+                    <option value="">-Выберите тип-</option>
                     @foreach (var type in ViewBag.DocumentTypes)
                     {
                         <option value="@type.ид_типа"
@@ -120,7 +120,7 @@
             <div class="form-group">
                 <label asp-for="ид_грузоотправителя">Грузоотправитель</label>
                 <select asp-for="ид_грузоотправителя" class="form-control" required>
-                    <option value="">-- Выберите организацию --</option>
+                    <option value="">-Выберите организацию-</option>
                     @foreach (var org in ViewBag.Organizations)
                     {
                         <option value="@org.ид_организации"
@@ -134,7 +134,7 @@
             <div class="form-group">
                 <label asp-for="ид_перевозчика">Перевозчик</label>
                 <select asp-for="ид_перевозчика" class="form-control" required>
-                    <option value="">-- Выберите организацию --</option>
+                    <option value="">-Выберите организацию-</option>
                     @foreach (var org in ViewBag.Organizations)
                     {
                         <option value="@org.ид_организации"
@@ -148,7 +148,7 @@
             <div class="form-group">
                 <label asp-for="ид_получателя">Грузополучатель</label>
                 <select asp-for="ид_получателя" class="form-control" required>
-                    <option value="">-- Выберите организацию --</option>
+                    <option value="">-Выберите организацию-</option>
                     @foreach (var org in ViewBag.Organizations)
                     {
                         <option value="@org.ид_организации"
@@ -162,7 +162,7 @@
             <div class="form-group">
                 <label asp-for="ид_водителя">Водитель</label>
                 <select asp-for="ид_водителя" class="form-control" required>
-                    <option value="">-- Выберите водителя --</option>
+                    <option value="">-Выберите водителя-</option>
                     @foreach (var driver in ViewBag.Drivers)
                     {
                         <option value="@driver.ид_водителя"
@@ -176,7 +176,7 @@
             <div class="form-group">
                 <label asp-for="ид_транспорта">Транспорт</label>
                 <select asp-for="ид_транспорта" class="form-control" required>
-                    <option value="">-- Выберите транспорт --</option>
+                    <option value="">-Выберите транспорт-</option>
                     @foreach (var t in ViewBag.Transport)
                     {
                         <option value="@t.ид_транспорта"
@@ -190,7 +190,7 @@
             <div class="form-group">
                 <label asp-for="ид_пункта_погрузки">Пункт погрузки</label>
                 <select asp-for="ид_пункта_погрузки" class="form-control">
-                    <option value="">-- Выберите пункт погрузки --</option>
+                    <option value="">-Выберите пункт погрузки-</option>
                     @foreach (var point in ViewBag.LoadingPoints)
                     {
                         <option value="@point.ид_пункта_погрузки"
@@ -204,7 +204,7 @@
             <div class="form-group">
                 <label asp-for="ид_пункта_разгрузки">Пункт разгрузки</label>
                 <select asp-for="ид_пункта_разгрузки" class="form-control">
-                    <option value="">-- Выберите пункт разгрузки --</option>
+                    <option value="">-Выберите пункт разгрузки-</option>
                     @foreach (var point in ViewBag.UnloadingPoints)
                     {
                         <option value="@point.ид_пункта_разгрузки"

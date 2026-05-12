@@ -1,4 +1,29 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+﻿let confirmCallback = null;
+
+function showNotification(message) {
+    const modal = document.getElementById('notificationModal');
+    const messageEl = document.getElementById('notificationMessage');
+    if (modal && messageEl) {
+        messageEl.textContent = message;
+        modal.style.display = 'block';
+    } else {
+        alert(message);
+    }
+}
+
+function showConfirm(message, onConfirm) {
+    const modal = document.getElementById('confirmActionModal');
+    const messageEl = document.getElementById('confirmActionMessage');
+    if (modal && messageEl) {
+        messageEl.textContent = message;
+        modal.style.display = 'block';
+        confirmCallback = onConfirm;
+    } else {
+        if (confirm(message)) onConfirm();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
     // Восстановить активную вкладку после перезагрузки
     const savedTab = sessionStorage.getItem('activeAdminTab');
     if (savedTab) {
@@ -23,9 +48,37 @@
         });
     });
 
+    // ============ МОДАЛЬНЫЕ ОКНА ============
+    document.getElementById('confirmActionYes')?.addEventListener('click', function () {
+        document.getElementById('confirmActionModal').style.display = 'none';
+        if (confirmCallback) confirmCallback();
+        confirmCallback = null;
+    });
+
+    document.getElementById('confirmActionNo')?.addEventListener('click', function () {
+        document.getElementById('confirmActionModal').style.display = 'none';
+        confirmCallback = null;
+    });
+
+    document.getElementById('confirmActionModal')?.addEventListener('click', function (e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+            confirmCallback = null;
+        }
+    });
+
+    document.getElementById('closeNotificationBtn')?.addEventListener('click', function () {
+        document.getElementById('notificationModal').style.display = 'none';
+    });
+
+    document.getElementById('notificationModal')?.addEventListener('click', function (e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
+
     // ============ УНИВЕРСАЛЬНЫЕ ФУНКЦИИ ДЛЯ ТАБЛИЦ ============
 
-    // Добавление записи
     function setupAddForm(formId, url, getRowData) {
         document.getElementById(formId)?.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -44,37 +97,36 @@
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
-                        alert('Добавлено');
+                        showNotification('Добавлено');
                         location.reload();
                     } else {
-                        alert('Ошибка: ' + (res.error || ''));
+                        showNotification('Ошибка: ' + (res.error || ''));
                     }
                 });
         });
     }
 
-    // Удаление записи
     function setupDelete(tableBodyId, deleteUrl) {
         document.getElementById(tableBodyId)?.addEventListener('click', function (e) {
             if (e.target.classList.contains('btn-delete')) {
-                if (!confirm('Удалить?')) return;
                 const row = e.target.closest('tr');
                 const id = row.dataset.id;
 
-                fetch(`${deleteUrl}?id=${id}`, { method: 'DELETE' })
-                    .then(r => r.json())
-                    .then(res => {
-                        if (res.success) {
-                            row.remove();
-                        } else {
-                            alert('Ошибка');
-                        }
-                    });
+                showConfirm('Удалить?', function () {
+                    fetch(`${deleteUrl}?id=${id}`, { method: 'DELETE' })
+                        .then(r => r.json())
+                        .then(res => {
+                            if (res.success) {
+                                row.remove();
+                            } else {
+                                showNotification('Ошибка');
+                            }
+                        });
+                });
             }
         });
     }
 
-    // Обновление записи
     function setupUpdate(tableBodyId, updateUrl, getRowData) {
         document.getElementById(tableBodyId)?.addEventListener('click', function (e) {
             if (e.target.classList.contains('btn-update') || e.target.classList.contains('btn-update-role')) {
@@ -90,7 +142,7 @@
                 })
                     .then(r => r.json())
                     .then(res => {
-                        alert(res.success ? 'Сохранено' : 'Ошибка');
+                        showNotification(res.success ? 'Сохранено' : 'Ошибка');
                     });
             }
         });
@@ -232,7 +284,6 @@
 
     // ============ МАРШРУТЫ ============
 
-    // Добавление точки маршрута (создание)
     let pointCounter = 1;
 
     document.getElementById('addPointBtn')?.addEventListener('click', function () {
@@ -264,7 +315,6 @@
         });
     }
 
-    // Отправка формы создания маршрута
     document.getElementById('addRouteForm')?.addEventListener('submit', function (e) {
         const senders = Array.from(this.querySelectorAll('[name="senderId[]"]')).map(s => s.value);
         const loadingPoints = Array.from(this.querySelectorAll('[name="loadingPointId[]"]')).map(s => s.value);
@@ -287,29 +337,35 @@
             this.appendChild(hiddenField);
         }
         hiddenField.value = JSON.stringify(routePointsData);
+
+        sessionStorage.setItem('activeAdminTab', 'routes');
     });
 
     // ============ РЕДАКТИРОВАНИЕ МАРШРУТА ============
 
-    // Добавление точки в режиме редактирования
     document.getElementById('addEditPointBtn')?.addEventListener('click', function () {
         const container = document.getElementById('editRoutePointsContainer');
         const rows = container.querySelectorAll('.route-point-row');
         addEditPointRow(container, null, rows.length + 1);
     });
 
-    // Отправка формы редактирования
     document.getElementById('editRouteForm')?.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const points = [];
         document.querySelectorAll('#editRoutePointsContainer .route-point-row').forEach((row, index) => {
+            const pointIdVal = row.querySelector('.point-id')?.value;
+            const senderVal = row.querySelector('.edit-sender')?.value;
+            const loadingVal = row.querySelector('.edit-loading')?.value;
+            const unloadingVal = row.querySelector('.edit-unloading')?.value;
+            const receiverVal = row.querySelector('.edit-receiver')?.value;
+
             points.push({
-                ид_точки: row.querySelector('.point-id')?.value || null,
-                ид_грузоотправителя: row.querySelector('.edit-sender')?.value || null,
-                ид_пункта_погрузки: row.querySelector('.edit-loading')?.value || null,
-                ид_пункта_разгрузки: row.querySelector('.edit-unloading')?.value || null,
-                ид_грузополучателя: row.querySelector('.edit-receiver')?.value || null,
+                ид_точки: pointIdVal ? parseInt(pointIdVal) : null,
+                ид_грузоотправителя: senderVal ? parseInt(senderVal) : null,
+                ид_пункта_погрузки: loadingVal ? parseInt(loadingVal) : null,
+                ид_пункта_разгрузки: unloadingVal ? parseInt(unloadingVal) : null,
+                ид_грузополучателя: receiverVal ? parseInt(receiverVal) : null,
                 порядковый_номер: index + 1
             });
         });
@@ -332,21 +388,24 @@
             });
 
             if (response.ok) {
-                alert('Маршрут обновлён!');
-                location.reload();
+                if (response.ok) {
+                    document.getElementById('editRouteModal').style.display = 'none';
+                    sessionStorage.setItem('activeAdminTab', 'routes');
+                    showNotification('Маршрут обновлён!');
+                    setTimeout(() => location.reload(),2500);
+                }
             } else {
                 const result = await response.json();
-                alert('Ошибка: ' + (result.error || ''));
+                showNotification('Ошибка: ' + (result.error || ''));
             }
         } catch (error) {
-            alert('Ошибка: ' + error.message);
+            showNotification('Ошибка: ' + error.message);
         }
     });
 });
 
 // ============ ГЛОБАЛЬНЫЕ ФУНКЦИИ ============
 
-// Редактирование маршрута
 async function editRoute(routeId) {
     try {
         const response = await fetch(`/Admin/GetRoute/${routeId}`);
@@ -359,7 +418,6 @@ async function editRoute(routeId) {
         document.getElementById('editCarrierId').value = route.ид_перевозчика || '';
         document.getElementById('editStatus').value = route.статус || 'активен';
 
-        // Загружаем точки
         const container = document.getElementById('editRoutePointsContainer');
         container.innerHTML = '';
 
@@ -373,7 +431,7 @@ async function editRoute(routeId) {
 
         document.getElementById('editRouteModal').style.display = 'block';
     } catch (error) {
-        alert('Ошибка загрузки маршрута: ' + error.message);
+        showNotification('Ошибка загрузки маршрута: ' + error.message);
     }
 }
 
@@ -385,20 +443,20 @@ function addEditPointRow(container, point, number) {
         <span class="point-number">${number}</span>
         <input type="hidden" class="point-id" value="${point?.ид_точки || ''}" />
         <select class="edit-sender" style="flex:1; min-width:120px;">
-            <option value="">-- Грузоотправитель --</option>
+            <option value="">Грузоотправитель</option>
             ${getOrganizationsOptions(point?.ид_грузоотправителя)}
         </select>
         <select class="edit-loading" style="flex:1; min-width:120px;">
-            <option value="">-- Пункт погрузки --</option>
+            <option value="">Пункт погрузки</option>
             ${getLoadingPointsOptions(point?.ид_пункта_погрузки)}
         </select>
         <span>→</span>
         <select class="edit-unloading" style="flex:1; min-width:120px;">
-            <option value="">-- Пункт разгрузки --</option>
+            <option value="">Пункт разгрузки</option>
             ${getUnloadingPointsOptions(point?.ид_пункта_разгрузки)}
         </select>
         <select class="edit-receiver" style="flex:1; min-width:120px;">
-            <option value="">-- Грузополучатель --</option>
+            <option value="">Грузополучатель</option>
             ${getOrganizationsOptions(point?.ид_грузополучателя)}
         </select>
         <button type="button" class="btn-remove-point" onclick="this.closest('.route-point-row').remove();">✖</button>
@@ -407,14 +465,11 @@ function addEditPointRow(container, point, number) {
 }
 
 function getOrganizationsOptions(selectedId) {
-    const orgsElement = document.querySelector('#editRouteModal select[name="organizations"]');
-    // Получаем организации из первого селекта в форме создания
     const firstSenderSelect = document.querySelector('[name="senderId[]"]');
     if (!firstSenderSelect) return '';
 
     let options = '';
-    const allOptions = firstSenderSelect.querySelectorAll('option');
-    allOptions.forEach(opt => {
+    firstSenderSelect.querySelectorAll('option').forEach(opt => {
         if (opt.value) {
             options += `<option value="${opt.value}" ${opt.value == selectedId ? 'selected' : ''}>${opt.textContent}</option>`;
         }
@@ -448,30 +503,29 @@ function getUnloadingPointsOptions(selectedId) {
     return options;
 }
 
-// Удаление маршрута (глобальная функция, вызывается из onclick)
 async function deleteRoute(routeId) {
-    if (!confirm('Удалить маршрут?')) return;
+    showConfirm('Удалить маршрут?', async function () {
+        try {
+            const response = await fetch(`/Admin/DeleteRoute/${routeId}`, {
+                method: 'DELETE'
+            });
 
-    try {
-        const response = await fetch(`/Admin/DeleteRoute/${routeId}`, {
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-            location.reload();
-        } else {
-            const text = await response.text();
-            let result;
-            if (text) {
-                try {
-                    result = JSON.parse(text);
-                } catch (e) {
-                    result = { error: text };
+            if (response.ok) {
+                if (response.ok) {
+                    sessionStorage.setItem('activeAdminTab', 'routes');
+                    showNotification('Маршрут удалён');
+                    setTimeout(() => location.reload(),2500);
                 }
+            } else {
+                const text = await response.text();
+                let result;
+                if (text) {
+                    try { result = JSON.parse(text); } catch (e) { result = { error: text }; }
+                }
+                showNotification('Ошибка: ' + (result?.error || 'Неизвестная ошибка'));
             }
-            alert('Ошибка: ' + (result?.error || 'Неизвестная ошибка'));
+        } catch (error) {
+            showNotification('Ошибка: ' + error.message);
         }
-    } catch (error) {
-        alert('Ошибка: ' + error.message);
-    }
+    });
 }
