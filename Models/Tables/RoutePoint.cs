@@ -8,7 +8,7 @@ namespace Blank.Models.Tables
     {
         [Key]
         [Column("ид_точки")]
-        public int ид_точки { get; set; }
+        public int? ид_точки { get; set; }
 
         [Column("ид_маршрута")]
         [Required]

@@ -60,7 +60,7 @@ function addNewRow() {
     const newRow = document.createElement('tr');
     newRow.setAttribute('data-is-existing', 'false');
 
-    const goodsOptions = '<option value="">-- Выберите товар --</option>' +
+    const goodsOptions = '<option value="">-Выберите товар-</option>' +
         goodsList.map(g => `<option value="${g.ид_товара}">${g.наименование}</option>`).join('');
 
     newRow.innerHTML = `

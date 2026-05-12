@@ -306,7 +306,7 @@
         color: #155724;
     }
 
-    .route-status.завершен {
+    .route-status.неактивен {
         background: #e9ecef;
         color: #6c757d;
     }
@@ -411,21 +411,22 @@
     }
 
 .btn-remove-point {
-    background: #dc3545;
+    background: black;
     color: white;
+    padding-right: 5px;
     border: none;
     border-radius: 50%;
     width: 28px;
     height: 28px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 
     .btn-remove-point:hover {
-        background: #c82333;
+        background: #333;
     }
 
 /* ============ АДАПТИВНОСТЬ ============ */
@@ -517,4 +518,27 @@
         font-size: 14px;
         height: 36px;
     }
+}
+
+.notification-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.notification-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 350px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
