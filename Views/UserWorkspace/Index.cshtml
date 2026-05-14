@@ -1,5 +1,4 @@
 ﻿@model List<Blank.Models.Views.MainPage>
-
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Главная";
@@ -29,7 +28,7 @@
             <tbody>
                 @foreach (var doc in Model)
                 {
-                    <tr onclick="selectDocument(@doc.ид_документа)">
+                    <tr data-id="@doc.ид_документа" onclick="selectDocument(@doc.ид_документа)">
                         <td style="text-align: center;"><input type="radio" name="selectedId" value="@doc.ид_документа"></td>
                         <td class="col-номер_документа">@doc.номер_документа</td>
                         <td class="col-тип">@doc.тип</td>
@@ -49,3 +48,7 @@
         </table>
     </div>
 </div>
+
+@section Scripts {
+    <script src="/js/UserWorkspace/Index.js"></script>
+}

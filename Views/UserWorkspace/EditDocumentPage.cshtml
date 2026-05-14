@@ -218,9 +218,9 @@
                                     </td>
                                     <td><input type="text" class="goods-unit" readonly value="@(pos.Товар?.единицы_измерения ?? "")"></td>
                                     <td><input type="number" class="goods-quantity" value="@pos.количество.ToString().Replace(",", ".")" step="0.001"></td>
-                                    <td><input type="number" class="goods-price" value="@pos.цена_за_единицу.ToString().Replace(",", ".")" step="0.01"></td>
-                                    <td><input type="number" class="goods-discount" value="@discount.ToString().Replace(",", ".")" step="0.1"></td>
-                                    <td><input type="number" class="goods-vat" value="@vatRate.ToString().Replace(",", ".")" step="0.5"></td>
+                                    <td><input type="number" class="goods-price" value="@pos.цена_за_единицу.ToString().Replace(",", ".")" step="0.001"></td>
+                                    <td><input type="number" class="goods-discount" value="@discount.ToString().Replace(",", ".")" step="0.001"></td>
+                                    <td><input type="number" class="goods-vat" value="@vatRate.ToString().Replace(",", ".")" step="0.001"></td>
                                     <td class="goods-sum-without-vat">@costAfterDiscount.ToString("F2")</td>
                                     <td class="goods-vat-amount">@vatAmount.ToString("F2")</td>
                                     <td class="goods-sum">@totalWithVat.ToString("F2")</td>
