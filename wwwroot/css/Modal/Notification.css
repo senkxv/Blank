@@ -145,3 +145,198 @@
         font-size: 10px;
     }
 }
+
+/* ========== БАЗОВЫЕ СТИЛИ ДЛЯ ВСЕХ МОДАЛЬНЫХ ОКОН ========== */
+.notification-modal {
+    display: none !important; /* скрыто по умолчанию */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1100;
+    min-width: 300px;
+    max-width: 400px;
+    width: auto;
+    text-align: center;
+}
+
+/* ========== КОНТЕНТ МОДАЛЬНОГО ОКНА ========== */
+.notification-content {
+    padding: 25px 30px;
+}
+
+#notificationMessage {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+/* ========== КНОПКИ В МОДАЛЬНОМ ОКНЕ ========== */
+#closeNotificationBtn,
+#confirmDeleteYes,
+#confirmDeleteNo {
+    padding: 8px 20px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    margin: 5px;
+}
+
+    #closeNotificationBtn:hover,
+    #confirmDeleteYes:hover {
+        background-color: #333;
+    }
+
+#confirmDeleteNo {
+    background-color: #666;
+}
+
+    #confirmDeleteNo:hover {
+        background-color: #444;
+    }
+
+.notification-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* ========== ОКНО ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ========== */
+#confirmDeleteModal {
+    /* наследует всё от .notification-modal */
+}
+
+#confirmDeleteMessage {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+/* ========== ПЛАНШЕТЫ ========== */
+@media (max-width: 768px) {
+    .notification-modal {
+        min-width: 280px;
+        max-width: 350px;
+    }
+
+    .notification-content {
+        padding: 22px 25px;
+    }
+
+    #notificationMessage,
+    #confirmDeleteMessage {
+        font-size: 15px;
+    }
+}
+
+/* ========== БОЛЬШИЕ ТЕЛЕФОНЫ ========== */
+@media (max-width: 550px) {
+    .notification-modal {
+        min-width: 260px;
+        max-width: 300px;
+    }
+
+    .notification-content {
+        padding: 18px 22px;
+    }
+
+    #notificationMessage,
+    #confirmDeleteMessage {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    #closeNotificationBtn,
+    #confirmDeleteYes,
+    #confirmDeleteNo {
+        padding: 7px 18px;
+        font-size: 13px;
+    }
+}
+
+/* ========== МАЛЕНЬКИЕ ТЕЛЕФОНЫ ========== */
+@media (max-width: 450px) {
+    .notification-modal {
+        min-width: 200px;
+        max-width: 260px;
+    }
+
+    .notification-content {
+        padding: 15px 18px;
+    }
+
+    #notificationMessage,
+    #confirmDeleteMessage {
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    #closeNotificationBtn,
+    #confirmDeleteYes,
+    #confirmDeleteNo {
+        padding: 6px 15px;
+        font-size: 12px;
+    }
+}
+
+/* ========== ОЧЕНЬ МАЛЕНЬКИЕ ТЕЛЕФОНЫ ========== */
+@media (max-width: 360px) {
+    .notification-modal {
+        min-width: 180px;
+        max-width: 220px;
+    }
+
+    .notification-content {
+        padding: 12px 15px;
+    }
+
+    #notificationMessage,
+    #confirmDeleteMessage {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
+    #closeNotificationBtn,
+    #confirmDeleteYes,
+    #confirmDeleteNo {
+        padding: 5px 12px;
+        font-size: 11px;
+    }
+}
+
+/* ========== КРИТИЧЕСКИ МАЛЕНЬКИЕ ========== */
+@media (max-width: 280px) {
+    .notification-modal {
+        min-width: 160px;
+        max-width: 190px;
+    }
+
+    .notification-content {
+        padding: 10px 12px;
+    }
+
+    #notificationMessage,
+    #confirmDeleteMessage {
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+
+    #closeNotificationBtn,
+    #confirmDeleteYes,
+    #confirmDeleteNo {
+        padding: 4px 10px;
+        font-size: 10px;
+    }
+}

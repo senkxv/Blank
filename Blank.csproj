@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <None Include="wwwroot\css\Login\Authorization.css" />
+    <None Include="wwwroot\files\Помощь.pdf" />
   </ItemGroup>
 
   <ItemGroup>
