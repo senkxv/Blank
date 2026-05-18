@@ -33,9 +33,11 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             tab.classList.add('active');
             document.getElementById('tab-' + savedTab).classList.add('active');
-            sessionStorage.removeItem('activeAdminTab');
         }
+        sessionStorage.removeItem('activeAdminTab');
     }
+    // Убираем класс, который скрывал вкладки
+    document.body.classList.remove('admin-loading');
 
     // ============ ВКЛАДКИ ============
     document.querySelectorAll('.tab').forEach(button => {
@@ -388,10 +390,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             if (response.ok) {
-                    document.getElementById('editRouteModal').style.display = 'none';
-                    sessionStorage.setItem('activeAdminTab', 'routes');
-                    document.getElementById('notificationModal').setAttribute('data-reload', 'true');
-                    showNotification('Маршрут обновлён!');
+                document.getElementById('editRouteModal').style.display = 'none';
+                sessionStorage.setItem('activeAdminTab', 'routes');
+                document.getElementById('notificationModal').setAttribute('data-reload', 'true');
+                showNotification('Маршрут обновлён!');
             } else {
                 const result = await response.json();
                 showNotification('Ошибка: ' + (result.error || ''));
@@ -509,9 +511,9 @@ async function deleteRoute(routeId) {
             });
 
             if (response.ok) {
-                    sessionStorage.setItem('activeAdminTab', 'routes');
-                    document.getElementById('notificationModal').setAttribute('data-reload', 'true');
-                    showNotification('Маршрут удалён');
+                sessionStorage.setItem('activeAdminTab', 'routes');
+                document.getElementById('notificationModal').setAttribute('data-reload', 'true');
+                showNotification('Маршрут удалён');
             } else {
                 const text = await response.text();
                 let result;
