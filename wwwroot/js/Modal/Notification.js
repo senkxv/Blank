@@ -14,6 +14,11 @@ function closeNotification() {
     const modal = document.getElementById('notificationModal');
     if (modal) {
         modal.style.display = 'none';
+        // Проверяем, нужно ли обновить страницу
+        if (modal.getAttribute('data-reload') === 'true') {
+            modal.removeAttribute('data-reload');
+            location.reload();
+        }
     }
 }
 
@@ -25,6 +30,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (closeBtn) {
         closeBtn.addEventListener('click', closeNotification);
     }
+
+
 
     // Закрытие при клике на фон
     if (modal) {
