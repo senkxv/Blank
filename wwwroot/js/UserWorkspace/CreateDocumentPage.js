@@ -128,30 +128,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('skipPointBtn')?.addEventListener('click', function (e) {
         e.preventDefault();
 
-        const modal = document.getElementById('skipPointModal');
-        const message = document.getElementById('skipPointMessage');
-        const confirmBtn = document.getElementById('skipPointConfirmBtn');
-        const cancelBtn = document.getElementById('skipPointCancelBtn');
-
-        if (!modal || !message || !confirmBtn || !cancelBtn) return;
-
-        message.textContent = 'Пропустить эту точку? Накладная не будет создана.';
-        modal.style.display = 'block';
-
-        confirmBtn.onclick = function () {
-            modal.style.display = 'none';
-            const form = document.getElementById('documentForm');
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'action';
-            input.value = 'skip';
-            form.appendChild(input);
-            form.submit();
-        };
-
-        cancelBtn.onclick = function () {
-            modal.style.display = 'none';
-        };
+        var form = document.getElementById('documentForm');
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'action';
+        input.value = 'skip';
+        form.appendChild(input);
+        form.submit();
     });
 
     // ============ ДОБАВЛЕНИЕ ТОВАРА ============
