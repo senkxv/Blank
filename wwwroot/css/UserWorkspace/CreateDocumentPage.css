@@ -5,12 +5,12 @@
     padding: 0 20px;
 }
 
-.form-container h2 {
-    margin-bottom: 25px;
-    color: #333;
-    font-family: Comfortaa;
-    font-size: 24px;
-}
+    .form-container h2 {
+        margin-bottom: 25px;
+        color: #333;
+        font-family: Comfortaa;
+        font-size: 24px;
+    }
 
 .form-grid {
     display: grid;
@@ -98,7 +98,6 @@ select.form-control {
         box-shadow: 0 0 0 2px white, 0 0 0 4px black;
     }
 
-/* Пропустить точку — серая */
 .btn-skip {
     margin-top: 30px;
     border-radius: 10px;
@@ -126,7 +125,6 @@ select.form-control {
         border-color: #999;
     }
 
-/* Отмена — белая с чёрной обводкой */
 .btn-cancel-route {
     margin-top: 30px;
     border-radius: 10px;
@@ -150,6 +148,7 @@ select.form-control {
     .btn-cancel-route:hover {
         box-shadow: 0 0 0 2px black, 0 0 0 4px white;
     }
+
 .goods-section {
     margin-top: 30px;
     padding: 20px;
@@ -199,50 +198,49 @@ select.form-control {
         border: 1px solid #ddd;
     }
 
-    /* Убрать линии между заголовками */
     .goods-table thead th {
         border: none;
     }
 
-        .goods-table th:first-child,
-        .goods-table td:first-child {
-            width: 200px;
-        }
+    .goods-table th:first-child,
+    .goods-table td:first-child {
+        width: 200px;
+    }
 
-        .goods-table th:nth-child(2),
-        .goods-table td:nth-child(2) {
-            width: 75px;
-        }
+    .goods-table th:nth-child(2),
+    .goods-table td:nth-child(2) {
+        width: 75px;
+    }
 
-        .goods-table td:nth-child(3) input {
-            width: 85px;
-        }
+    .goods-table td:nth-child(3) input {
+        width: 85px;
+    }
 
-        .goods-table td:nth-child(4) input {
-            width: 105px;
-        }
+    .goods-table td:nth-child(4) input {
+        width: 105px;
+    }
 
-        .goods-table td:nth-child(5) input {
-            width: 75px;
-        }
+    .goods-table td:nth-child(5) input {
+        width: 75px;
+    }
 
-        .goods-table td:nth-child(6) input {
-            width: 70px;
-        }
+    .goods-table td:nth-child(6) input {
+        width: 70px;
+    }
 
-        .goods-table td:nth-child(7),
-        .goods-table td:nth-child(8),
-        .goods-table td:nth-child(9) {
-            width: 115px;
-        }
+    .goods-table td:nth-child(7),
+    .goods-table td:nth-child(8),
+    .goods-table td:nth-child(9) {
+        width: 115px;
+    }
 
-        .goods-table td:nth-child(10) input {
-            width: 85px;
-        }
+    .goods-table td:nth-child(10) input {
+        width: 85px;
+    }
 
-        .goods-table td:nth-child(11) {
-            width: 45px;
-        }
+    .goods-table td:nth-child(11) {
+        width: 45px;
+    }
 
     .goods-table input[type="number"] {
         width: 100%;
@@ -290,14 +288,14 @@ select.form-control {
     }
 
 .remove-goods {
-    background: #dc3545;
+    background: black;
     color: white;
     border: none;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -307,7 +305,7 @@ select.form-control {
 }
 
     .remove-goods:hover {
-        background: #c82333;
+        background: #333;
     }
 
 .route-selection {
@@ -397,8 +395,96 @@ select.form-control {
     color: #555;
 }
 
+/* ========== МОДАЛЬНЫЕ ОКНА ========== */
+#notificationModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+}
 
+#skipPointModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+}
 
+    #notificationModal .notification-content,
+    #skipPointModal .notification-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        text-align: center;
+        min-width: 350px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+        #notificationModal .notification-content p,
+        #skipPointModal .notification-content p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+    #skipPointModal .notification-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+        #skipPointModal .notification-buttons .btn-save {
+            margin-top: 0;
+            border-radius: 10px;
+            color: white;
+            background: black;
+            border: none;
+            min-width: 150px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            #skipPointModal .notification-buttons .btn-save:hover {
+                box-shadow: 0 0 0 2px white, 0 0 0 4px black;
+            }
+
+        #skipPointModal .notification-buttons .btn-cancel {
+            margin-top: 0;
+            border-radius: 10px;
+            color: black;
+            background: white;
+            border: 2px solid black;
+            min-width: 150px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            #skipPointModal .notification-buttons .btn-cancel:hover {
+                box-shadow: 0 0 0 2px black, 0 0 0 4px white;
+            }
+
+/* ========== АДАПТИВНОСТЬ ========== */
 @media (max-width: 1400px) {
     .form-container {
         max-width: 100%;
@@ -471,6 +557,17 @@ select.form-control {
     .progress-arrow {
         font-size: 14px;
     }
+
+    #notificationModal .notification-content,
+    #skipPointModal .notification-content {
+        min-width: 300px;
+        padding: 25px;
+    }
+
+        #notificationModal .notification-content p,
+        #skipPointModal .notification-content p {
+            font-size: 15px;
+        }
 }
 
 @media (max-width: 480px) {
@@ -551,173 +648,45 @@ select.form-control {
         height: 28px;
         font-size: 14px;
     }
-}
 
-.notification-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-}
-
-.notification-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    text-align: center;
-    min-width: 350px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-
-    .notification-content p {
-        font-size: 16px;
-        margin-bottom: 20px;
-        color: #333;
-    }
-
-/* Кнопка Отмена в модальном окне — белая с чёрной обводкой */
-.notification-buttons .btn-cancel {
-    margin-top: 30px;
-    border-radius: 10px;
-    color: black;
-    background: white;
-    border: 2px solid black;
-    transition: .2s linear;
-    min-width: 150px;
-    width: auto;
-    height: 40px;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 0 30px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    line-height: 1.2;
-}
-
-    .notification-buttons .btn-cancel:hover {
-        box-shadow: 0 0 0 2px black, 0 0 0 4px white;
-    }
-
-/* Кнопка Да, пропустить в модальном окне — чёрная */
-.notification-buttons .btn-save {
-    margin-top: 30px;
-    border-radius: 10px;
-    color: white;
-    background: black;
-    border: none;
-    transition: .2s linear;
-    min-width: 150px;
-    width: auto;
-    height: 40px;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 0 30px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    line-height: 1.2;
-}
-
-    .notification-buttons .btn-save:hover {
-        box-shadow: 0 0 0 2px white, 0 0 0 4px black;
-    }
-
-.remove-goods {
-    background: black;
-    color: white;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    margin: 0 auto;
-}
-
-    .remove-goods:hover {
-        background: #333;
-    }
-
-/* Адаптивность модальных окон */
-@media (max-width: 768px) {
-    .notification-content {
-        min-width: 300px;
-        padding: 25px;
-    }
-
-        .notification-content p {
-            font-size: 15px;
-        }
-
-    .notification-buttons {
-        flex-direction: row;
-        gap: 10px;
-    }
-
-        .notification-buttons .btn-save,
-        .notification-buttons .btn-cancel {
-            min-width: 120px;
-            padding: 0 20px;
-            font-size: 14px;
-            height: 36px;
-        }
-}
-
-@media (max-width: 480px) {
-    .notification-content {
+    #notificationModal .notification-content,
+    #skipPointModal .notification-content {
         min-width: auto;
         width: 90vw;
         padding: 20px;
     }
 
-        .notification-content p {
+        #notificationModal .notification-content p,
+        #skipPointModal .notification-content p {
             font-size: 14px;
             margin-bottom: 15px;
         }
 
-    .notification-buttons {
+    #skipPointModal .notification-buttons {
         flex-direction: column;
         gap: 10px;
     }
 
-        .notification-buttons .btn-save,
-        .notification-buttons .btn-cancel {
+        #skipPointModal .notification-buttons .btn-save,
+        #skipPointModal .notification-buttons .btn-cancel {
             width: 100%;
-            min-width: auto;
-            padding: 0 20px;
-            font-size: 14px;
-            height: 36px;
-            margin-top: 0;
         }
 }
 
 @media (max-width: 350px) {
-    .notification-content {
+    #notificationModal .notification-content,
+    #skipPointModal .notification-content {
         width: 95vw;
         padding: 15px;
     }
 
-        .notification-content p {
+        #notificationModal .notification-content p,
+        #skipPointModal .notification-content p {
             font-size: 13px;
         }
 
-    .notification-buttons .btn-save,
-    .notification-buttons .btn-cancel {
+    #skipPointModal .notification-buttons .btn-save,
+    #skipPointModal .notification-buttons .btn-cancel {
         font-size: 13px;
         height: 34px;
     }
