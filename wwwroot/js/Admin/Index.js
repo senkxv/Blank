@@ -388,12 +388,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             if (response.ok) {
-                if (response.ok) {
                     document.getElementById('editRouteModal').style.display = 'none';
                     sessionStorage.setItem('activeAdminTab', 'routes');
                     document.getElementById('notificationModal').setAttribute('data-reload', 'true');
                     showNotification('Маршрут обновлён!');
-                }
             } else {
                 const result = await response.json();
                 showNotification('Ошибка: ' + (result.error || ''));
@@ -511,11 +509,9 @@ async function deleteRoute(routeId) {
             });
 
             if (response.ok) {
-                if (response.ok) {
                     sessionStorage.setItem('activeAdminTab', 'routes');
                     document.getElementById('notificationModal').setAttribute('data-reload', 'true');
                     showNotification('Маршрут удалён');
-                }
             } else {
                 const text = await response.text();
                 let result;
