@@ -391,8 +391,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (response.ok) {
                     document.getElementById('editRouteModal').style.display = 'none';
                     sessionStorage.setItem('activeAdminTab', 'routes');
+                    document.getElementById('notificationModal').setAttribute('data-reload', 'true');
                     showNotification('Маршрут обновлён!');
-                    setTimeout(() => location.reload(),2500);
                 }
             } else {
                 const result = await response.json();
@@ -513,8 +513,8 @@ async function deleteRoute(routeId) {
             if (response.ok) {
                 if (response.ok) {
                     sessionStorage.setItem('activeAdminTab', 'routes');
+                    document.getElementById('notificationModal').setAttribute('data-reload', 'true');
                     showNotification('Маршрут удалён');
-                    setTimeout(() => location.reload(),2500);
                 }
             } else {
                 const text = await response.text();
