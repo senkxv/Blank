@@ -97,8 +97,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
+                        document.getElementById('notificationModal').setAttribute('data-reload', 'true');
                         showNotification('Добавлено');
-                        location.reload();
                     } else {
                         showNotification('Ошибка: ' + (res.error || ''));
                     }
