@@ -21,46 +21,60 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
-
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=SN+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
-</head>
-    <body>
-        <header>
-            <div class="header-container">
-                <nav>
-                    <ul>
-                        <li><a href="/UserWorkspace/Index">Главная</a></li>
-                        <li><a href="/UserWorkspace/CreateDocumentPage">Добавить</a></li>
-                        <li><a href="#" onclick="editSelectedDocument()">Изменить</a></li>
-                    <li><a href="#" onclick="deleteSelectedDocument(); return false;">Удалить</a></li>
-                        @if (!isAdmin)
-                        {
-                            <li><a href="#" onclick="location.reload()">Обновить</a></li>
-                        }
-                        <li><a href="#" onclick="previewSelectedDocument()">Предпросмотр</a></li>
-                        <li><a href="/UserWorkspace/ExportFullBackup">Экспорт</a></li>
-                        <li><a href="/UserWorkspace/RestoreFromBackup">Импорт</a></li>
-                        <li><a href="#" id="searchLink">Поиск</a></li>
-                        <li><a href="#" id="filterLink">Фильтр</a></li>
-                        @if (isAdmin)
-                        {
-                            <li><a href="/Admin/Index">Администрирование</a></li>
-                        }
-                        <li><a href="/Login/Logout">Выход</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
 
-        <div class="content-wrapper">
-            <main>
-                <div id="searchModal">
-                    <form method="get" action="/UserWorkspace/Search" class="search-form">
-                        <input type="text" name="searchString" placeholder="Введите текст для поиска..." />
-                        <button type="submit">Найти</button>
-                        <button type="button" id="closeSearchBtn">Отмена</button>
-                    </form>
-                </div>
+    <style>
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Спиннер загрузки -->
+    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:99999; justify-content:center; align-items:center;">
+        <div style="text-align:center;">
+            <div style="width:50px; height:50px; border:5px solid #ccc; border-top:5px solid black; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 15px;"></div>
+            <p style="font-family:Comfortaa; color:#333;">Формирование документа...</p>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-container">
+            <nav>
+                <ul>
+                    <li><a href="/UserWorkspace/Index">Главная</a></li>
+                    <li><a href="/UserWorkspace/CreateDocumentPage">Добавить</a></li>
+                    <li><a href="#" onclick="editSelectedDocument()">Изменить</a></li>
+                    <li><a href="#" onclick="deleteSelectedDocument(); return false;">Удалить</a></li>
+                    @if (!isAdmin)
+                    {
+                        <li><a href="#" onclick="location.reload()">Обновить</a></li>
+                    }
+                    <li><a href="#" onclick="previewSelectedDocument()">Предпросмотр</a></li>
+                    <li><a href="/UserWorkspace/ExportFullBackup">Экспорт</a></li>
+                    <li><a href="/UserWorkspace/RestoreFromBackup">Импорт</a></li>
+                    <li><a href="#" id="searchLink">Поиск</a></li>
+                    <li><a href="#" id="filterLink">Фильтр</a></li>
+                    @if (isAdmin)
+                    {
+                        <li><a href="/Admin/Index">Администрирование</a></li>
+                    }
+                    <li><a href="/Login/Logout">Выход</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="content-wrapper">
+        <main>
+            <div id="searchModal">
+                <form method="get" action="/UserWorkspace/Search" class="search-form">
+                    <input type="text" name="searchString" placeholder="Введите текст для поиска..." />
+                    <button type="submit">Найти</button>
+                    <button type="button" id="closeSearchBtn">Отмена</button>
+                </form>
+            </div>
 
             <div id="notificationModal">
                 <div class="notification-content">
@@ -69,71 +83,66 @@
                 </div>
             </div>
 
-                <div id="filterModal">
-                    <div class="filter-content">
-                        <h3>Настройка таблицы</h3>
-        
-                        <div class="filter-section">
-                            <h4>Сортировка</h4>
-                            <select id="sortField">
-                                <option value="тип">По типу документа</option>
-                                <option value="номер_документа">По номеру документа</option>
-                                <option value="дата_создания">По дате создания</option>
-                                <option value="грузоотправитель">По грузоотправителю</option>
-                                <option value="перевозчик">По перевозчику</option>
-                                <option value="грузополучатель">По грузополучателю</option>
-                                <option value="ФИО_Водителя">По ФИО водителя</option>
-                            </select>
-                            <select id="sortOrder">
-                                <option value="asc">По возрастанию</option>
-                                <option value="desc">По убыванию</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-section">
-                            <h4>Отображаемые столбцы</h4>
-                            <div class="columns-grid">
-                                <label><input type="checkbox" value="тип" checked> Тип документа</label>
-                                <label><input type="checkbox" value="номер_документа" checked> Номер документа</label>
-                                <label><input type="checkbox" value="дата_создания" checked> Дата создания</label>
-                                <label><input type="checkbox" value="грузоотправитель" checked> Грузоотправитель</label>
-                                <label><input type="checkbox" value="перевозчик" checked> Перевозчик</label>
-                                <label><input type="checkbox" value="грузополучатель" checked> Грузополучатель</label>
-                                <label><input type="checkbox" value="пункт_погрузки" checked> Пункт погрузки</label>
-                                <label><input type="checkbox" value="пункт_разгрузки" checked> Пункт разгрузки</label>
-                                <label><input type="checkbox" value="ФИО_Водителя" checked> ФИО водителя</label>
-                                <label><input type="checkbox" value="Марка_Машины" checked> Марка машины</label>
-                                <label><input type="checkbox" value="Регистрационный_Номер" checked> Рег. номер</label>
-                                <label><input type="checkbox" value="Тип_ТС" checked> Тип ТС</label>
-                            </div>
-                        </div>
+            <div id="filterModal">
+                <div class="filter-content">
+                    <h3>Настройка таблицы</h3>
+                    <div class="filter-section">
+                        <h4>Сортировка</h4>
+                        <select id="sortField">
+                            <option value="тип">По типу документа</option>
+                            <option value="номер_документа">По номеру документа</option>
+                            <option value="дата_создания">По дате создания</option>
+                            <option value="грузоотправитель">По грузоотправителю</option>
+                            <option value="перевозчик">По перевозчику</option>
+                            <option value="грузополучатель">По грузополучателю</option>
+                            <option value="ФИО_Водителя">По ФИО водителя</option>
+                        </select>
+                        <select id="sortOrder">
+                            <option value="asc">По возрастанию</option>
+                            <option value="desc">По убыванию</option>
+                        </select>
                     </div>
-
-                    <div class="filter-buttons">
-                        <button id="applyFilterBtn">Применить</button>
-                        <button id="closeFilterBtn">Отмена</button>
+                    <div class="filter-section">
+                        <h4>Отображаемые столбцы</h4>
+                        <div class="columns-grid">
+                            <label><input type="checkbox" value="тип" checked> Тип документа</label>
+                            <label><input type="checkbox" value="номер_документа" checked> Номер документа</label>
+                            <label><input type="checkbox" value="дата_создания" checked> Дата создания</label>
+                            <label><input type="checkbox" value="грузоотправитель" checked> Грузоотправитель</label>
+                            <label><input type="checkbox" value="перевозчик" checked> Перевозчик</label>
+                            <label><input type="checkbox" value="грузополучатель" checked> Грузополучатель</label>
+                            <label><input type="checkbox" value="пункт_погрузки" checked> Пункт погрузки</label>
+                            <label><input type="checkbox" value="пункт_разгрузки" checked> Пункт разгрузки</label>
+                            <label><input type="checkbox" value="ФИО_Водителя" checked> ФИО водителя</label>
+                            <label><input type="checkbox" value="Марка_Машины" checked> Марка машины</label>
+                            <label><input type="checkbox" value="Регистрационный_Номер" checked> Рег. номер</label>
+                            <label><input type="checkbox" value="Тип_ТС" checked> Тип ТС</label>
+                        </div>
                     </div>
                 </div>
-
-                @RenderBody()
-            </main>
-        </div>
-
-        <footer>
-            <div class="footer-container">
-                <ul>
-                    <li><p>Контакты:</p></li>
-                    <li>почта: <a href="mailto:sxnkxv@gmail.com">sxnkxv@gmail.com</a></li>
-                    <li>телефон: <a href="tel:+375256070373">+375 25 607-03-73</a></li>
-                <li>github: <a href="https://github.com/senkxv" target="_blank">github/senkxv</a></li>
-                    <li><p>Помощь:</p></li>
-                    <li><a href="/files/Помощь.pdf" target="_blank">?</a></li>
-                </ul>
+                <div class="filter-buttons">
+                    <button id="applyFilterBtn">Применить</button>
+                    <button id="closeFilterBtn">Отмена</button>
+                </div>
             </div>
-        </footer>
 
+            @RenderBody()
+        </main>
+    </div>
 
-        @await RenderSectionAsync("Scripts", required: false)
+    <footer>
+        <div class="footer-container">
+            <ul>
+                <li><p>Контакты:</p></li>
+                <li>почта: <a href="mailto:sxnkxv@gmail.com">sxnkxv@gmail.com</a></li>
+                <li>телефон: <a href="tel:+375256070373">+375 25 607-03-73</a></li>
+                <li>github: <a href="https://github.com/senkxv" target="_blank">github/senkxv</a></li>
+                <li><p>Помощь:</p></li>
+                <li><a href="/files/Помощь.pdf" target="_blank">?</a></li>
+            </ul>
+        </div>
+    </footer>
 
-    </body>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
 </html>

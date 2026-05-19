@@ -59,11 +59,34 @@ window.deleteSelectedDocument = function () {
     }
 };
 
-// Предпросмотр выбранного документа
-window.previewSelectedDocument = function () {
+window.previewSelectedDocument = async function () {
     const docNumber = sessionStorage.getItem('selectedDocumentNumber');
     if (docNumber) {
-        window.open('/Print/' + docNumber, '_blank');
+        var overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'flex';
+
+        try {
+            // Запрашиваем PDF через fetch
+            const response = await fetch('/Print/' + docNumber);
+            
+            if (response.ok) {
+                // Получаем PDF как Blob
+                const blob = await response.blob();
+                // Создаём URL для Blob
+                const url = URL.createObjectURL(blob);
+                // Открываем в новой вкладке
+                window.open(url, '_blank');
+                // Освобождаем память
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            } else {
+                alert('Документ не найден');
+            }
+        } catch (error) {
+            alert('Ошибка при загрузке документа');
+        } finally {
+            // Скрываем спиннер
+            if (overlay) overlay.style.display = 'none';
+        }
     } else {
         const id = sessionStorage.getItem('selectedDocumentId');
         if (id) {
