@@ -1,4 +1,5 @@
 using Blank.Data;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
@@ -14,8 +15,16 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromDays(7);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-    options.Cookie.MaxAge = TimeSpan.FromDays(2); // добавьте это
+    options.Cookie.MaxAge = TimeSpan.FromDays(2);
 });
+
+// Постоянное хранилище ключей шифрования в wwwroot/keys
+var keysPath = Path.Combine(builder.Environment.WebRootPath, "keys");
+Directory.CreateDirectory(keysPath);
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
+    .SetApplicationName("BlankApp");
 
 builder.Services.AddControllersWithViews();
 
