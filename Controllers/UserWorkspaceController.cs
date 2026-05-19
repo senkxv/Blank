@@ -2153,6 +2153,10 @@ namespace Blank.Controllers
             {
                 workbook.SaveToStream(stream, Spire.Xls.FileFormat.PDF);
                 byte[] pdfBytes = stream.ToArray();
+
+                HttpContext.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+                HttpContext.Response.Headers["Pragma"] = "no-cache";
+                HttpContext.Response.Headers["Expires"] = "0";
                 return File(pdfBytes, "application/pdf");
             }
         }
@@ -2258,6 +2262,9 @@ namespace Blank.Controllers
 
             var converter = new HtmlToPdf();
             var pdf = converter.ConvertHtmlString(html);
+            HttpContext.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            HttpContext.Response.Headers["Pragma"] = "no-cache";
+            HttpContext.Response.Headers["Expires"] = "0";
             return File(pdf.Save(), "application/pdf");
         }
 
@@ -2452,6 +2459,10 @@ namespace Blank.Controllers
                     Spire.Pdf.PdfDocument.MergeFiles(streams, mergedPdf);
                     foreach (var s in pdfStreams) s.Dispose();
                     mergedPdf.Position = 0;
+
+                    HttpContext.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+                    HttpContext.Response.Headers["Pragma"] = "no-cache";
+                    HttpContext.Response.Headers["Expires"] = "0";
                     return File(mergedPdf.ToArray(), "application/pdf");
                 }
             }
@@ -2724,6 +2735,10 @@ namespace Blank.Controllers
             {
                 workbook.SaveToStream(stream, Spire.Xls.FileFormat.PDF);
                 byte[] pdfBytes = stream.ToArray();
+
+                HttpContext.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+                HttpContext.Response.Headers["Pragma"] = "no-cache";
+                HttpContext.Response.Headers["Expires"] = "0";
                 return File(pdfBytes, "application/pdf");
             }
         }
