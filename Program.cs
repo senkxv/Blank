@@ -14,6 +14,7 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromDays(7);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.MaxAge = TimeSpan.FromDays(7); // добавьте это
 });
 
 builder.Services.AddControllersWithViews();
