@@ -765,12 +765,6 @@ namespace Blank.Controllers
                 return Content("Ошибка: организация не определена. Войдите заново.");
             }
 
-            // Получаем список ID всех организаций, принадлежащих администратору
-            var userOrgIds = _context.Организации
-                .Where(o => o.ид_организации == userOrgId || o.ид_владельца == userOrgId)
-                .Select(o => o.ид_организации)
-                .ToList();
-
             using (var package = new ExcelPackage())
             {
                 // Лист 1: Документы
@@ -790,9 +784,7 @@ namespace Blank.Controllers
                 sheetDocuments.Cells[1, 13].Value = "сдал_грузоотправитель";
 
                 var документы = _context.Документы
-                    .Where(d => userOrgIds.Contains(d.ид_грузоотправителя)
-                             || userOrgIds.Contains(d.ид_перевозчика)
-                             || userOrgIds.Contains(d.ид_получателя))
+                    .Where(d => d.ид_грузоотправителя == userOrgId)
                     .ToList();
                 int row = 2;
                 foreach (var doc in документы)
@@ -880,7 +872,7 @@ namespace Blank.Controllers
                 sheetOrganizations.Cells[1, 5].Value = "почта";
                 sheetOrganizations.Cells[1, 6].Value = "ид_владельца";
 
-                var организации = _context.Организации.Where(o => userOrgIds.Contains(o.ид_организации)).ToList();
+                var организации = _context.Организации.Where(o => o.ид_организации == userOrgId).ToList();
                 row = 2;
                 foreach (var org in организации)
                 {
@@ -1031,6 +1023,7 @@ namespace Blank.Controllers
                     $"Backup_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> RestoreFromBackup()
         {
@@ -1067,33 +1060,30 @@ namespace Blank.Controllers
                         {
                             try
                             {
-                                await _context.Database.ExecuteSqlRawAsync("SET SQL_SAFE_UPDATES = 0;");
                                 await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 0;");
 
-                                // ========== 1. ОЧИЩАЕМ ТАБЛИЦЫ ==========
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Позиции;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Документы;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Пункт_Погрузки;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Пункт_Разгрузки;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Водители;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Транспорт;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Организации;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Товары;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Типы_Документов;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Марки_Транспорта;");
-                                await _context.Database.ExecuteSqlRawAsync("DELETE FROM Типы_Транспорта;");
+                                int countDocs = 0;
+                                int countPositions = 0;
+                                Dictionary<int, int> docIdMapping = new Dictionary<int, int>();
 
-                                // ========== МАППИНГИ ==========
-                                Dictionary<int, int> orgIdMapping = new Dictionary<int, int>();
-                                Dictionary<int, int> driverIdMapping = new Dictionary<int, int>();
-                                Dictionary<int, int> transportIdMapping = new Dictionary<int, int>();
-                                Dictionary<int, int> loadingPointIdMapping = new Dictionary<int, int>();
-                                Dictionary<int, int> unloadingPointIdMapping = new Dictionary<int, int>();
-                                Dictionary<int, int> goodsIdMapping = new Dictionary<int, int>();
+                                // ========== 1. ТИПЫ ДОКУМЕНТОВ ==========
+                                var sheetTypes = package.Workbook.Worksheets["ТипыДокументов"];
+                                if (sheetTypes?.Dimension?.Rows > 1)
+                                {
+                                    for (int row = 2; row <= sheetTypes.Dimension.Rows; row++)
+                                    {
+                                        var id = sheetTypes.Cells[row, 1]?.Value;
+                                        var shortName = sheetTypes.Cells[row, 2]?.Value?.ToString();
+                                        if (id == null || string.IsNullOrEmpty(shortName)) continue;
+                                        await _context.Database.ExecuteSqlRawAsync(
+                                            "INSERT IGNORE INTO Типы_Документов (ид_типа, краткое_наименование, полное_наименование) VALUES ({0}, {1}, {2})",
+                                            Convert.ToInt32(id), shortName, sheetTypes.Cells[row, 3]?.Value?.ToString() ?? "");
+                                    }
+                                }
 
                                 // ========== 2. МАРКИ ТРАНСПОРТА ==========
                                 var sheetMarks = package.Workbook.Worksheets["МаркиТранспорта"];
-                                if (sheetMarks != null && sheetMarks.Dimension != null && sheetMarks.Dimension.Rows > 1)
+                                if (sheetMarks?.Dimension?.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetMarks.Dimension.Rows; row++)
                                     {
@@ -1101,14 +1091,14 @@ namespace Blank.Controllers
                                         var name = sheetMarks.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(name)) continue;
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Марки_Транспорта (ид_марки, наименование_марки) VALUES ({0}, {1})",
+                                            "INSERT IGNORE INTO Марки_Транспорта (ид_марки, наименование_марки) VALUES ({0}, {1})",
                                             Convert.ToInt32(id), name);
                                     }
                                 }
 
                                 // ========== 3. ТИПЫ ТРАНСПОРТА ==========
                                 var sheetTransportTypes = package.Workbook.Worksheets["ТипыТранспорта"];
-                                if (sheetTransportTypes != null && sheetTransportTypes.Dimension != null && sheetTransportTypes.Dimension.Rows > 1)
+                                if (sheetTransportTypes?.Dimension?.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetTransportTypes.Dimension.Rows; row++)
                                     {
@@ -1116,70 +1106,41 @@ namespace Blank.Controllers
                                         var name = sheetTransportTypes.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(name)) continue;
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Типы_Транспорта (ид_типа_транспорта, наименование_типа) VALUES ({0}, {1})",
+                                            "INSERT IGNORE INTO Типы_Транспорта (ид_типа_транспорта, наименование_типа) VALUES ({0}, {1})",
                                             Convert.ToInt32(id), name);
                                     }
                                 }
 
-                                // ========== 4. ТИПЫ ДОКУМЕНТОВ ==========
-                                var sheetTypes = package.Workbook.Worksheets["ТипыДокументов"];
-                                if (sheetTypes != null && sheetTypes.Dimension != null && sheetTypes.Dimension.Rows > 1)
-                                {
-                                    for (int row = 2; row <= sheetTypes.Dimension.Rows; row++)
-                                    {
-                                        var id = sheetTypes.Cells[row, 1]?.Value;
-                                        var shortName = sheetTypes.Cells[row, 2]?.Value?.ToString();
-                                        var fullName = sheetTypes.Cells[row, 3]?.Value?.ToString();
-                                        if (id == null || string.IsNullOrEmpty(shortName)) continue;
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Типы_Документов (ид_типа, краткое_наименование, полное_наименование) VALUES ({0}, {1}, {2})",
-                                            Convert.ToInt32(id), shortName, fullName ?? "");
-                                    }
-                                }
-
-                                // ========== 5. ОРГАНИЗАЦИИ С МАППИНГОМ ==========
+                                // ========== 4. ОРГАНИЗАЦИИ ==========
                                 var sheetOrgs = package.Workbook.Worksheets["Организации"];
-                                if (sheetOrgs != null && sheetOrgs.Dimension != null && sheetOrgs.Dimension.Rows > 1)
+                                if (sheetOrgs?.Dimension?.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetOrgs.Dimension.Rows; row++)
                                     {
                                         var id = sheetOrgs.Cells[row, 1]?.Value;
                                         var name = sheetOrgs.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(name)) continue;
-
-                                        int oldOrgId = Convert.ToInt32(id);
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Организации (название, унп, адрес, почта, ид_владельца) VALUES ({0}, {1}, {2}, {3}, {4})",
-                                            name,
+                                            "INSERT IGNORE INTO Организации (ид_организации, название, унп, адрес, почта, ид_владельца) VALUES ({0}, {1}, {2}, {3}, {4}, {5})",
+                                            Convert.ToInt32(id), name,
                                             sheetOrgs.Cells[row, 3]?.Value?.ToString() ?? "",
                                             sheetOrgs.Cells[row, 4]?.Value?.ToString() ?? "",
                                             sheetOrgs.Cells[row, 5]?.Value?.ToString() ?? "",
                                             ownerId);
-
-                                        using (var cmd = _context.Database.GetDbConnection().CreateCommand())
-                                        {
-                                            cmd.CommandText = "SELECT LAST_INSERT_ID()";
-                                            await _context.Database.OpenConnectionAsync();
-                                            var newId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                                            orgIdMapping[oldOrgId] = newId;
-                                        }
                                     }
                                 }
 
-                                // ========== 6. ТОВАРЫ С МАППИНГОМ ==========
+                                // ========== 5. ТОВАРЫ ==========
                                 var sheetGoods = package.Workbook.Worksheets["Товары"];
-                                if (sheetGoods != null && sheetGoods.Dimension != null && sheetGoods.Dimension.Rows > 1)
+                                if (sheetGoods?.Dimension?.Rows > 1)
                                 {
                                     var header2 = sheetGoods.Cells[1, 2]?.Value?.ToString() ?? "";
                                     bool hasCodeColumn = header2 == "код_товара";
-
                                     for (int row = 2; row <= sheetGoods.Dimension.Rows; row++)
                                     {
                                         var id = sheetGoods.Cells[row, 1]?.Value;
                                         if (id == null) continue;
-
-                                        int oldGoodsId = Convert.ToInt32(id);
-                                        string code, name, unit;
+                                        string code = "", name = "", unit = "";
                                         if (hasCodeColumn)
                                         {
                                             code = sheetGoods.Cells[row, 2]?.Value?.ToString() ?? "";
@@ -1188,150 +1149,95 @@ namespace Blank.Controllers
                                         }
                                         else
                                         {
-                                            code = "";
                                             name = sheetGoods.Cells[row, 2]?.Value?.ToString() ?? "";
                                             unit = sheetGoods.Cells[row, 3]?.Value?.ToString() ?? "";
                                         }
-
                                         if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(code)) continue;
-
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Товары (код_товара, наименование, единицы_измерения, ид_организации) VALUES ({0}, {1}, {2}, {3})",
-                                            code, name, unit, ownerId);
-
-                                        using (var cmd = _context.Database.GetDbConnection().CreateCommand())
-                                        {
-                                            cmd.CommandText = "SELECT LAST_INSERT_ID()";
-                                            await _context.Database.OpenConnectionAsync();
-                                            var newId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                                            goodsIdMapping[oldGoodsId] = newId;
-                                        }
+                                            "INSERT IGNORE INTO Товары (ид_товара, код_товара, наименование, единицы_измерения, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4})",
+                                            Convert.ToInt32(id), code, name, unit, ownerId);
                                     }
                                 }
 
-                                // ========== 7. ВОДИТЕЛИ С МАППИНГОМ ==========
+                                // ========== 6. ВОДИТЕЛИ ==========
                                 var sheetDrivers = package.Workbook.Worksheets["Водители"];
-                                if (sheetDrivers != null && sheetDrivers.Dimension != null && sheetDrivers.Dimension.Rows > 1)
+                                if (sheetDrivers?.Dimension?.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetDrivers.Dimension.Rows; row++)
                                     {
                                         var id = sheetDrivers.Cells[row, 1]?.Value;
                                         var lastName = sheetDrivers.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(lastName)) continue;
-
-                                        int oldDriverId = Convert.ToInt32(id);
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Водители (фамилия, имя, отчество, номер_лицензии, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4})",
-                                            lastName,
+                                            "INSERT IGNORE INTO Водители (ид_водителя, фамилия, имя, отчество, номер_лицензии, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4}, {5})",
+                                            Convert.ToInt32(id), lastName,
                                             sheetDrivers.Cells[row, 3]?.Value?.ToString() ?? "",
                                             sheetDrivers.Cells[row, 4]?.Value?.ToString() ?? "",
                                             sheetDrivers.Cells[row, 5]?.Value?.ToString() ?? "",
                                             ownerId);
-
-                                        using (var cmd = _context.Database.GetDbConnection().CreateCommand())
-                                        {
-                                            cmd.CommandText = "SELECT LAST_INSERT_ID()";
-                                            await _context.Database.OpenConnectionAsync();
-                                            var newId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                                            driverIdMapping[oldDriverId] = newId;
-                                        }
                                     }
                                 }
 
-                                // ========== 8. ТРАНСПОРТ С МАППИНГОМ ==========
+                                // ========== 7. ТРАНСПОРТ ==========
                                 var sheetTransport = package.Workbook.Worksheets["Транспорт"];
-                                if (sheetTransport != null && sheetTransport.Dimension != null && sheetTransport.Dimension.Rows > 1)
+                                if (sheetTransport?.Dimension?.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetTransport.Dimension.Rows; row++)
                                     {
                                         var id = sheetTransport.Cells[row, 1]?.Value;
                                         var regNumber = sheetTransport.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(regNumber)) continue;
-
-                                        int oldTransportId = Convert.ToInt32(id);
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Транспорт (регистрационный_номер, ид_марки, ид_типа_транспорта, ид_организации) VALUES ({0}, {1}, {2}, {3})",
-                                            regNumber,
+                                            "INSERT IGNORE INTO Транспорт (ид_транспорта, регистрационный_номер, ид_марки, ид_типа_транспорта, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4})",
+                                            Convert.ToInt32(id), regNumber,
                                             sheetTransport.Cells[row, 3]?.Value ?? 1,
                                             sheetTransport.Cells[row, 4]?.Value ?? 1,
                                             ownerId);
-
-                                        using (var cmd = _context.Database.GetDbConnection().CreateCommand())
-                                        {
-                                            cmd.CommandText = "SELECT LAST_INSERT_ID()";
-                                            await _context.Database.OpenConnectionAsync();
-                                            var newId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                                            transportIdMapping[oldTransportId] = newId;
-                                        }
                                     }
                                 }
 
-                                // ========== 9. ПУНКТЫ ПОГРУЗКИ С МАППИНГОМ ==========
+                                // ========== 8. ПУНКТЫ ПОГРУЗКИ ==========
                                 var sheetLoading = package.Workbook.Worksheets["ПунктыПогрузки"];
-                                if (sheetLoading != null && sheetLoading.Dimension != null && sheetLoading.Dimension.Rows > 1)
+                                if (sheetLoading?.Dimension?.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetLoading.Dimension.Rows; row++)
                                     {
                                         var id = sheetLoading.Cells[row, 1]?.Value;
                                         var name = sheetLoading.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(name)) continue;
-
-                                        int oldPointId = Convert.ToInt32(id);
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Пункт_Погрузки (наименование, адрес, ид_организации) VALUES ({0}, {1}, {2})",
-                                            name,
+                                            "INSERT IGNORE INTO Пункт_Погрузки (ид_пункта_погрузки, наименование, адрес, ид_организации) VALUES ({0}, {1}, {2}, {3})",
+                                            Convert.ToInt32(id), name,
                                             sheetLoading.Cells[row, 3]?.Value?.ToString() ?? "",
                                             ownerId);
-
-                                        using (var cmd = _context.Database.GetDbConnection().CreateCommand())
-                                        {
-                                            cmd.CommandText = "SELECT LAST_INSERT_ID()";
-                                            await _context.Database.OpenConnectionAsync();
-                                            var newId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                                            loadingPointIdMapping[oldPointId] = newId;
-                                        }
                                     }
                                 }
 
-                                // ========== 10. ПУНКТЫ РАЗГРУЗКИ С МАППИНГОМ ==========
+                                // ========== 9. ПУНКТЫ РАЗГРУЗКИ ==========
                                 var sheetUnloading = package.Workbook.Worksheets["ПунктыРазгрузки"];
-                                if (sheetUnloading != null && sheetUnloading.Dimension != null && sheetUnloading.Dimension.Rows > 1)
+                                if (sheetUnloading?.Dimension?.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetUnloading.Dimension.Rows; row++)
                                     {
                                         var id = sheetUnloading.Cells[row, 1]?.Value;
                                         var name = sheetUnloading.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(name)) continue;
-
-                                        int oldPointId = Convert.ToInt32(id);
                                         await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT INTO Пункт_Разгрузки (наименование, адрес, ид_организации) VALUES ({0}, {1}, {2})",
-                                            name,
+                                            "INSERT IGNORE INTO Пункт_Разгрузки (ид_пункта_разгрузки, наименование, адрес, ид_организации) VALUES ({0}, {1}, {2}, {3})",
+                                            Convert.ToInt32(id), name,
                                             sheetUnloading.Cells[row, 3]?.Value?.ToString() ?? "",
                                             ownerId);
-
-                                        using (var cmd = _context.Database.GetDbConnection().CreateCommand())
-                                        {
-                                            cmd.CommandText = "SELECT LAST_INSERT_ID()";
-                                            await _context.Database.OpenConnectionAsync();
-                                            var newId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                                            unloadingPointIdMapping[oldPointId] = newId;
-                                        }
                                     }
                                 }
 
-                                // ========== 11. ДОКУМЕНТЫ ==========
+                                // ========== 10. ДОКУМЕНТЫ (с маппингом ID) ==========
                                 var sheetDocs = package.Workbook.Worksheets["Документы"];
-                                int countDocs = 0;
-                                Dictionary<int, int> docIdMapping = new Dictionary<int, int>();
-
-                                if (sheetDocs != null && sheetDocs.Dimension != null && sheetDocs.Dimension.Rows > 1)
+                                if (sheetDocs?.Dimension?.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetDocs.Dimension.Rows; row++)
                                     {
                                         var docNumberCell = sheetDocs.Cells[row, 2]?.Value;
                                         if (docNumberCell == null) continue;
-
                                         string docNumber = docNumberCell.ToString().Trim();
                                         if (string.IsNullOrEmpty(docNumber)) continue;
 
@@ -1349,26 +1255,12 @@ namespace Blank.Controllers
                                         if (typeId < 1) typeId = 1;
 
                                         int senderId = GetIntValue(sheetDocs.Cells[row, 5]?.Value);
-                                        if (orgIdMapping.ContainsKey(senderId)) senderId = orgIdMapping[senderId];
-
                                         int carrierId = GetIntValue(sheetDocs.Cells[row, 6]?.Value);
-                                        if (orgIdMapping.ContainsKey(carrierId)) carrierId = orgIdMapping[carrierId];
-
                                         int receiverId = GetIntValue(sheetDocs.Cells[row, 7]?.Value);
-                                        if (orgIdMapping.ContainsKey(receiverId)) receiverId = orgIdMapping[receiverId];
-
                                         int loadingPointId = GetIntValue(sheetDocs.Cells[row, 8]?.Value);
-                                        if (loadingPointIdMapping.ContainsKey(loadingPointId)) loadingPointId = loadingPointIdMapping[loadingPointId];
-
                                         int unloadingPointId = GetIntValue(sheetDocs.Cells[row, 9]?.Value);
-                                        if (unloadingPointIdMapping.ContainsKey(unloadingPointId)) unloadingPointId = unloadingPointIdMapping[unloadingPointId];
-
                                         int driverId = GetIntValue(sheetDocs.Cells[row, 10]?.Value);
-                                        if (driverIdMapping.ContainsKey(driverId)) driverId = driverIdMapping[driverId];
-
                                         int transportId = GetIntValue(sheetDocs.Cells[row, 11]?.Value);
-                                        if (transportIdMapping.ContainsKey(transportId)) transportId = transportIdMapping[transportId];
-
                                         string отпускРазрешил = sheetDocs.Cells[row, 12]?.Value?.ToString() ?? "";
                                         string сдалГрузоотправитель = sheetDocs.Cells[row, 13]?.Value?.ToString() ?? "";
 
@@ -1383,41 +1275,35 @@ namespace Blank.Controllers
                                             loadingPointId, unloadingPointId, driverId, transportId,
                                             отпускРазрешил, сдалГрузоотправитель);
 
-                                        var newId = await _context.Документы
-                                            .Where(d => d.номер_документа == docNumber && d.дата_создания == docDate)
-                                            .OrderByDescending(d => d.ид_документа)
-                                            .Select(d => d.ид_документа)
-                                            .FirstOrDefaultAsync();
-
-                                        docIdMapping[originalDocId] = newId;
+                                        // Получаем новый ID
+                                        int newDocId;
+                                        using (var cmd = _context.Database.GetDbConnection().CreateCommand())
+                                        {
+                                            cmd.CommandText = "SELECT LAST_INSERT_ID()";
+                                            await _context.Database.OpenConnectionAsync();
+                                            newDocId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+                                        }
+                                        docIdMapping[originalDocId] = newDocId;
                                         countDocs++;
                                     }
                                 }
 
-                                // ========== 12. ПОЗИЦИИ ==========
+                                // ========== 11. ПОЗИЦИИ (с маппингом документов) ==========
                                 var sheetPositions = package.Workbook.Worksheets["Позиции"];
-                                int countPositions = 0;
-
-                                if (sheetPositions != null && sheetPositions.Dimension != null && sheetPositions.Dimension.Rows > 1)
+                                if (sheetPositions?.Dimension?.Rows > 1)
                                 {
                                     for (int row = 2; row <= sheetPositions.Dimension.Rows; row++)
                                     {
                                         var docIdObj = sheetPositions.Cells[row, 2]?.Value;
                                         if (docIdObj == null) continue;
-
                                         int oldDocId = Convert.ToInt32(docIdObj);
-                                        if (oldDocId == 0) continue;
                                         if (!docIdMapping.ContainsKey(oldDocId)) continue;
-
                                         int docId = docIdMapping[oldDocId];
-                                        int goodsId = GetIntValue(sheetPositions.Cells[row, 3]?.Value);
-                                        if (goodsId == 0) goodsId = 1;
-                                        if (goodsIdMapping.ContainsKey(goodsId)) goodsId = goodsIdMapping[goodsId];
 
+                                        int goodsId = GetIntValue(sheetPositions.Cells[row, 3]?.Value);
                                         double quantity = 0;
                                         if (sheetPositions.Cells[row, 4]?.Value != null)
                                             double.TryParse(sheetPositions.Cells[row, 4].Value.ToString(), out quantity);
-
                                         decimal price = 0;
                                         if (sheetPositions.Cells[row, 5]?.Value != null)
                                             decimal.TryParse(sheetPositions.Cells[row, 5].Value.ToString(), out price);
@@ -1425,25 +1311,19 @@ namespace Blank.Controllers
                                         object vatRateParam = DBNull.Value;
                                         if (sheetPositions.Cells[row, 6]?.Value != null && decimal.TryParse(sheetPositions.Cells[row, 6].Value.ToString(), out decimal vat))
                                             vatRateParam = vat;
-
                                         object discountParam = DBNull.Value;
                                         if (sheetPositions.Cells[row, 7]?.Value != null && decimal.TryParse(sheetPositions.Cells[row, 7].Value.ToString(), out decimal disc))
                                             discountParam = disc;
-
                                         object weightParam = DBNull.Value;
                                         if (sheetPositions.Cells[row, 8]?.Value != null && decimal.TryParse(sheetPositions.Cells[row, 8].Value.ToString(), out decimal weight))
                                             weightParam = weight;
-
                                         object packagesParam = DBNull.Value;
                                         if (sheetPositions.Cells[row, 9]?.Value != null && int.TryParse(sheetPositions.Cells[row, 9].Value.ToString(), out int packages))
                                             packagesParam = packages;
-
                                         string примечание = sheetPositions.Cells[row, 10]?.Value?.ToString() ?? "";
-
                                         object vatSumParam = DBNull.Value;
                                         if (sheetPositions.Cells[row, 11]?.Value != null && decimal.TryParse(sheetPositions.Cells[row, 11].Value.ToString(), out decimal vatSum))
                                             vatSumParam = vatSum;
-
                                         object totalWithVatParam = DBNull.Value;
                                         if (sheetPositions.Cells[row, 12]?.Value != null && decimal.TryParse(sheetPositions.Cells[row, 12].Value.ToString(), out decimal totalWithVat))
                                             totalWithVatParam = totalWithVat;
@@ -1470,14 +1350,11 @@ namespace Blank.Controllers
                                     VALUES (@docId, @goodsId, @quantity, @price, @vatRate, @discount, 
                                             @weight, @packages, @note, @vatSum, @totalWithVat)",
                                             parameters.ToArray());
-
                                         countPositions++;
                                     }
                                 }
 
                                 await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 1;");
-                                await _context.Database.ExecuteSqlRawAsync("SET SQL_SAFE_UPDATES = 1;");
-
                                 await transaction.CommitAsync();
 
                                 TempData["Success"] = $"Восстановлено: Документов: {countDocs}, Позиций: {countPositions}";
@@ -1486,7 +1363,6 @@ namespace Blank.Controllers
                             {
                                 await transaction.RollbackAsync();
                                 await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 1;");
-                                await _context.Database.ExecuteSqlRawAsync("SET SQL_SAFE_UPDATES = 1;");
                                 TempData["Error"] = $"Ошибка: {ex.Message}<br/>{ex.InnerException?.Message}";
                             }
                         }
