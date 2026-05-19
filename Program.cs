@@ -1,6 +1,10 @@
 using Blank.Data;
 using Microsoft.EntityFrameworkCore;
 
+var cultureInfo = new System.Globalization.CultureInfo("ru-RU");
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
@@ -16,10 +20,6 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddControllersWithViews();
-
-var cultureInfo = new System.Globalization.CultureInfo("ru-RU");
-System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 var app = builder.Build();
 
