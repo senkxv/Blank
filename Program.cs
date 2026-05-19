@@ -1,9 +1,6 @@
 using Blank.Data;
 using Microsoft.EntityFrameworkCore;
-
-var cultureInfo = new System.Globalization.CultureInfo("ru-RU");
-System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +58,22 @@ app.UseStatusCodePages(async context =>
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+// Middleware для установки русской культуры
+app.Use(async (context, next) =>
+{
+    try
+    {
+        var culture = new CultureInfo("ru-RU");
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+    }
+    catch
+    {
+        // Если русская культура недоступна, используем инвариантную
+    }
+    await next();
+});
 
 app.UseSession();
 
