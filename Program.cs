@@ -40,31 +40,8 @@ else
     app.UseHsts();
 }
 
-app.UseStatusCodePages(async context =>
-{
-    var response = context.HttpContext.Response;
-
-    if (response.StatusCode == 404)
-    {
-        response.Redirect("/UserWorkspace/Error404");
-    }
-    else if (response.StatusCode == 500)
-    {
-        response.Redirect("/UserWorkspace/Error500");
-    }
-    else if (response.StatusCode == 403)
-    {
-        response.Redirect("/UserWorkspace/Error403");
-    }
-    else if (response.StatusCode == 401)
-    {
-        response.Redirect("/UserWorkspace/Error401");
-    }
-    else if (response.StatusCode == 400)
-    {
-        response.Redirect("/UserWorkspace/Error400");
-    }
-});
+// Исправленный обработчик ошибок (сохраняет сессию)
+app.UseStatusCodePagesWithReExecute("/UserWorkspace/Error{0}");
 
 app.UseHttpsRedirection();
 app.UseRouting();

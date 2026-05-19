@@ -31,29 +31,18 @@ namespace Blank.Controllers
             _context = context;
         }
 
-        public IActionResult Error404()
+        [Route("/UserWorkspace/Error{statusCode}")]
+        public IActionResult Error(int statusCode)
         {
-            return View();
-        }
-
-        public IActionResult Error500()
-        {
-            return View();
-        }
-
-        public IActionResult Error403()
-        {
-            return View();
-        }
-
-        public IActionResult Error401()
-        {
-            return View();
-        }
-
-        public IActionResult Error400()
-        {
-            return View();
+            return statusCode switch
+            {
+                404 => View("Error404"),
+                500 => View("Error500"),
+                403 => View("Error403"),
+                401 => View("Error401"),
+                400 => View("Error400"),
+                _ => View("Error500")
+            };
         }
 
         public IActionResult Index()
