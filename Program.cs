@@ -17,6 +17,10 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddControllersWithViews();
 
+var cultureInfo = new System.Globalization.CultureInfo("ru-RU");
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
