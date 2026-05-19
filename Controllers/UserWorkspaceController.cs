@@ -1837,7 +1837,22 @@ namespace Blank.Controllers
         [Route("Print/{documentNumber}")]
         public async Task<IActionResult> PrintByNumber(string documentNumber)
         {
-            var doc = await _context.Документы.FirstOrDefaultAsync(d => d.номер_документа == documentNumber);
+            var userOrgIdStr = HttpContext.Session.GetString("UserOrgId");
+            int? userOrgId = string.IsNullOrEmpty(userOrgIdStr) ? null : int.Parse(userOrgIdStr);
+
+            // Получаем список ID организаций пользователя
+            var userOrgIds = await _context.Организации
+                .Where(o => o.ид_организации == userOrgId || o.ид_владельца == userOrgId)
+                .Select(o => o.ид_организации)
+                .ToListAsync();
+
+            // Ищем документ, который принадлежит одной из организаций пользователя
+            var doc = await _context.Документы.FirstOrDefaultAsync(d =>
+                d.номер_документа == documentNumber &&
+                (userOrgIds.Contains(d.ид_грузоотправителя) ||
+                 userOrgIds.Contains(d.ид_перевозчика) ||
+                 userOrgIds.Contains(d.ид_получателя)));
+
             if (doc == null) return NotFound();
 
             var docType = await _context.Типы_Документов
