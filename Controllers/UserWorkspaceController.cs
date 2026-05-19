@@ -1934,27 +1934,29 @@ namespace Blank.Controllers
 
             // 5. Основные замены (кроме строки 37)
             var mainReplacements = new Dictionary<string, string>
-    {
-        { "{sender}", (грузоотправитель?.название ?? "") + ", " + (грузоотправитель?.адрес ?? "") },
-        { "{receiver}", (грузополучатель?.название ?? "") + ", " + (грузополучатель?.адрес ?? "") },
-        { "{date}", formattedDate },
-        { "{mark}", mark },
-        { "{reg_number}", regNumber },
-        { "{driver_fio}", driverFio },
-        { "{loading_point}", пунктПогрузки?.наименование ?? "" },
-        { "{unloading_point}", пунктРазгрузки?.наименование ?? "" },
-        { "{otpusk}", документ.отпуск_разрешил ?? "" },
-        { "{sdal}", документ.сдал_грузоотправитель ?? "" },
-        { "{total_c}", totalQuantity.ToString("F0", cultureForExcel) },
-        { "{total_sum}", totalCost.ToString("F2", cultureForExcel).Replace(".", ",") },
-        { "{total_sn}", totalNds.ToString("F2", cultureForExcel).Replace(".", ",") },
-        { "{total_swn}", totalSumWithNds.ToString("F2", cultureForExcel).Replace(".", ",") },
-        { "{total_weight}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") },
-        { "{total_sn_hand}", NumToTextHelper.SumInWords(totalNds) },
-        { "{total_swn_hand}", NumToTextHelper.SumInWords(totalSumWithNds) },
-        { "{total_w_hand}", NumToTextHelper.WeightInWords(totalWeight) },
-        { "{total_w}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") }
-    };
+{
+    { "{sender}", (грузоотправитель?.название ?? "") + ", " + (грузоотправитель?.адрес ?? "") },
+    { "{sender_unp}", грузоотправитель?.унп ?? "" },
+    { "{receiver}", (грузополучатель?.название ?? "") + ", " + (грузополучатель?.адрес ?? "") },
+    { "{receiver_unp}", грузополучатель?.унп ?? "" },
+    { "{date}", formattedDate },
+    { "{mark}", mark },
+    { "{reg_number}", regNumber },
+    { "{driver_fio}", driverFio },
+    { "{loading_point}", пунктПогрузки?.наименование ?? "" },
+    { "{unloading_point}", пунктРазгрузки?.наименование ?? "" },
+    { "{otpusk}", документ.отпуск_разрешил ?? "" },
+    { "{sdal}", документ.сдал_грузоотправитель ?? "" },
+    { "{total_c}", totalQuantity.ToString("F0", cultureForExcel) },
+    { "{total_sum}", totalCost.ToString("F2", cultureForExcel).Replace(".", ",") },
+    { "{total_sn}", totalNds.ToString("F2", cultureForExcel).Replace(".", ",") },
+    { "{total_swn}", totalSumWithNds.ToString("F2", cultureForExcel).Replace(".", ",") },
+    { "{total_weight}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") },
+    { "{total_sn_hand}", NumToTextHelper.SumInWords(totalNds) },
+    { "{total_swn_hand}", NumToTextHelper.SumInWords(totalSumWithNds) },
+    { "{total_w_hand}", NumToTextHelper.WeightInWords(totalWeight) },
+    { "{total_w}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") }
+};
 
             foreach (var cell in sheet.AllocatedRange)
             {
@@ -2508,7 +2510,9 @@ namespace Blank.Controllers
             var mainReplacements = new Dictionary<string, string>
     {
         { "{sender}", (грузоотправитель?.название ?? "") + ", " + (грузоотправитель?.адрес ?? "") },
+         { "{sender_unp}", грузоотправитель?.унп ?? "" },
         { "{receiver}", (грузополучатель?.название ?? "") + ", " + (грузополучатель?.адрес ?? "") },
+         { "{receiver_unp}", грузополучатель?.унп ?? "" },
         { "{date}", formattedDate },
         { "{mark}", mark },
         { "{reg_number}", regNumber },
