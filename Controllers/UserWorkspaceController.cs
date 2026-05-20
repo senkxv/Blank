@@ -132,7 +132,16 @@ namespace Blank.Controllers
             int userOrgId = string.IsNullOrEmpty(userOrgIdStr) ? 106 : int.Parse(userOrgIdStr);
 
             ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
-            ViewBag.Organizations = _context.Организации.ToList();
+            // Только организации пользователя
+            ViewBag.Organizations = _context.Организации
+                .Where(o => o.ид_организации == userOrgId || o.ид_владельца == userOrgId)
+                .ToList();
+
+            // Только маршруты организации пользователя
+            ViewBag.AvailableRoutes = _context.Маршруты
+                .Include(r => r.ТочкиМаршрута.OrderBy(t => t.порядковый_номер))
+                .Where(r => r.ид_организации == userOrgId && r.статус == "активен")
+                .ToList();
             ViewBag.Drivers = _context.Водители.Where(d => d.ид_организации == userOrgId).ToList();
             ViewBag.Transport = _context.Транспорт.Where(t => t.ид_организации == userOrgId).ToList();
             ViewBag.LoadingPoints = _context.Пункт_Погрузки.Where(p => p.ид_организации == userOrgId).ToList();
@@ -140,18 +149,6 @@ namespace Blank.Controllers
             ViewBag.Goods = _context.Товары.Where(g => g.ид_организации == userOrgId).ToList();
             ViewBag.UserOrgId = userOrgId;
 
-            ViewBag.AvailableRoutes = _context.Маршруты
-                .Include(r => r.ТочкиМаршрута.OrderBy(t => t.порядковый_номер))
-                .Where(r => r.ид_организации == userOrgId && r.статус == "активен")
-                .ToList();
-
-            if (ViewBag.AvailableRoutes.Count == 0)
-            {
-                ViewBag.AvailableRoutes = _context.Маршруты
-                    .Include(r => r.ТочкиМаршрута.OrderBy(t => t.порядковый_номер))
-                    .Where(r => r.статус == "активен")
-                    .ToList();
-            }
 
             if (routeId.HasValue)
             {
