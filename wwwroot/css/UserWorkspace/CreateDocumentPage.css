@@ -310,7 +310,7 @@ select.form-control {
 
 .route-selection {
     box-shadow: 15px 15px 15px rgba(0,0,0,0.1);
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
     margin-bottom: 20px;
     padding: 15px;
     border-radius: 8px;

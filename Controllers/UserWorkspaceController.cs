@@ -678,6 +678,12 @@ namespace Blank.Controllers
                 return Content("Ошибка: организация не определена. Войдите заново.");
             }
 
+            // Получаем список ID всех организаций, принадлежащих администратору
+            var userOrgIds = _context.Организации
+                .Where(o => o.ид_организации == userOrgId || o.ид_владельца == userOrgId)
+                .Select(o => o.ид_организации)
+                .ToList();
+
             using (var package = new ExcelPackage())
             {
                 // Лист 1: Документы
@@ -697,7 +703,9 @@ namespace Blank.Controllers
                 sheetDocuments.Cells[1, 13].Value = "сдал_грузоотправитель";
 
                 var документы = _context.Документы
-                    .Where(d => d.ид_грузоотправителя == userOrgId)
+                    .Where(d => userOrgIds.Contains(d.ид_грузоотправителя)
+                             || userOrgIds.Contains(d.ид_перевозчика)
+                             || userOrgIds.Contains(d.ид_получателя))
                     .ToList();
                 int row = 2;
                 foreach (var doc in документы)
@@ -785,7 +793,7 @@ namespace Blank.Controllers
                 sheetOrganizations.Cells[1, 5].Value = "почта";
                 sheetOrganizations.Cells[1, 6].Value = "ид_владельца";
 
-                var организации = _context.Организации.Where(o => o.ид_организации == userOrgId).ToList();
+                var организации = _context.Организации.Where(o => userOrgIds.Contains(o.ид_организации)).ToList();
                 row = 2;
                 foreach (var org in организации)
                 {
@@ -978,53 +986,14 @@ namespace Blank.Controllers
                                 int countDocs = 0;
                                 int countPositions = 0;
                                 Dictionary<int, int> docIdMapping = new Dictionary<int, int>();
+                                Dictionary<int, int> goodsIdMapping = new Dictionary<int, int>();
+                                Dictionary<int, int> driverIdMapping = new Dictionary<int, int>();
+                                Dictionary<int, int> transportIdMapping = new Dictionary<int, int>();
+                                Dictionary<int, int> loadingPointIdMapping = new Dictionary<int, int>();
+                                Dictionary<int, int> unloadingPointIdMapping = new Dictionary<int, int>();
+                                Dictionary<int, int> orgIdMapping = new Dictionary<int, int>();
 
-                                // ========== 1. ТИПЫ ДОКУМЕНТОВ ==========
-                                var sheetTypes = package.Workbook.Worksheets["ТипыДокументов"];
-                                if (sheetTypes?.Dimension?.Rows > 1)
-                                {
-                                    for (int row = 2; row <= sheetTypes.Dimension.Rows; row++)
-                                    {
-                                        var id = sheetTypes.Cells[row, 1]?.Value;
-                                        var shortName = sheetTypes.Cells[row, 2]?.Value?.ToString();
-                                        if (id == null || string.IsNullOrEmpty(shortName)) continue;
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT IGNORE INTO Типы_Документов (ид_типа, краткое_наименование, полное_наименование) VALUES ({0}, {1}, {2})",
-                                            Convert.ToInt32(id), shortName, sheetTypes.Cells[row, 3]?.Value?.ToString() ?? "");
-                                    }
-                                }
-
-                                // ========== 2. МАРКИ ТРАНСПОРТА ==========
-                                var sheetMarks = package.Workbook.Worksheets["МаркиТранспорта"];
-                                if (sheetMarks?.Dimension?.Rows > 1)
-                                {
-                                    for (int row = 2; row <= sheetMarks.Dimension.Rows; row++)
-                                    {
-                                        var id = sheetMarks.Cells[row, 1]?.Value;
-                                        var name = sheetMarks.Cells[row, 2]?.Value?.ToString();
-                                        if (id == null || string.IsNullOrEmpty(name)) continue;
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT IGNORE INTO Марки_Транспорта (ид_марки, наименование_марки) VALUES ({0}, {1})",
-                                            Convert.ToInt32(id), name);
-                                    }
-                                }
-
-                                // ========== 3. ТИПЫ ТРАНСПОРТА ==========
-                                var sheetTransportTypes = package.Workbook.Worksheets["ТипыТранспорта"];
-                                if (sheetTransportTypes?.Dimension?.Rows > 1)
-                                {
-                                    for (int row = 2; row <= sheetTransportTypes.Dimension.Rows; row++)
-                                    {
-                                        var id = sheetTransportTypes.Cells[row, 1]?.Value;
-                                        var name = sheetTransportTypes.Cells[row, 2]?.Value?.ToString();
-                                        if (id == null || string.IsNullOrEmpty(name)) continue;
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT IGNORE INTO Типы_Транспорта (ид_типа_транспорта, наименование_типа) VALUES ({0}, {1})",
-                                            Convert.ToInt32(id), name);
-                                    }
-                                }
-
-                                // ========== 4. ОРГАНИЗАЦИИ ==========
+                                // 1. Организации
                                 var sheetOrgs = package.Workbook.Worksheets["Организации"];
                                 if (sheetOrgs?.Dimension?.Rows > 1)
                                 {
@@ -1033,17 +1002,25 @@ namespace Blank.Controllers
                                         var id = sheetOrgs.Cells[row, 1]?.Value;
                                         var name = sheetOrgs.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(name)) continue;
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT IGNORE INTO Организации (ид_организации, название, унп, адрес, почта, ид_владельца) VALUES ({0}, {1}, {2}, {3}, {4}, {5})",
-                                            Convert.ToInt32(id), name,
-                                            sheetOrgs.Cells[row, 3]?.Value?.ToString() ?? "",
-                                            sheetOrgs.Cells[row, 4]?.Value?.ToString() ?? "",
-                                            sheetOrgs.Cells[row, 5]?.Value?.ToString() ?? "",
-                                            ownerId);
+                                        int oldId = Convert.ToInt32(id);
+
+                                        // Проверяем, существует ли уже такая организация
+                                        var existing = await _context.Организации.FindAsync(oldId);
+                                        if (existing == null)
+                                        {
+                                            await _context.Database.ExecuteSqlRawAsync(
+                                                "INSERT INTO Организации (ид_организации, название, унп, адрес, почта, ид_владельца) VALUES ({0}, {1}, {2}, {3}, {4}, {5})",
+                                                oldId, name,
+                                                sheetOrgs.Cells[row, 3]?.Value?.ToString() ?? "",
+                                                sheetOrgs.Cells[row, 4]?.Value?.ToString() ?? "",
+                                                sheetOrgs.Cells[row, 5]?.Value?.ToString() ?? "",
+                                                ownerId);
+                                        }
+                                        orgIdMapping[oldId] = oldId; // ID остаётся прежним
                                     }
                                 }
 
-                                // ========== 5. ТОВАРЫ ==========
+                                // 2. Товары
                                 var sheetGoods = package.Workbook.Worksheets["Товары"];
                                 if (sheetGoods?.Dimension?.Rows > 1)
                                 {
@@ -1053,6 +1030,7 @@ namespace Blank.Controllers
                                     {
                                         var id = sheetGoods.Cells[row, 1]?.Value;
                                         if (id == null) continue;
+                                        int oldId = Convert.ToInt32(id);
                                         string code = "", name = "", unit = "";
                                         if (hasCodeColumn)
                                         {
@@ -1066,13 +1044,19 @@ namespace Blank.Controllers
                                             unit = sheetGoods.Cells[row, 3]?.Value?.ToString() ?? "";
                                         }
                                         if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(code)) continue;
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT IGNORE INTO Товары (ид_товара, код_товара, наименование, единицы_измерения, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4})",
-                                            Convert.ToInt32(id), code, name, unit, ownerId);
+
+                                        var existing = await _context.Товары.FindAsync(oldId);
+                                        if (existing == null)
+                                        {
+                                            await _context.Database.ExecuteSqlRawAsync(
+                                                "INSERT INTO Товары (ид_товара, код_товара, наименование, единицы_измерения, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4})",
+                                                oldId, code, name, unit, ownerId);
+                                        }
+                                        goodsIdMapping[oldId] = oldId;
                                     }
                                 }
 
-                                // ========== 6. ВОДИТЕЛИ ==========
+                                // 3. Водители
                                 var sheetDrivers = package.Workbook.Worksheets["Водители"];
                                 if (sheetDrivers?.Dimension?.Rows > 1)
                                 {
@@ -1081,17 +1065,24 @@ namespace Blank.Controllers
                                         var id = sheetDrivers.Cells[row, 1]?.Value;
                                         var lastName = sheetDrivers.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(lastName)) continue;
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT IGNORE INTO Водители (ид_водителя, фамилия, имя, отчество, номер_лицензии, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4}, {5})",
-                                            Convert.ToInt32(id), lastName,
-                                            sheetDrivers.Cells[row, 3]?.Value?.ToString() ?? "",
-                                            sheetDrivers.Cells[row, 4]?.Value?.ToString() ?? "",
-                                            sheetDrivers.Cells[row, 5]?.Value?.ToString() ?? "",
-                                            ownerId);
+                                        int oldId = Convert.ToInt32(id);
+
+                                        var existing = await _context.Водители.FindAsync(oldId);
+                                        if (existing == null)
+                                        {
+                                            await _context.Database.ExecuteSqlRawAsync(
+                                                "INSERT INTO Водители (ид_водителя, фамилия, имя, отчество, номер_лицензии, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4}, {5})",
+                                                oldId, lastName,
+                                                sheetDrivers.Cells[row, 3]?.Value?.ToString() ?? "",
+                                                sheetDrivers.Cells[row, 4]?.Value?.ToString() ?? "",
+                                                sheetDrivers.Cells[row, 5]?.Value?.ToString() ?? "",
+                                                ownerId);
+                                        }
+                                        driverIdMapping[oldId] = oldId;
                                     }
                                 }
 
-                                // ========== 7. ТРАНСПОРТ ==========
+                                // 4. Транспорт
                                 var sheetTransport = package.Workbook.Worksheets["Транспорт"];
                                 if (sheetTransport?.Dimension?.Rows > 1)
                                 {
@@ -1100,16 +1091,23 @@ namespace Blank.Controllers
                                         var id = sheetTransport.Cells[row, 1]?.Value;
                                         var regNumber = sheetTransport.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(regNumber)) continue;
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT IGNORE INTO Транспорт (ид_транспорта, регистрационный_номер, ид_марки, ид_типа_транспорта, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4})",
-                                            Convert.ToInt32(id), regNumber,
-                                            sheetTransport.Cells[row, 3]?.Value ?? 1,
-                                            sheetTransport.Cells[row, 4]?.Value ?? 1,
-                                            ownerId);
+                                        int oldId = Convert.ToInt32(id);
+
+                                        var existing = await _context.Транспорт.FindAsync(oldId);
+                                        if (existing == null)
+                                        {
+                                            await _context.Database.ExecuteSqlRawAsync(
+                                                "INSERT INTO Транспорт (ид_транспорта, регистрационный_номер, ид_марки, ид_типа_транспорта, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4})",
+                                                oldId, regNumber,
+                                                sheetTransport.Cells[row, 3]?.Value ?? 1,
+                                                sheetTransport.Cells[row, 4]?.Value ?? 1,
+                                                ownerId);
+                                        }
+                                        transportIdMapping[oldId] = oldId;
                                     }
                                 }
 
-                                // ========== 8. ПУНКТЫ ПОГРУЗКИ ==========
+                                // 5. Пункты погрузки
                                 var sheetLoading = package.Workbook.Worksheets["ПунктыПогрузки"];
                                 if (sheetLoading?.Dimension?.Rows > 1)
                                 {
@@ -1118,15 +1116,22 @@ namespace Blank.Controllers
                                         var id = sheetLoading.Cells[row, 1]?.Value;
                                         var name = sheetLoading.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(name)) continue;
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT IGNORE INTO Пункт_Погрузки (ид_пункта_погрузки, наименование, адрес, ид_организации) VALUES ({0}, {1}, {2}, {3})",
-                                            Convert.ToInt32(id), name,
-                                            sheetLoading.Cells[row, 3]?.Value?.ToString() ?? "",
-                                            ownerId);
+                                        int oldId = Convert.ToInt32(id);
+
+                                        var existing = await _context.Пункт_Погрузки.FindAsync(oldId);
+                                        if (existing == null)
+                                        {
+                                            await _context.Database.ExecuteSqlRawAsync(
+                                                "INSERT INTO Пункт_Погрузки (ид_пункта_погрузки, наименование, адрес, ид_организации) VALUES ({0}, {1}, {2}, {3})",
+                                                oldId, name,
+                                                sheetLoading.Cells[row, 3]?.Value?.ToString() ?? "",
+                                                ownerId);
+                                        }
+                                        loadingPointIdMapping[oldId] = oldId;
                                     }
                                 }
 
-                                // ========== 9. ПУНКТЫ РАЗГРУЗКИ ==========
+                                // 6. Пункты разгрузки
                                 var sheetUnloading = package.Workbook.Worksheets["ПунктыРазгрузки"];
                                 if (sheetUnloading?.Dimension?.Rows > 1)
                                 {
@@ -1135,15 +1140,22 @@ namespace Blank.Controllers
                                         var id = sheetUnloading.Cells[row, 1]?.Value;
                                         var name = sheetUnloading.Cells[row, 2]?.Value?.ToString();
                                         if (id == null || string.IsNullOrEmpty(name)) continue;
-                                        await _context.Database.ExecuteSqlRawAsync(
-                                            "INSERT IGNORE INTO Пункт_Разгрузки (ид_пункта_разгрузки, наименование, адрес, ид_организации) VALUES ({0}, {1}, {2}, {3})",
-                                            Convert.ToInt32(id), name,
-                                            sheetUnloading.Cells[row, 3]?.Value?.ToString() ?? "",
-                                            ownerId);
+                                        int oldId = Convert.ToInt32(id);
+
+                                        var existing = await _context.Пункт_Разгрузки.FindAsync(oldId);
+                                        if (existing == null)
+                                        {
+                                            await _context.Database.ExecuteSqlRawAsync(
+                                                "INSERT INTO Пункт_Разгрузки (ид_пункта_разгрузки, наименование, адрес, ид_организации) VALUES ({0}, {1}, {2}, {3})",
+                                                oldId, name,
+                                                sheetUnloading.Cells[row, 3]?.Value?.ToString() ?? "",
+                                                ownerId);
+                                        }
+                                        unloadingPointIdMapping[oldId] = oldId;
                                     }
                                 }
 
-                                // ========== 10. ДОКУМЕНТЫ (с маппингом ID) ==========
+                                // 7. Документы (через EF Core для точного получения ID)
                                 var sheetDocs = package.Workbook.Worksheets["Документы"];
                                 if (sheetDocs?.Dimension?.Rows > 1)
                                 {
@@ -1177,31 +1189,38 @@ namespace Blank.Controllers
                                         string отпускРазрешил = sheetDocs.Cells[row, 12]?.Value?.ToString() ?? "";
                                         string сдалГрузоотправитель = sheetDocs.Cells[row, 13]?.Value?.ToString() ?? "";
 
-                                        await _context.Database.ExecuteSqlRawAsync(@"
-                                    INSERT INTO Документы (номер_документа, дата_создания, 
-                                        ид_типа, ид_грузоотправителя, ид_перевозчика, ид_получателя,
-                                        ид_пункта_погрузки, ид_пункта_разгрузки, ид_водителя, ид_транспорта,
-                                        отпуск_разрешил, сдал_грузоотправитель, ид_пользователя) 
-                                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, 1)",
-                                            docNumber, docDate, typeId,
-                                            senderId, carrierId, receiverId,
-                                            loadingPointId, unloadingPointId, driverId, transportId,
-                                            отпускРазрешил, сдалГрузоотправитель);
+                                        // Избегаем дубликатов номера внутри той же организации
+                                        bool номерЗанят = await _context.Документы
+                                            .AnyAsync(d => d.номер_документа == docNumber && d.ид_грузоотправителя == senderId);
+                                        if (номерЗанят)
+                                            docNumber += "_import";
 
-                                        // Получаем новый ID
-                                        int newDocId;
-                                        using (var cmd = _context.Database.GetDbConnection().CreateCommand())
+                                        var newDoc = new Documents
                                         {
-                                            cmd.CommandText = "SELECT LAST_INSERT_ID()";
-                                            await _context.Database.OpenConnectionAsync();
-                                            newDocId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
-                                        }
-                                        docIdMapping[originalDocId] = newDocId;
+                                            номер_документа = docNumber,
+                                            дата_создания = docDate,
+                                            ид_типа = typeId,
+                                            ид_грузоотправителя = senderId,
+                                            ид_перевозчика = carrierId,
+                                            ид_получателя = receiverId,
+                                            ид_пункта_погрузки = loadingPointId,
+                                            ид_пункта_разгрузки = unloadingPointId,
+                                            ид_водителя = driverId,
+                                            ид_транспорта = transportId,
+                                            отпуск_разрешил = отпускРазрешил,
+                                            сдал_грузоотправитель = сдалГрузоотправитель,
+                                            ид_пользователя = 1
+                                        };
+
+                                        _context.Документы.Add(newDoc);
+                                        await _context.SaveChangesAsync();
+
+                                        docIdMapping[originalDocId] = newDoc.ид_документа;
                                         countDocs++;
                                     }
                                 }
 
-                                // ========== 11. ПОЗИЦИИ (с маппингом документов) ==========
+                                // 8. Позиции
                                 var sheetPositions = package.Workbook.Worksheets["Позиции"];
                                 if (sheetPositions?.Dimension?.Rows > 1)
                                 {
@@ -1221,50 +1240,44 @@ namespace Blank.Controllers
                                         if (sheetPositions.Cells[row, 5]?.Value != null)
                                             decimal.TryParse(sheetPositions.Cells[row, 5].Value.ToString(), out price);
 
-                                        object vatRateParam = DBNull.Value;
-                                        if (sheetPositions.Cells[row, 6]?.Value != null && decimal.TryParse(sheetPositions.Cells[row, 6].Value.ToString(), out decimal vat))
-                                            vatRateParam = vat;
-                                        object discountParam = DBNull.Value;
-                                        if (sheetPositions.Cells[row, 7]?.Value != null && decimal.TryParse(sheetPositions.Cells[row, 7].Value.ToString(), out decimal disc))
-                                            discountParam = disc;
-                                        object weightParam = DBNull.Value;
-                                        if (sheetPositions.Cells[row, 8]?.Value != null && decimal.TryParse(sheetPositions.Cells[row, 8].Value.ToString(), out decimal weight))
-                                            weightParam = weight;
-                                        object packagesParam = DBNull.Value;
-                                        if (sheetPositions.Cells[row, 9]?.Value != null && int.TryParse(sheetPositions.Cells[row, 9].Value.ToString(), out int packages))
-                                            packagesParam = packages;
-                                        string примечание = sheetPositions.Cells[row, 10]?.Value?.ToString() ?? "";
-                                        object vatSumParam = DBNull.Value;
-                                        if (sheetPositions.Cells[row, 11]?.Value != null && decimal.TryParse(sheetPositions.Cells[row, 11].Value.ToString(), out decimal vatSum))
-                                            vatSumParam = vatSum;
-                                        object totalWithVatParam = DBNull.Value;
-                                        if (sheetPositions.Cells[row, 12]?.Value != null && decimal.TryParse(sheetPositions.Cells[row, 12].Value.ToString(), out decimal totalWithVat))
-                                            totalWithVatParam = totalWithVat;
+                                        decimal vat = 0;
+                                        if (sheetPositions.Cells[row, 6]?.Value != null)
+                                            decimal.TryParse(sheetPositions.Cells[row, 6].Value.ToString(), out vat);
+                                        decimal discount = 0;
+                                        if (sheetPositions.Cells[row, 7]?.Value != null)
+                                            decimal.TryParse(sheetPositions.Cells[row, 7].Value.ToString(), out discount);
+                                        decimal weight = 0;
+                                        if (sheetPositions.Cells[row, 8]?.Value != null)
+                                            decimal.TryParse(sheetPositions.Cells[row, 8].Value.ToString(), out weight);
+                                        int packages = 0;
+                                        if (sheetPositions.Cells[row, 9]?.Value != null)
+                                            int.TryParse(sheetPositions.Cells[row, 9].Value.ToString(), out packages);
+                                        string note = sheetPositions.Cells[row, 10]?.Value?.ToString() ?? "";
+                                        decimal vatSum = 0;
+                                        if (sheetPositions.Cells[row, 11]?.Value != null)
+                                            decimal.TryParse(sheetPositions.Cells[row, 11].Value.ToString(), out vatSum);
+                                        decimal total = 0;
+                                        if (sheetPositions.Cells[row, 12]?.Value != null)
+                                            decimal.TryParse(sheetPositions.Cells[row, 12].Value.ToString(), out total);
 
-                                        var parameters = new List<MySqlParameter>
-                                {
-                                    new MySqlParameter("@docId", docId),
-                                    new MySqlParameter("@goodsId", goodsId),
-                                    new MySqlParameter("@quantity", quantity),
-                                    new MySqlParameter("@price", price),
-                                    new MySqlParameter("@vatRate", vatRateParam),
-                                    new MySqlParameter("@discount", discountParam),
-                                    new MySqlParameter("@weight", weightParam),
-                                    new MySqlParameter("@packages", packagesParam),
-                                    new MySqlParameter("@note", примечание),
-                                    new MySqlParameter("@vatSum", vatSumParam),
-                                    new MySqlParameter("@totalWithVat", totalWithVatParam)
-                                };
-
-                                        await _context.Database.ExecuteSqlRawAsync(@"
-                                    INSERT INTO Позиции (ид_документа, ид_товара, количество, цена_за_единицу,
-                                        ставка_ндс, скидка, масса_груза, грузовых_мест, примечание, 
-                                        сумма_ндс, стоимость_с_ндс) 
-                                    VALUES (@docId, @goodsId, @quantity, @price, @vatRate, @discount, 
-                                            @weight, @packages, @note, @vatSum, @totalWithVat)",
-                                            parameters.ToArray());
+                                        var newPos = new Positions
+                                        {
+                                            ид_документа = docId,
+                                            ид_товара = goodsId,
+                                            количество = quantity,
+                                            цена_за_единицу = price,
+                                            ставка_ндс = vat,
+                                            скидка = discount,
+                                            масса_груза = weight,
+                                            грузовых_мест = packages > 0 ? packages : (int?)null,
+                                            примечание = string.IsNullOrEmpty(note) ? null : note,
+                                            сумма_ндс = vatSum,
+                                            стоимость_с_ндс = total
+                                        };
+                                        _context.Позиции.Add(newPos);
                                         countPositions++;
                                     }
+                                    await _context.SaveChangesAsync();
                                 }
 
                                 await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 1;");

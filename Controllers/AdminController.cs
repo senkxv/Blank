@@ -284,7 +284,39 @@ namespace Blank.Controllers
         public async Task<IActionResult> DeleteOrganization(int id)
         {
             var org = await _context.Организации.FindAsync(id);
-            if (org == null) return Json(new { success = false });
+            if (org == null) return Json(new { success = false, error = "Организация не найдена" });
+
+            // Проверяем документы
+            bool hasDocs = await _context.Документы.AnyAsync(d =>
+                d.ид_грузоотправителя == id || d.ид_перевозчика == id || d.ид_получателя == id);
+            if (hasDocs)
+                return Json(new { success = false, error = "Невозможно удалить организацию: на неё есть документы." });
+
+            // Проверяем водителей
+            bool hasDrivers = await _context.Водители.AnyAsync(d => d.ид_организации == id);
+            if (hasDrivers)
+                return Json(new { success = false, error = "Невозможно удалить организацию: есть связанные водители." });
+
+            // Проверяем транспорт
+            bool hasTransport = await _context.Транспорт.AnyAsync(t => t.ид_организации == id);
+            if (hasTransport)
+                return Json(new { success = false, error = "Невозможно удалить организацию: есть связанный транспорт." });
+
+            // Проверяем пункты погрузки
+            bool hasLoading = await _context.Пункт_Погрузки.AnyAsync(p => p.ид_организации == id);
+            if (hasLoading)
+                return Json(new { success = false, error = "Невозможно удалить организацию: есть связанные пункты погрузки." });
+
+            // Проверяем пункты разгрузки
+            bool hasUnloading = await _context.Пункт_Разгрузки.AnyAsync(p => p.ид_организации == id);
+            if (hasUnloading)
+                return Json(new { success = false, error = "Невозможно удалить организацию: есть связанные пункты разгрузки." });
+
+            // Проверяем товары
+            bool hasGoods = await _context.Товары.AnyAsync(g => g.ид_организации == id);
+            if (hasGoods)
+                return Json(new { success = false, error = "Невозможно удалить организацию: есть связанные товары." });
+
             _context.Организации.Remove(org);
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -323,7 +355,18 @@ namespace Blank.Controllers
         public async Task<IActionResult> DeleteDriver(int id)
         {
             var d = await _context.Водители.FindAsync(id);
-            if (d == null) return Json(new { success = false });
+            if (d == null) return Json(new { success = false, error = "Водитель не найден" });
+
+            // Проверяем использование в документах
+            bool hasDocs = await _context.Документы.AnyAsync(doc => doc.ид_водителя == id);
+            if (hasDocs)
+                return Json(new { success = false, error = "Невозможно удалить водителя: он используется в документах." });
+
+            // Проверяем использование в маршрутах
+            bool hasRoutes = await _context.Маршруты.AnyAsync(r => r.ид_водителя == id);
+            if (hasRoutes)
+                return Json(new { success = false, error = "Невозможно удалить водителя: он используется в маршрутах." });
+
             _context.Водители.Remove(d);
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -363,32 +406,27 @@ namespace Blank.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateTransport([FromBody] TransportModel model)
+        public async Task<IActionResult> UpdateTransport([FromBody] TransportUpdateModel model)
         {
             var t = await _context.Транспорт.FindAsync(model.Id);
-            if (t == null) return Json(new { success = false });
-
-            var brand = await _context.Марка_Транспорта
-                .FirstOrDefaultAsync(m => m.наименование_марки == model.BrandName);
-            if (brand == null)
-            {
-                brand = new Transport_Mark { наименование_марки = model.BrandName };
-                _context.Марка_Транспорта.Add(brand);
-                await _context.SaveChangesAsync();
-            }
-
-            var type = await _context.Тип_Транспорта
-                .FirstOrDefaultAsync(t => t.наименование_типа == model.TypeName);
-            if (type == null)
-            {
-                type = new Transport_Type { наименование_типа = model.TypeName };
-                _context.Тип_Транспорта.Add(type);
-                await _context.SaveChangesAsync();
-            }
+            if (t == null) return Json(new { success = false, error = "Транспорт не найден" });
 
             t.регистрационный_номер = model.RegNumber;
-            t.ид_марки = brand.ид_марки;
-            t.ид_типа_транспорта = type.ид_типа_транспорта;
+
+            // Безопасно обновляем марку
+            if (int.TryParse(model.BrandId, out int brandId))
+            {
+                var brandExists = await _context.Марка_Транспорта.AnyAsync(m => m.ид_марки == brandId);
+                if (brandExists) t.ид_марки = brandId;
+            }
+
+            // Безопасно обновляем тип
+            if (int.TryParse(model.TypeId, out int typeId))
+            {
+                var typeExists = await _context.Тип_Транспорта.AnyAsync(t => t.ид_типа_транспорта == typeId);
+                if (typeExists) t.ид_типа_транспорта = typeId;
+            }
+
             await _context.SaveChangesAsync();
             return Json(new { success = true });
         }
@@ -397,7 +435,18 @@ namespace Blank.Controllers
         public async Task<IActionResult> DeleteTransport(int id)
         {
             var t = await _context.Транспорт.FindAsync(id);
-            if (t == null) return Json(new { success = false });
+            if (t == null) return Json(new { success = false, error = "Транспорт не найден" });
+
+            // Проверяем использование в документах
+            bool hasDocs = await _context.Документы.AnyAsync(doc => doc.ид_транспорта == id);
+            if (hasDocs)
+                return Json(new { success = false, error = "Невозможно удалить транспорт: он используется в документах." });
+
+            // Проверяем использование в маршрутах
+            bool hasRoutes = await _context.Маршруты.AnyAsync(r => r.ид_транспорта == id);
+            if (hasRoutes)
+                return Json(new { success = false, error = "Невозможно удалить транспорт: он используется в маршрутах." });
+
             _context.Транспорт.Remove(t);
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -434,7 +483,13 @@ namespace Blank.Controllers
         public async Task<IActionResult> DeleteGoods(int id)
         {
             var g = await _context.Товары.FindAsync(id);
-            if (g == null) return Json(new { success = false });
+            if (g == null) return Json(new { success = false, error = "Товар не найден" });
+
+            // Проверяем использование в позициях документов
+            bool hasPositions = await _context.Позиции.AnyAsync(p => p.ид_товара == id);
+            if (hasPositions)
+                return Json(new { success = false, error = "Невозможно удалить товар: он используется в накладных." });
+
             _context.Товары.Remove(g);
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -469,7 +524,18 @@ namespace Blank.Controllers
         public async Task<IActionResult> DeleteLoadingPoint(int id)
         {
             var p = await _context.Пункт_Погрузки.FindAsync(id);
-            if (p == null) return Json(new { success = false });
+            if (p == null) return Json(new { success = false, error = "Пункт погрузки не найден" });
+
+            // Проверяем использование в документах
+            bool hasDocs = await _context.Документы.AnyAsync(doc => doc.ид_пункта_погрузки == id);
+            if (hasDocs)
+                return Json(new { success = false, error = "Невозможно удалить пункт погрузки: он используется в документах." });
+
+            // Проверяем использование в точках маршрутов
+            bool hasRoutePoints = await _context.Точки_Маршрута.AnyAsync(t => t.ид_пункта_погрузки == id);
+            if (hasRoutePoints)
+                return Json(new { success = false, error = "Невозможно удалить пункт погрузки: он используется в маршрутах." });
+
             _context.Пункт_Погрузки.Remove(p);
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -504,7 +570,18 @@ namespace Blank.Controllers
         public async Task<IActionResult> DeleteUnloadingPoint(int id)
         {
             var p = await _context.Пункт_Разгрузки.FindAsync(id);
-            if (p == null) return Json(new { success = false });
+            if (p == null) return Json(new { success = false, error = "Пункт разгрузки не найден" });
+
+            // Проверяем использование в документах
+            bool hasDocs = await _context.Документы.AnyAsync(doc => doc.ид_пункта_разгрузки == id);
+            if (hasDocs)
+                return Json(new { success = false, error = "Невозможно удалить пункт разгрузки: он используется в документах." });
+
+            // Проверяем использование в точках маршрутов
+            bool hasRoutePoints = await _context.Точки_Маршрута.AnyAsync(t => t.ид_пункта_разгрузки == id);
+            if (hasRoutePoints)
+                return Json(new { success = false, error = "Невозможно удалить пункт разгрузки: он используется в маршрутах." });
+
             _context.Пункт_Разгрузки.Remove(p);
             await _context.SaveChangesAsync();
             return Json(new { success = true });
@@ -543,7 +620,18 @@ namespace Blank.Controllers
         public async Task<IActionResult> DeleteUser(int id)
         {
             var u = await _context.Пользователи.FindAsync(id);
-            if (u == null) return Json(new { success = false });
+            if (u == null) return Json(new { success = false, error = "Пользователь не найден" });
+
+            // Проверяем использование в документах
+            bool hasDocs = await _context.Документы.AnyAsync(doc => doc.ид_пользователя == id);
+            if (hasDocs)
+                return Json(new { success = false, error = "Невозможно удалить пользователя: он создавал документы." });
+
+            // Нельзя удалить самого себя
+            var currentUserId = HttpContext.Session.GetString("UserId");
+            if (currentUserId != null && int.Parse(currentUserId) == id)
+                return Json(new { success = false, error = "Невозможно удалить самого себя." });
+
             _context.Пользователи.Remove(u);
             await _context.SaveChangesAsync();
             return Json(new { success = true });

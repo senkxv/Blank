@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (res.success) {
                                 row.remove();
                             } else {
-                                showNotification('Ошибка');
+                                showNotification(res.error || 'Ошибка');
                             }
                         });
                 });
@@ -205,9 +205,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setupUpdate('transportTableBody', '/Admin/UpdateTransport', function (row) {
         return {
-            regNumber: row.querySelector('.edit-regnumber').value,
-            brandId: row.querySelector('.edit-brand').value,
-            typeId: row.querySelector('.edit-type').value
+            regNumber: row.querySelector('.edit-regnumber')?.value || '',
+            brandId: row.querySelector('.edit-brand')?.value || '1',
+            typeId: row.querySelector('.edit-type')?.value || '1'
         };
     });
 
@@ -283,6 +283,7 @@ document.addEventListener('DOMContentLoaded', function () {
             roleId: row.querySelector('.edit-role').value
         };
     });
+
 
     // ============ МАРШРУТЫ ============
 
