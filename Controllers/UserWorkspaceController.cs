@@ -675,7 +675,6 @@ namespace Blank.Controllers
                 return Content("Ошибка: организация не определена. Войдите заново.");
             }
 
-            // Получаем список ID всех организаций, принадлежащих администратору
             var userOrgIds = _context.Организации
                 .Where(o => o.ид_организации == userOrgId || o.ид_владельца == userOrgId)
                 .Select(o => o.ид_организации)
@@ -903,12 +902,20 @@ namespace Blank.Controllers
                 }
                 sheetDocTypes.Cells.AutoFitColumns();
 
-                // Лист: Марки транспорта
+                // Лист: Марки транспорта — только используемые организацией
                 var sheetMarks = package.Workbook.Worksheets.Add("МаркиТранспорта");
                 sheetMarks.Cells[1, 1].Value = "ид_марки";
                 sheetMarks.Cells[1, 2].Value = "наименование_марки";
 
-                var marks = _context.Марка_Транспорта.ToList();
+                var usedBrandIds = _context.Транспорт
+                    .Where(t => t.ид_организации == userOrgId)
+                    .Select(t => t.ид_марки)
+                    .Distinct()
+                    .ToList();
+
+                var marks = _context.Марка_Транспорта
+                    .Where(m => usedBrandIds.Contains(m.ид_марки))
+                    .ToList();
                 row = 2;
                 foreach (var mark in marks)
                 {
@@ -918,12 +925,20 @@ namespace Blank.Controllers
                 }
                 sheetMarks.Cells.AutoFitColumns();
 
-                // Лист: Типы транспорта
+                // Лист: Типы транспорта — только используемые организацией
                 var sheetTransportTypesExport = package.Workbook.Worksheets.Add("ТипыТранспорта");
                 sheetTransportTypesExport.Cells[1, 1].Value = "ид_типа_транспорта";
                 sheetTransportTypesExport.Cells[1, 2].Value = "наименование_типа";
 
-                var types = _context.Тип_Транспорта.ToList();
+                var usedTypeIds = _context.Транспорт
+                    .Where(t => t.ид_организации == userOrgId)
+                    .Select(t => t.ид_типа_транспорта)
+                    .Distinct()
+                    .ToList();
+
+                var types = _context.Тип_Транспорта
+                    .Where(t => usedTypeIds.Contains(t.ид_типа_транспорта))
+                    .ToList();
                 row = 2;
                 foreach (var type in types)
                 {
