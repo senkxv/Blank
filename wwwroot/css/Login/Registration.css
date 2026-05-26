@@ -235,7 +235,6 @@ input:checked + .slider {
     margin: 0;
 }
 
-/* Ошибки */
 .field-error {
     color: #990000;
     font-size: 12px;

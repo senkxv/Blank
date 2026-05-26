@@ -32,9 +32,10 @@ namespace Blank.Models.ViewModels
         [MaxLength(500, ErrorMessage = "Примечание не более 500 символов")]
         public string? note { get; set; }
 
-        // Добавлено для предпросмотра
         public decimal? ставка_ндс { get; set; }
+
         public string? товар_наименование { get; set; }
+
         public string? единицы_измерения { get; set; }
     }
 }

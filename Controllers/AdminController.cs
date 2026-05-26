@@ -38,7 +38,6 @@ namespace Blank.Controllers
             }
         }
 
-        // ==================== ГЛАВНАЯ СТРАНИЦА ====================
         [HttpGet]
         public IActionResult Index()
         {
@@ -60,7 +59,6 @@ namespace Blank.Controllers
             ViewBag.Users = _context.Пользователи.Where(u => u.ид_организации == userOrgId).ToList();
             ViewBag.Transport = _context.Транспорт.Where(t => t.ид_организации == userOrgId).ToList();
 
-            // Загрузка маршрутов
             ViewBag.Routes = _context.Маршруты
                 .Include(r => r.Водитель)
                 .Include(r => r.Транспорт)
@@ -75,7 +73,6 @@ namespace Blank.Controllers
             return View();
         }
 
-        // ==================== МАРШРУТЫ ====================
         [HttpPost]
         public async Task<IActionResult> CreateRoute(string routeName, string driverId, string transportId, string carrierId, string routePointsData)
         {
@@ -97,10 +94,9 @@ namespace Blank.Controllers
     string.IsNullOrEmpty(driverId) ? null : int.Parse(driverId),
     string.IsNullOrEmpty(transportId) ? null : int.Parse(transportId),
     string.IsNullOrEmpty(carrierId) ? null : int.Parse(carrierId),
-    1, // ТТН
+    1, 
     "активен");
 
-                // Получаем ID созданного маршрута
                 var routeId = await _context.Маршруты
                     .OrderByDescending(r => r.ид_маршрута)
                     .Select(r => r.ид_маршрута)
@@ -108,7 +104,6 @@ namespace Blank.Controllers
 
                 await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 1;");
 
-                // Сохраняем точки маршрута
                 if (!string.IsNullOrEmpty(routePointsData) && routeId > 0)
                 {
                     var points = JsonSerializer.Deserialize<List<RoutePointViewModel>>(routePointsData);
@@ -141,7 +136,6 @@ namespace Blank.Controllers
             return RedirectToAction("Index");
         }
 
-        // Получить маршрут для редактирования
         [HttpGet]
         public async Task<IActionResult> GetRoute(int id)
         {
@@ -188,17 +182,14 @@ namespace Blank.Controllers
                 route.ид_перевозчика = string.IsNullOrEmpty(request.carrierId) ? null : int.Parse(request.carrierId);
                 route.статус = request.status ?? "активен";
 
-                // Обновляем точки
                 if (!string.IsNullOrEmpty(request.routePointsData))
                 {
                     var points = JsonSerializer.Deserialize<List<RoutePointUpdateModel>>(request.routePointsData);
 
-                    // Удаляем старые точки
                     var oldPoints = _context.Точки_Маршрута.Where(t => t.ид_маршрута == request.id);
                     _context.Точки_Маршрута.RemoveRange(oldPoints);
                     await _context.SaveChangesAsync();
 
-                    // Добавляем новые
                     if (points != null)
                     {
                         foreach (var point in points)
@@ -251,7 +242,6 @@ namespace Blank.Controllers
             }
         }
 
-        // ==================== ОРГАНИЗАЦИИ ====================
         [HttpPost]
         public async Task<IActionResult> AddOrganization([FromBody] CompanyModel model)
         {
@@ -286,33 +276,27 @@ namespace Blank.Controllers
             var org = await _context.Организации.FindAsync(id);
             if (org == null) return Json(new { success = false, error = "Организация не найдена" });
 
-            // Проверяем документы
             bool hasDocs = await _context.Документы.AnyAsync(d =>
                 d.ид_грузоотправителя == id || d.ид_перевозчика == id || d.ид_получателя == id);
             if (hasDocs)
                 return Json(new { success = false, error = "Невозможно удалить организацию: на неё есть документы." });
 
-            // Проверяем водителей
             bool hasDrivers = await _context.Водители.AnyAsync(d => d.ид_организации == id);
             if (hasDrivers)
                 return Json(new { success = false, error = "Невозможно удалить организацию: есть связанные водители." });
 
-            // Проверяем транспорт
             bool hasTransport = await _context.Транспорт.AnyAsync(t => t.ид_организации == id);
             if (hasTransport)
                 return Json(new { success = false, error = "Невозможно удалить организацию: есть связанный транспорт." });
 
-            // Проверяем пункты погрузки
             bool hasLoading = await _context.Пункт_Погрузки.AnyAsync(p => p.ид_организации == id);
             if (hasLoading)
                 return Json(new { success = false, error = "Невозможно удалить организацию: есть связанные пункты погрузки." });
 
-            // Проверяем пункты разгрузки
             bool hasUnloading = await _context.Пункт_Разгрузки.AnyAsync(p => p.ид_организации == id);
             if (hasUnloading)
                 return Json(new { success = false, error = "Невозможно удалить организацию: есть связанные пункты разгрузки." });
 
-            // Проверяем товары
             bool hasGoods = await _context.Товары.AnyAsync(g => g.ид_организации == id);
             if (hasGoods)
                 return Json(new { success = false, error = "Невозможно удалить организацию: есть связанные товары." });
@@ -322,7 +306,6 @@ namespace Blank.Controllers
             return Json(new { success = true });
         }
 
-        // ==================== ВОДИТЕЛИ ====================
         [HttpPost]
         public async Task<IActionResult> AddDriver([FromBody] DriverModel model)
         {
@@ -357,12 +340,10 @@ namespace Blank.Controllers
             var d = await _context.Водители.FindAsync(id);
             if (d == null) return Json(new { success = false, error = "Водитель не найден" });
 
-            // Проверяем использование в документах
             bool hasDocs = await _context.Документы.AnyAsync(doc => doc.ид_водителя == id);
             if (hasDocs)
                 return Json(new { success = false, error = "Невозможно удалить водителя: он используется в документах." });
 
-            // Проверяем использование в маршрутах
             bool hasRoutes = await _context.Маршруты.AnyAsync(r => r.ид_водителя == id);
             if (hasRoutes)
                 return Json(new { success = false, error = "Невозможно удалить водителя: он используется в маршрутах." });
@@ -372,7 +353,6 @@ namespace Blank.Controllers
             return Json(new { success = true });
         }
 
-        // ==================== ТРАНСПОРТ ====================
         [HttpPost]
         public async Task<IActionResult> AddTransport([FromBody] TransportModel model)
         {
@@ -413,14 +393,12 @@ namespace Blank.Controllers
 
             t.регистрационный_номер = model.RegNumber;
 
-            // Безопасно обновляем марку
             if (int.TryParse(model.BrandId, out int brandId))
             {
                 var brandExists = await _context.Марка_Транспорта.AnyAsync(m => m.ид_марки == brandId);
                 if (brandExists) t.ид_марки = brandId;
             }
 
-            // Безопасно обновляем тип
             if (int.TryParse(model.TypeId, out int typeId))
             {
                 var typeExists = await _context.Тип_Транспорта.AnyAsync(t => t.ид_типа_транспорта == typeId);
@@ -437,12 +415,10 @@ namespace Blank.Controllers
             var t = await _context.Транспорт.FindAsync(id);
             if (t == null) return Json(new { success = false, error = "Транспорт не найден" });
 
-            // Проверяем использование в документах
             bool hasDocs = await _context.Документы.AnyAsync(doc => doc.ид_транспорта == id);
             if (hasDocs)
                 return Json(new { success = false, error = "Невозможно удалить транспорт: он используется в документах." });
 
-            // Проверяем использование в маршрутах
             bool hasRoutes = await _context.Маршруты.AnyAsync(r => r.ид_транспорта == id);
             if (hasRoutes)
                 return Json(new { success = false, error = "Невозможно удалить транспорт: он используется в маршрутах." });
@@ -452,7 +428,6 @@ namespace Blank.Controllers
             return Json(new { success = true });
         }
 
-        // ==================== ТОВАРЫ ====================
         [HttpPost]
         public async Task<IActionResult> AddGoods([FromBody] GoodsModel model)
         {
@@ -485,7 +460,6 @@ namespace Blank.Controllers
             var g = await _context.Товары.FindAsync(id);
             if (g == null) return Json(new { success = false, error = "Товар не найден" });
 
-            // Проверяем использование в позициях документов
             bool hasPositions = await _context.Позиции.AnyAsync(p => p.ид_товара == id);
             if (hasPositions)
                 return Json(new { success = false, error = "Невозможно удалить товар: он используется в накладных." });
@@ -495,7 +469,6 @@ namespace Blank.Controllers
             return Json(new { success = true });
         }
 
-        // ==================== ПУНКТЫ ПОГРУЗКИ ====================
         [HttpPost]
         public async Task<IActionResult> AddLoadingPoint([FromBody] PointModel model)
         {
@@ -526,12 +499,10 @@ namespace Blank.Controllers
             var p = await _context.Пункт_Погрузки.FindAsync(id);
             if (p == null) return Json(new { success = false, error = "Пункт погрузки не найден" });
 
-            // Проверяем использование в документах
             bool hasDocs = await _context.Документы.AnyAsync(doc => doc.ид_пункта_погрузки == id);
             if (hasDocs)
                 return Json(new { success = false, error = "Невозможно удалить пункт погрузки: он используется в документах." });
 
-            // Проверяем использование в точках маршрутов
             bool hasRoutePoints = await _context.Точки_Маршрута.AnyAsync(t => t.ид_пункта_погрузки == id);
             if (hasRoutePoints)
                 return Json(new { success = false, error = "Невозможно удалить пункт погрузки: он используется в маршрутах." });
@@ -541,7 +512,6 @@ namespace Blank.Controllers
             return Json(new { success = true });
         }
 
-        // ==================== ПУНКТЫ РАЗГРУЗКИ ====================
         [HttpPost]
         public async Task<IActionResult> AddUnloadingPoint([FromBody] PointModel model)
         {
@@ -572,12 +542,10 @@ namespace Blank.Controllers
             var p = await _context.Пункт_Разгрузки.FindAsync(id);
             if (p == null) return Json(new { success = false, error = "Пункт разгрузки не найден" });
 
-            // Проверяем использование в документах
             bool hasDocs = await _context.Документы.AnyAsync(doc => doc.ид_пункта_разгрузки == id);
             if (hasDocs)
                 return Json(new { success = false, error = "Невозможно удалить пункт разгрузки: он используется в документах." });
 
-            // Проверяем использование в точках маршрутов
             bool hasRoutePoints = await _context.Точки_Маршрута.AnyAsync(t => t.ид_пункта_разгрузки == id);
             if (hasRoutePoints)
                 return Json(new { success = false, error = "Невозможно удалить пункт разгрузки: он используется в маршрутах." });
@@ -587,7 +555,6 @@ namespace Blank.Controllers
             return Json(new { success = true });
         }
 
-        // ==================== ПОЛЬЗОВАТЕЛИ ====================
         [HttpPost]
         public async Task<IActionResult> AddUser([FromBody] UserModel model)
         {
@@ -622,12 +589,10 @@ namespace Blank.Controllers
             var u = await _context.Пользователи.FindAsync(id);
             if (u == null) return Json(new { success = false, error = "Пользователь не найден" });
 
-            // Проверяем использование в документах
             bool hasDocs = await _context.Документы.AnyAsync(doc => doc.ид_пользователя == id);
             if (hasDocs)
                 return Json(new { success = false, error = "Невозможно удалить пользователя: он создавал документы." });
 
-            // Нельзя удалить самого себя
             var currentUserId = HttpContext.Session.GetString("UserId");
             if (currentUserId != null && int.Parse(currentUserId) == id)
                 return Json(new { success = false, error = "Невозможно удалить самого себя." });
@@ -638,7 +603,6 @@ namespace Blank.Controllers
         }
     }
 
-    // ==================== МОДЕЛИ ДЛЯ AJAX ====================
     public class CompanyModel
     {
         public int Id { get; set; }

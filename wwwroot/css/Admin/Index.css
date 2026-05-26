@@ -397,7 +397,6 @@
         background: #333;
     }
 
-/* ========== МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ========== */
 #confirmActionModal {
     display: none;
     position: fixed;

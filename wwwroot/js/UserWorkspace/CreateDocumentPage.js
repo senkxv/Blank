@@ -113,7 +113,6 @@ function collectPositions() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Закрытие модального окна уведомлений
     document.getElementById('closeNotificationBtn')?.addEventListener('click', function () {
         document.getElementById('notificationModal').style.display = 'none';
     });
@@ -124,7 +123,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ============ КНОПКА ПРОПУСКА ТОЧКИ ============
     document.getElementById('skipPointBtn')?.addEventListener('click', function (e) {
         e.preventDefault();
 
@@ -137,10 +135,8 @@ document.addEventListener('DOMContentLoaded', function () {
         form.submit();
     });
 
-    // ============ ДОБАВЛЕНИЕ ТОВАРА ============
     document.getElementById('addGoodsBtn')?.addEventListener('click', addNewRow);
 
-    // ============ ИЗМЕНЕНИЕ ТОВАРА В SELECT ============
     document.getElementById('goodsTableBody')?.addEventListener('change', function (e) {
         if (e.target.classList.contains('goods-select')) {
             const goodsId = parseInt(e.target.value);
@@ -150,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ============ ВВОД ЧИСЕЛ ============
     document.getElementById('goodsTableBody')?.addEventListener('input', function (e) {
         if (e.target.classList.contains('goods-quantity') ||
             e.target.classList.contains('goods-price') ||
@@ -163,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ============ УДАЛЕНИЕ ТОВАРА ============
     document.getElementById('goodsTableBody')?.addEventListener('click', function (e) {
         if (e.target.classList.contains('remove-goods')) {
             e.target.closest('tr').remove();
@@ -174,7 +168,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ============ ОТПРАВКА ФОРМЫ ============
     const form = document.getElementById('documentForm');
     if (form) {
         form.addEventListener('submit', function (e) {
@@ -191,6 +184,5 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ============ ПЕРВИЧНЫЙ РАСЧЁТ ============
     calculateTotalWeight();
 });

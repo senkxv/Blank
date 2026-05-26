@@ -24,7 +24,6 @@ function showConfirm(message, onConfirm) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Восстановить активную вкладку после перезагрузки
     const savedTab = sessionStorage.getItem('activeAdminTab');
     if (savedTab) {
         const tab = document.querySelector(`.tab[data-tab="${savedTab}"]`);
@@ -36,10 +35,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         sessionStorage.removeItem('activeAdminTab');
     }
-    // Убираем класс, который скрывал вкладки
     document.body.classList.remove('admin-loading');
 
-    // ============ ВКЛАДКИ ============
     document.querySelectorAll('.tab').forEach(button => {
         button.addEventListener('click', function () {
             document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -50,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ============ МОДАЛЬНЫЕ ОКНА ============
     document.getElementById('confirmActionYes')?.addEventListener('click', function () {
         document.getElementById('confirmActionModal').style.display = 'none';
         if (confirmCallback) confirmCallback();
@@ -78,8 +74,6 @@ document.addEventListener('DOMContentLoaded', function () {
             this.style.display = 'none';
         }
     });
-
-    // ============ УНИВЕРСАЛЬНЫЕ ФУНКЦИИ ДЛЯ ТАБЛИЦ ============
 
     function setupAddForm(formId, url, getRowData) {
         document.getElementById(formId)?.addEventListener('submit', function (e) {
@@ -150,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ============ ОРГАНИЗАЦИИ ============
     setupAddForm('addOrgForm', '/Admin/AddOrganization', function (form) {
         return {
             name: form.querySelector('[name="name"]').value,
@@ -171,7 +164,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     });
 
-    // ============ ВОДИТЕЛИ ============
     setupAddForm('addDriverForm', '/Admin/AddDriver', function (form) {
         return {
             lastName: form.querySelector('[name="lastName"]').value,
@@ -192,7 +184,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     });
 
-    // ============ ТРАНСПОРТ ============
     setupAddForm('addTransportForm', '/Admin/AddTransport', function (form) {
         return {
             regNumber: form.querySelector('[name="regNumber"]').value,
@@ -211,7 +202,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     });
 
-    // ============ ТОВАРЫ ============
     setupAddForm('addGoodsForm', '/Admin/AddGoods', function (form) {
         return {
             code: form.querySelector('[name="code"]').value,
@@ -230,7 +220,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     });
 
-    // ============ ПУНКТЫ ПОГРУЗКИ ============
     setupAddForm('addLoadingForm', '/Admin/AddLoadingPoint', function (form) {
         return {
             name: form.querySelector('[name="name"]').value,
@@ -247,7 +236,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     });
 
-    // ============ ПУНКТЫ РАЗГРУЗКИ ============
     setupAddForm('addUnloadingForm', '/Admin/AddUnloadingPoint', function (form) {
         return {
             name: form.querySelector('[name="name"]').value,
@@ -264,7 +252,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     });
 
-    // ============ ПОЛЬЗОВАТЕЛИ ============
     setupAddForm('addUserForm', '/Admin/AddUser', function (form) {
         return {
             email: form.querySelector('[name="email"]').value,
@@ -283,9 +270,6 @@ document.addEventListener('DOMContentLoaded', function () {
             roleId: row.querySelector('.edit-role').value
         };
     });
-
-
-    // ============ МАРШРУТЫ ============
 
     let pointCounter = 1;
 
@@ -343,8 +327,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         sessionStorage.setItem('activeAdminTab', 'routes');
     });
-
-    // ============ РЕДАКТИРОВАНИЕ МАРШРУТА ============
 
     document.getElementById('addEditPointBtn')?.addEventListener('click', function () {
         const container = document.getElementById('editRoutePointsContainer');
@@ -404,8 +386,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-
-// ============ ГЛОБАЛЬНЫЕ ФУНКЦИИ ============
 
 async function editRoute(routeId) {
     try {

@@ -1,5 +1,4 @@
-﻿/* Модальное окно уведомлений */
-#notificationModal {
+﻿#notificationModal {
     display: none;
     position: fixed;
     top: 50%;
@@ -42,7 +41,6 @@
         background-color: #333;
     }
 
-/* Планшеты */
 @media (max-width: 768px) {
     #notificationModal {
         min-width: 280px;
@@ -58,7 +56,6 @@
     }
 }
 
-/* Большие телефоны */
 @media (max-width: 550px) {
     #notificationModal {
         min-width: 260px;
@@ -80,7 +77,6 @@
     }
 }
 
-/* Маленькие телефоны */
 @media (max-width: 450px) {
     #notificationModal {
         min-width: 200px;
@@ -102,7 +98,6 @@
     }
 }
 
-/* Очень маленькие телефоны */
 @media (max-width: 360px) {
     #notificationModal {
         min-width: 180px;
@@ -124,7 +119,6 @@
     }
 }
 
-/* Критически маленькие */
 @media (max-width: 280px) {
     #notificationModal {
         min-width: 160px;
@@ -146,9 +140,8 @@
     }
 }
 
-/* ========== БАЗОВЫЕ СТИЛИ ДЛЯ ВСЕХ МОДАЛЬНЫХ ОКОН ========== */
 .notification-modal {
-    display: none !important; /* скрыто по умолчанию */
+    display: none !important; 
     position: fixed;
     top: 50%;
     left: 50%;
@@ -163,7 +156,6 @@
     text-align: center;
 }
 
-/* ========== КОНТЕНТ МОДАЛЬНОГО ОКНА ========== */
 .notification-content {
     padding: 25px 30px;
 }
@@ -176,7 +168,6 @@
     word-wrap: break-word;
 }
 
-/* ========== КНОПКИ В МОДАЛЬНОМ ОКНЕ ========== */
 #closeNotificationBtn,
 #confirmDeleteYes,
 #confirmDeleteNo {
@@ -211,9 +202,8 @@
     margin-top: 15px;
 }
 
-/* ========== ОКНО ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ========== */
 #confirmDeleteModal {
-    /* наследует всё от .notification-modal */
+
 }
 
 #confirmDeleteMessage {
@@ -224,7 +214,6 @@
     word-wrap: break-word;
 }
 
-/* ========== ПЛАНШЕТЫ ========== */
 @media (max-width: 768px) {
     .notification-modal {
         min-width: 280px;
@@ -241,7 +230,6 @@
     }
 }
 
-/* ========== БОЛЬШИЕ ТЕЛЕФОНЫ ========== */
 @media (max-width: 550px) {
     .notification-modal {
         min-width: 260px;
@@ -266,7 +254,6 @@
     }
 }
 
-/* ========== МАЛЕНЬКИЕ ТЕЛЕФОНЫ ========== */
 @media (max-width: 450px) {
     .notification-modal {
         min-width: 200px;
@@ -291,7 +278,6 @@
     }
 }
 
-/* ========== ОЧЕНЬ МАЛЕНЬКИЕ ТЕЛЕФОНЫ ========== */
 @media (max-width: 360px) {
     .notification-modal {
         min-width: 180px;
@@ -316,7 +302,6 @@
     }
 }
 
-/* ========== КРИТИЧЕСКИ МАЛЕНЬКИЕ ========== */
 @media (max-width: 280px) {
     .notification-modal {
         min-width: 160px;

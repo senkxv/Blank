@@ -23,7 +23,7 @@
         </div>
     }
 
-    @* ✅ Выбор маршрута — ВЫПАДАЮЩИЙ СПИСОК *@
+    @*  *@
     <div class="route-selection">
         <h3>Выберите маршрут (опционально):</h3>
         
@@ -42,7 +42,7 @@
         </select>
     </div>
 
-    @* Прогресс по маршруту *@
+    @*  *@
     @if (ViewBag.SelectedRoute != null)
     {
         <div class="route-progress">
@@ -76,7 +76,7 @@
     <form method="post" asp-action="CreateDocumentPage" class="document-form" id="documentForm">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        @* Скрытые поля для маршрута *@
+        @*  *@
         @if (ViewBag.RouteId != null)
         {
             <input type="hidden" name="routeId" value="@ViewBag.RouteId" />
@@ -219,7 +219,7 @@
             </div>
         </div>
 
-        @* Таблица товаров *@
+        @*  *@
         <div class="goods-section">
             <h3>Товары (позиции накладной)</h3>
             <div class="table-wrapper">

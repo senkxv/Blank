@@ -30,9 +30,8 @@ namespace Blank.Models.Tables
 
         [Column("статус")]
         [MaxLength(50)]
-        public string статус { get; set; } = "активен"; // активен, завершен
+        public string статус { get; set; } = "активен"; 
 
-        // Навигационные свойства
         [ForeignKey("ид_организации")]
         public virtual Organization Организация { get; set; }
 
@@ -48,7 +47,7 @@ namespace Blank.Models.Tables
         public virtual ICollection<RoutePoint> ТочкиМаршрута { get; set; }
 
         [Column("ид_типа")]
-        public int? ид_типа { get; set; } = 1; // 1 = ТТН по умолчанию
+        public int? ид_типа { get; set; } = 1; 
 
         [ForeignKey("ид_типа")]
         public virtual Document_Type ТипДокумента { get; set; }

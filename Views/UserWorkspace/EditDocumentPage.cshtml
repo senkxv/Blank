@@ -12,7 +12,6 @@
 <script src="/js/UserWorkspace/EditDocumentPage.js"></script>
 
 <script>
-    // Исправляем все числовые поля с запятыми на точки
     document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('input[type="number"]').forEach(function(input) {
     if (input.value && input.value.includes(',')) {
@@ -21,8 +20,7 @@
     });
     });
 </script>
- 
-<!-- Модальное окно подтверждения удаления позиции -->
+
 <div id="confirmDeleteModal" class="notification-modal" style="display:none;">
     <div class="notification-content">
         <p id="confirmDeleteMessage">Удалить эту позицию?</p>
@@ -253,4 +251,3 @@
         <input type="hidden" name="deletedPositions" id="deletedPositions" />
     </form>
 </div>
-

@@ -139,7 +139,6 @@ label {
         box-shadow: 0 0 0 2px white, 0 0 0 4px black;
     }
 
-/* Ошибки */
 .error-message {
     color: #990000;
     font-size: 12px;

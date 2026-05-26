@@ -8,19 +8,19 @@ namespace Blank.Models.Tables
     {
         [Key]
         [Column("ид_товара")]
-        public int ид_товара { get; set; }  // Убрал [Required] с первичного ключа
+        public int ид_товара { get; set; }  
 
         [Column("код_товара")]
         [MaxLength(45)]
-        public string? код_товара { get; set; }  // Убрал [Required]
+        public string? код_товара { get; set; }  
 
         [Column("наименование")]
         [MaxLength(255)]
-        public string? наименование { get; set; }  // Убрал [Required]
+        public string? наименование { get; set; }  
 
         [Column("единицы_измерения")]
         [MaxLength(45)]
-        public string? единицы_измерения { get; set; }  // Убрал [Required]
+        public string? единицы_измерения { get; set; }  
 
         [Column("ид_организации")]
         public int? ид_организации { get; set; }

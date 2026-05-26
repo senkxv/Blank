@@ -1,7 +1,5 @@
-﻿// Переменная для хранения ID документа, ожидающего удаления
-let pendingDeleteDocumentId = null;
+﻿let pendingDeleteDocumentId = null;
 
-// Функция выбора документа
 window.selectDocument = function (id) {
     sessionStorage.setItem('selectedDocumentId', id);
 
@@ -17,7 +15,6 @@ window.selectDocument = function (id) {
     if (radio) radio.checked = true;
 };
 
-// Редактирование выбранного документа
 window.editSelectedDocument = function () {
     const id = sessionStorage.getItem('selectedDocumentId');
     if (id) {
@@ -31,7 +28,6 @@ window.editSelectedDocument = function () {
     }
 };
 
-// Удаление — ОТКРЫВАЕТ МОДАЛЬНОЕ ОКНО
 window.deleteSelectedDocument = function () {
     var id = sessionStorage.getItem('selectedDocumentId');
 
@@ -66,17 +62,12 @@ window.previewSelectedDocument = async function () {
         if (overlay) overlay.style.display = 'flex';
 
         try {
-            // Запрашиваем PDF через fetch
             const response = await fetch('/Print/' + docNumber);
             
             if (response.ok) {
-                // Получаем PDF как Blob
                 const blob = await response.blob();
-                // Создаём URL для Blob
                 const url = URL.createObjectURL(blob);
-                // Открываем в новой вкладке
                 window.open(url, '_blank');
-                // Освобождаем память
                 setTimeout(() => URL.revokeObjectURL(url), 1000);
             } else {
                 alert('Документ не найден');
@@ -84,7 +75,6 @@ window.previewSelectedDocument = async function () {
         } catch (error) {
             alert('Ошибка при загрузке документа');
         } finally {
-            // Скрываем спиннер
             if (overlay) overlay.style.display = 'none';
         }
     } else {
@@ -101,7 +91,6 @@ window.previewSelectedDocument = async function () {
     }
 };
 
-// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function () {
     sessionStorage.removeItem('selectedDocumentId');
     sessionStorage.removeItem('selectedDocumentNumber');
@@ -121,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ===== ОБРАБОТЧИКИ МОДАЛЬНОГО ОКНА УДАЛЕНИЯ ДОКУМЕНТА =====
     const btnYes = document.getElementById('confirmDeleteYes');
     const btnNo = document.getElementById('confirmDeleteNo');
     const modal = document.getElementById('confirmDeleteModal');

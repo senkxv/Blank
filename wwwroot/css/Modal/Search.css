@@ -36,7 +36,6 @@
             border-color: black;
         }
 
-    /* Кнопка Найти — чёрная */
     #searchModal button[type="submit"] {
         border-radius: 10px;
         color: white;
@@ -53,7 +52,6 @@
             box-shadow: 0 0 0 2px white, 0 0 0 4px black;
         }
 
-/* Кнопка Отмена — белая с обводкой */
 #closeSearchBtn {
     border-radius: 10px;
     color: black;

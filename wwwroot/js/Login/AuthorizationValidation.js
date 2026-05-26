@@ -1,7 +1,6 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('.main-section-form');
 
-    // Переключение видимости пароля
     document.querySelectorAll('.toggle-password').forEach(button => {
         button.addEventListener('click', function () {
             const targetId = this.getAttribute('data-target');
@@ -46,20 +45,16 @@
         input.style.borderColor = 'red';
         input.classList.add('error-border');
 
-        // Находим контейнер (password-wrapper или сам input)
         const wrapper = input.closest('.password-wrapper') || input;
 
-        // Удаляем старую ошибку
         const oldError = document.querySelector(`.field-error[data-for="${inputId}"]`);
         if (oldError) oldError.remove();
 
-        // Создаём новую ошибку
         const error = document.createElement('div');
         error.className = 'field-error';
         error.setAttribute('data-for', inputId);
         error.textContent = message;
 
-        // Вставляем ПОСЛЕ контейнера
         wrapper.after(error);
     }
 

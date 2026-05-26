@@ -6,23 +6,17 @@ namespace Blank.Data
 {
     public class ApplicationDBContext : DbContext
     {
-        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
-            : base(options)
-        {
-        }
+        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Представление (без ключа)
             modelBuilder.Entity<MainPage>(entity =>
             {
                 entity.HasNoKey();
                 entity.ToView("Главная");
             });
-
-            // ==================== ОСНОВНЫЕ ТАБЛИЦЫ ====================
 
             modelBuilder.Entity<Documents>(entity =>
             {
@@ -90,8 +84,6 @@ namespace Blank.Data
                 entity.Property(e => e.ид_типа_транспорта).ValueGeneratedOnAdd();
             });
 
-            // ==================== ОСТАЛЬНЫЕ СУЩНОСТИ ====================
-
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasKey(e => e.ид_пользователя);
@@ -104,7 +96,6 @@ namespace Blank.Data
                 entity.Property(e => e.ид_должности).ValueGeneratedOnAdd();
             });
 
-            // Настройка Маршруты
             modelBuilder.Entity<DeliveryRoute>(entity =>
             {
                 entity.ToTable("маршруты");
@@ -131,7 +122,6 @@ namespace Blank.Data
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            // Настройка Точки_Маршрута
             modelBuilder.Entity<RoutePoint>(entity =>
             {
                 entity.ToTable("точки_маршрута");

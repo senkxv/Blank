@@ -134,7 +134,6 @@ function collectPositions() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Закрытие модального окна уведомлений
     document.getElementById('closeNotificationBtn')?.addEventListener('click', function () {
         document.getElementById('notificationModal').style.display = 'none';
     });
@@ -145,10 +144,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Кнопка добавления товара
     document.getElementById('addGoodsBtn')?.addEventListener('click', addNewRow);
 
-    // Изменение товара в select
     document.getElementById('goodsTableBody')?.addEventListener('change', function (e) {
         if (e.target.classList.contains('goods-select')) {
             const goodsId = parseInt(e.target.value);
@@ -162,7 +159,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Ввод чисел
     document.getElementById('goodsTableBody')?.addEventListener('input', function (e) {
         if (e.target.classList.contains('goods-quantity') ||
             e.target.classList.contains('goods-price') ||
@@ -175,7 +171,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Удаление товара — сразу удаляем, без модального окна
     document.getElementById('goodsTableBody')?.addEventListener('click', function (e) {
         if (e.target.classList.contains('remove-goods')) {
             const row = e.target.closest('tr');
@@ -183,7 +178,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Отправка формы
     const form = document.getElementById('documentForm');
     if (form) {
         form.addEventListener('submit', function (e) {
@@ -195,7 +189,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Инициализация расчётов для существующих строк
     document.querySelectorAll('#goodsTableBody tr[data-is-existing="true"]').forEach(row => {
         updateRowCalculations(row);
     });

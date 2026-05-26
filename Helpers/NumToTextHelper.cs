@@ -17,14 +17,12 @@ namespace Blank.Helpers
             string rublesStr = rubles == 0 ? "ноль" : RublesInWords(rubles);
             string kopeksStr = GetKopeksInWords(kopeks);
 
-            // Исправление: используем GetRublesEnding для склонения
             if (sum < 0)
                 return $"Минус {rublesStr}{GetRublesEnding(rubles)} {kopeksStr}";
 
             return $"{rublesStr}{GetRublesEnding(rubles)} {kopeksStr}";
         }
 
-        // Все остальные методы без изменений
         private static string GetKopeksInWords(int kopeks)
         {
             if (kopeks == 0) return "ноль копеек";

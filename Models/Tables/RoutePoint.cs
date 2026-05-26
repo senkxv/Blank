@@ -26,7 +26,7 @@ namespace Blank.Models.Tables
 
         [Column("тип_точки")]
         [MaxLength(50)]
-        public string тип_точки { get; set; } = "погрузка"; // погрузка, разгрузка, погрузка_разгрузка
+        public string тип_точки { get; set; } = "погрузка"; 
 
         [Column("ид_грузоотправителя")]
         public int? ид_грузоотправителя { get; set; }
@@ -40,7 +40,6 @@ namespace Blank.Models.Tables
         [ForeignKey("ид_грузополучателя")]
         public virtual Organization Грузополучатель { get; set; }
 
-        // Навигационные свойства
         [ForeignKey("ид_маршрута")]
         public virtual DeliveryRoute Маршрут { get; set; }
 

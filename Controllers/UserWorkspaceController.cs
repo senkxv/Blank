@@ -5,20 +5,15 @@ using Blank.Models.ViewModels;
 using Blank.Models.Views;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
 using OfficeOpenXml;
 using SelectPdf;
 using Spire.Doc;
 using Spire.Doc.Documents;
 using Spire.Doc.Fields;
-using Spire.Pdf;
 using Spire.Xls;
-using System.Drawing;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
-using Body = DocumentFormat.OpenXml.Wordprocessing.Body;
-using WordprocessingDocument = DocumentFormat.OpenXml.Packaging.WordprocessingDocument;
 
 namespace Blank.Controllers
 {
@@ -59,7 +54,6 @@ namespace Blank.Controllers
 
             if (userOrgId.HasValue)
             {
-                // Получаем список ID всех организаций, принадлежащих администратору
                 var userOrgIds = _context.Организации
                     .Where(o => o.ид_организации == userOrgId || o.ид_владельца == userOrgId)
                     .Select(o => o.ид_организации)
@@ -132,12 +126,10 @@ namespace Blank.Controllers
             int userOrgId = string.IsNullOrEmpty(userOrgIdStr) ? 106 : int.Parse(userOrgIdStr);
 
             ViewBag.DocumentTypes = _context.Типы_Документов.ToList();
-            // Только организации пользователя
             ViewBag.Organizations = _context.Организации
                 .Where(o => o.ид_организации == userOrgId || o.ид_владельца == userOrgId)
                 .ToList();
 
-            // Только маршруты организации пользователя
             ViewBag.AvailableRoutes = _context.Маршруты
                 .Include(r => r.ТочкиМаршрута.OrderBy(t => t.порядковый_номер))
                 .Where(r => r.ид_организации == userOrgId && r.статус == "активен")
@@ -682,7 +674,6 @@ namespace Blank.Controllers
 
             using (var package = new ExcelPackage())
             {
-                // Лист 1: Документы
                 var sheetDocuments = package.Workbook.Worksheets.Add("Документы");
                 sheetDocuments.Cells[1, 1].Value = "ид_документа";
                 sheetDocuments.Cells[1, 2].Value = "номер_документа";
@@ -723,7 +714,6 @@ namespace Blank.Controllers
                 }
                 sheetDocuments.Cells.AutoFitColumns();
 
-                // Лист 2: Позиции
                 var sheetPositions = package.Workbook.Worksheets.Add("Позиции");
                 sheetPositions.Cells[1, 1].Value = "ид_позиции";
                 sheetPositions.Cells[1, 2].Value = "ид_документа";
@@ -759,7 +749,6 @@ namespace Blank.Controllers
                 }
                 sheetPositions.Cells.AutoFitColumns();
 
-                // Лист 3: Товары
                 var sheetGoods = package.Workbook.Worksheets.Add("Товары");
                 sheetGoods.Cells[1, 1].Value = "ид_товара";
                 sheetGoods.Cells[1, 2].Value = "код_товара";
@@ -780,7 +769,6 @@ namespace Blank.Controllers
                 }
                 sheetGoods.Cells.AutoFitColumns();
 
-                // Лист 4: Организации
                 var sheetOrganizations = package.Workbook.Worksheets.Add("Организации");
                 sheetOrganizations.Cells[1, 1].Value = "ид_организации";
                 sheetOrganizations.Cells[1, 2].Value = "название";
@@ -803,7 +791,6 @@ namespace Blank.Controllers
                 }
                 sheetOrganizations.Cells.AutoFitColumns();
 
-                // Лист 5: Водители
                 var sheetDrivers = package.Workbook.Worksheets.Add("Водители");
                 sheetDrivers.Cells[1, 1].Value = "ид_водителя";
                 sheetDrivers.Cells[1, 2].Value = "фамилия";
@@ -826,7 +813,6 @@ namespace Blank.Controllers
                 }
                 sheetDrivers.Cells.AutoFitColumns();
 
-                // Лист 6: Транспорт
                 var sheetTransport = package.Workbook.Worksheets.Add("Транспорт");
                 sheetTransport.Cells[1, 1].Value = "ид_транспорта";
                 sheetTransport.Cells[1, 2].Value = "регистрационный_номер";
@@ -847,7 +833,6 @@ namespace Blank.Controllers
                 }
                 sheetTransport.Cells.AutoFitColumns();
 
-                // Лист 7: Пункты погрузки
                 var sheetLoadingPoints = package.Workbook.Worksheets.Add("ПунктыПогрузки");
                 sheetLoadingPoints.Cells[1, 1].Value = "ид_пункта_погрузки";
                 sheetLoadingPoints.Cells[1, 2].Value = "наименование";
@@ -866,7 +851,6 @@ namespace Blank.Controllers
                 }
                 sheetLoadingPoints.Cells.AutoFitColumns();
 
-                // Лист 8: Пункты разгрузки
                 var sheetUnloadingPoints = package.Workbook.Worksheets.Add("ПунктыРазгрузки");
                 sheetUnloadingPoints.Cells[1, 1].Value = "ид_пункта_разгрузки";
                 sheetUnloadingPoints.Cells[1, 2].Value = "наименование";
@@ -885,7 +869,6 @@ namespace Blank.Controllers
                 }
                 sheetUnloadingPoints.Cells.AutoFitColumns();
 
-                // Лист 9: Типы документов (общие)
                 var sheetDocTypes = package.Workbook.Worksheets.Add("ТипыДокументов");
                 sheetDocTypes.Cells[1, 1].Value = "ид_типа";
                 sheetDocTypes.Cells[1, 2].Value = "краткое_наименование";
@@ -902,7 +885,6 @@ namespace Blank.Controllers
                 }
                 sheetDocTypes.Cells.AutoFitColumns();
 
-                // Лист: Марки транспорта — только используемые организацией
                 var sheetMarks = package.Workbook.Worksheets.Add("МаркиТранспорта");
                 sheetMarks.Cells[1, 1].Value = "ид_марки";
                 sheetMarks.Cells[1, 2].Value = "наименование_марки";
@@ -925,7 +907,6 @@ namespace Blank.Controllers
                 }
                 sheetMarks.Cells.AutoFitColumns();
 
-                // Лист: Типы транспорта — только используемые организацией
                 var sheetTransportTypesExport = package.Workbook.Worksheets.Add("ТипыТранспорта");
                 sheetTransportTypesExport.Cells[1, 1].Value = "ид_типа_транспорта";
                 sheetTransportTypesExport.Cells[1, 2].Value = "наименование_типа";
@@ -1005,7 +986,6 @@ namespace Blank.Controllers
                                 Dictionary<int, int> unloadingPointIdMapping = new Dictionary<int, int>();
                                 Dictionary<int, int> orgIdMapping = new Dictionary<int, int>();
 
-                                // 1. Организации
                                 var sheetOrgs = package.Workbook.Worksheets["Организации"];
                                 if (sheetOrgs?.Dimension?.Rows > 1)
                                 {
@@ -1016,7 +996,6 @@ namespace Blank.Controllers
                                         if (id == null || string.IsNullOrEmpty(name)) continue;
                                         int oldId = Convert.ToInt32(id);
 
-                                        // Проверяем, существует ли уже такая организация
                                         var existing = await _context.Организации.FindAsync(oldId);
                                         if (existing == null)
                                         {
@@ -1028,11 +1007,10 @@ namespace Blank.Controllers
                                                 sheetOrgs.Cells[row, 5]?.Value?.ToString() ?? "",
                                                 ownerId);
                                         }
-                                        orgIdMapping[oldId] = oldId; // ID остаётся прежним
+                                        orgIdMapping[oldId] = oldId; 
                                     }
                                 }
 
-                                // 2. Товары
                                 var sheetGoods = package.Workbook.Worksheets["Товары"];
                                 if (sheetGoods?.Dimension?.Rows > 1)
                                 {
@@ -1061,14 +1039,14 @@ namespace Blank.Controllers
                                         if (existing == null)
                                         {
                                             await _context.Database.ExecuteSqlRawAsync(
-                                                "INSERT INTO Товары (ид_товара, код_товара, наименование, единицы_измерения, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4})",
+                                                "INSERT INTO Товары (ид_товара, код_товара, наименование, единицы_измерения, ид_организации) " +
+                                                "VALUES ({0}, {1}, {2}, {3}, {4})",
                                                 oldId, code, name, unit, ownerId);
                                         }
                                         goodsIdMapping[oldId] = oldId;
                                     }
                                 }
 
-                                // 3. Водители
                                 var sheetDrivers = package.Workbook.Worksheets["Водители"];
                                 if (sheetDrivers?.Dimension?.Rows > 1)
                                 {
@@ -1083,7 +1061,8 @@ namespace Blank.Controllers
                                         if (existing == null)
                                         {
                                             await _context.Database.ExecuteSqlRawAsync(
-                                                "INSERT INTO Водители (ид_водителя, фамилия, имя, отчество, номер_лицензии, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4}, {5})",
+                                                "INSERT INTO Водители (ид_водителя, фамилия, имя, отчество, номер_лицензии, ид_организации) " +
+                                                "VALUES ({0}, {1}, {2}, {3}, {4}, {5})",
                                                 oldId, lastName,
                                                 sheetDrivers.Cells[row, 3]?.Value?.ToString() ?? "",
                                                 sheetDrivers.Cells[row, 4]?.Value?.ToString() ?? "",
@@ -1094,7 +1073,6 @@ namespace Blank.Controllers
                                     }
                                 }
 
-                                // 4. Транспорт
                                 var sheetTransport = package.Workbook.Worksheets["Транспорт"];
                                 if (sheetTransport?.Dimension?.Rows > 1)
                                 {
@@ -1109,7 +1087,8 @@ namespace Blank.Controllers
                                         if (existing == null)
                                         {
                                             await _context.Database.ExecuteSqlRawAsync(
-                                                "INSERT INTO Транспорт (ид_транспорта, регистрационный_номер, ид_марки, ид_типа_транспорта, ид_организации) VALUES ({0}, {1}, {2}, {3}, {4})",
+                                                "INSERT INTO Транспорт (ид_транспорта, регистрационный_номер, ид_марки, ид_типа_транспорта, ид_организации) " +
+                                                "VALUES ({0}, {1}, {2}, {3}, {4})",
                                                 oldId, regNumber,
                                                 sheetTransport.Cells[row, 3]?.Value ?? 1,
                                                 sheetTransport.Cells[row, 4]?.Value ?? 1,
@@ -1119,7 +1098,6 @@ namespace Blank.Controllers
                                     }
                                 }
 
-                                // 5. Пункты погрузки
                                 var sheetLoading = package.Workbook.Worksheets["ПунктыПогрузки"];
                                 if (sheetLoading?.Dimension?.Rows > 1)
                                 {
@@ -1134,7 +1112,8 @@ namespace Blank.Controllers
                                         if (existing == null)
                                         {
                                             await _context.Database.ExecuteSqlRawAsync(
-                                                "INSERT INTO Пункт_Погрузки (ид_пункта_погрузки, наименование, адрес, ид_организации) VALUES ({0}, {1}, {2}, {3})",
+                                                "INSERT INTO Пункт_Погрузки (ид_пункта_погрузки, наименование, адрес, ид_организации) " +
+                                                "VALUES ({0}, {1}, {2}, {3})",
                                                 oldId, name,
                                                 sheetLoading.Cells[row, 3]?.Value?.ToString() ?? "",
                                                 ownerId);
@@ -1143,7 +1122,6 @@ namespace Blank.Controllers
                                     }
                                 }
 
-                                // 6. Пункты разгрузки
                                 var sheetUnloading = package.Workbook.Worksheets["ПунктыРазгрузки"];
                                 if (sheetUnloading?.Dimension?.Rows > 1)
                                 {
@@ -1158,7 +1136,8 @@ namespace Blank.Controllers
                                         if (existing == null)
                                         {
                                             await _context.Database.ExecuteSqlRawAsync(
-                                                "INSERT INTO Пункт_Разгрузки (ид_пункта_разгрузки, наименование, адрес, ид_организации) VALUES ({0}, {1}, {2}, {3})",
+                                                "INSERT INTO Пункт_Разгрузки (ид_пункта_разгрузки, наименование, адрес, ид_организации) " +
+                                                "VALUES ({0}, {1}, {2}, {3})",
                                                 oldId, name,
                                                 sheetUnloading.Cells[row, 3]?.Value?.ToString() ?? "",
                                                 ownerId);
@@ -1167,7 +1146,6 @@ namespace Blank.Controllers
                                     }
                                 }
 
-                                // 7. Документы (через EF Core для точного получения ID)
                                 var sheetDocs = package.Workbook.Worksheets["Документы"];
                                 if (sheetDocs?.Dimension?.Rows > 1)
                                 {
@@ -1201,7 +1179,6 @@ namespace Blank.Controllers
                                         string отпускРазрешил = sheetDocs.Cells[row, 12]?.Value?.ToString() ?? "";
                                         string сдалГрузоотправитель = sheetDocs.Cells[row, 13]?.Value?.ToString() ?? "";
 
-                                        // Избегаем дубликатов номера внутри той же организации
                                         bool номерЗанят = await _context.Документы
                                             .AnyAsync(d => d.номер_документа == docNumber && d.ид_грузоотправителя == senderId);
                                         if (номерЗанят)
@@ -1232,7 +1209,6 @@ namespace Blank.Controllers
                                     }
                                 }
 
-                                // 8. Позиции
                                 var sheetPositions = package.Workbook.Worksheets["Позиции"];
                                 if (sheetPositions?.Dimension?.Rows > 1)
                                 {
@@ -1315,7 +1291,6 @@ namespace Blank.Controllers
             return RedirectToAction("Index");
         }
 
-        // Вспомогательный метод для безопасного получения int значения
         private int GetIntValue(object value)
         {
             if (value == null) return 1;
@@ -1347,7 +1322,6 @@ namespace Blank.Controllers
                     result.AppendLine($"<h3>Отладка Excel файла</h3>");
                     result.AppendLine($"<b>Всего строк в Dimension: {sheet.Dimension?.Rows}</b><br/>");
 
-                    // Проходим по всем строкам и выводим, что видим
                     for (int row = 1; row <= 20; row++)
                     {
                         var cellValue = sheet.Cells[row, 3]?.Value;
@@ -1367,12 +1341,10 @@ namespace Blank.Controllers
 
         private async Task RestoreReferenceTables(ExcelPackage package)
         {
-            // Отключаем проверку внешних ключей (MySQL)
             await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 0;");
 
             try
             {
-                // 1. Типы документов
                 var sheetTypes = package.Workbook.Worksheets["ТипыДокументов"];
                 if (sheetTypes?.Dimension?.Rows > 1)
                 {
@@ -1387,7 +1359,6 @@ namespace Blank.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // 2. Организации
                 var sheetOrg = package.Workbook.Worksheets["Организации"];
                 if (sheetOrg?.Dimension?.Rows > 1)
                 {
@@ -1404,7 +1375,6 @@ namespace Blank.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // 3. Товары
                 var sheetGoods = package.Workbook.Worksheets["Товары"];
                 if (sheetGoods?.Dimension?.Rows > 1)
                 {
@@ -1419,7 +1389,6 @@ namespace Blank.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // 4. Водители
                 var sheetDrivers = package.Workbook.Worksheets["Водители"];
                 if (sheetDrivers?.Dimension?.Rows > 1)
                 {
@@ -1436,7 +1405,6 @@ namespace Blank.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // 5. Транспорт
                 var sheetTransport = package.Workbook.Worksheets["Транспорт"];
                 if (sheetTransport?.Dimension?.Rows > 1)
                 {
@@ -1452,7 +1420,6 @@ namespace Blank.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // 6. Пункты погрузки
                 var sheetLoading = package.Workbook.Worksheets["ПунктыПогрузки"];
                 if (sheetLoading?.Dimension?.Rows > 1)
                 {
@@ -1467,7 +1434,6 @@ namespace Blank.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // 7. Пункты разгрузки
                 var sheetUnloading = package.Workbook.Worksheets["ПунктыРазгрузки"];
                 if (sheetUnloading?.Dimension?.Rows > 1)
                 {
@@ -1482,8 +1448,7 @@ namespace Blank.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // 8. Марки транспорта (если нужен отдельный лист)
-                var sheetMarks = package.Workbook.Worksheets["Марка_Транспорта"]; // если есть
+                var sheetMarks = package.Workbook.Worksheets["Марка_Транспорта"]; 
                 if (sheetMarks?.Dimension?.Rows > 1)
                 {
                     for (int r = 2; r <= sheetMarks.Dimension.Rows; r++)
@@ -1498,7 +1463,6 @@ namespace Blank.Controllers
             }
             finally
             {
-                // Включаем обратно проверку внешних ключей
                 await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 1;");
             }
         }
@@ -1595,11 +1559,11 @@ namespace Blank.Controllers
 
                 DateTime? searchDate = null;
                 string[] dateFormats = {
-            "dd.MM.yyyy", "dd/MM/yyyy", "dd-MM-yyyy",
-            "dd.MM.yy", "dd/MM/yy", "dd-MM-yy",
-            "yyyy-MM-dd", "yyyy/MM/dd", "yyyy.MM.dd",
-            "MM/dd/yyyy", "MM-dd-yyyy", "MM.dd.yyyy"
-        };
+                    "dd.MM.yyyy", "dd/MM/yyyy", "dd-MM-yyyy",
+                    "dd.MM.yy", "dd/MM/yy", "dd-MM-yy",
+                    "yyyy-MM-dd", "yyyy/MM/dd", "yyyy.MM.dd",
+                    "MM/dd/yyyy", "MM-dd-yyyy", "MM.dd.yyyy"
+                };
 
                 if (DateTime.TryParseExact(searchString, dateFormats,
                     System.Globalization.CultureInfo.InvariantCulture,
@@ -1643,13 +1607,11 @@ namespace Blank.Controllers
             var userOrgIdStr = HttpContext.Session.GetString("UserOrgId");
             int? userOrgId = string.IsNullOrEmpty(userOrgIdStr) ? null : int.Parse(userOrgIdStr);
 
-            // Получаем список ID организаций пользователя
             var userOrgIds = await _context.Организации
                 .Where(o => o.ид_организации == userOrgId || o.ид_владельца == userOrgId)
                 .Select(o => o.ид_организации)
                 .ToListAsync();
 
-            // Ищем документ, который принадлежит одной из организаций пользователя
             var doc = await _context.Документы.FirstOrDefaultAsync(d =>
                 d.номер_документа == documentNumber &&
                 (userOrgIds.Contains(d.ид_грузоотправителя) ||
@@ -1673,15 +1635,8 @@ namespace Blank.Controllers
                 return await GeneratePrintPdf(doc);
         }
 
-        // В начало файла UserWorkspaceController.cs необходимо добавить:
-        // using System.Drawing;
-
-        // В начало файла UserWorkspaceController.cs необходимо добавить:
-        // using System.Drawing;
-
         private async Task<IActionResult> GenerateTtnPdf(Documents документ)
         {
-            // 1. Получение позиций и связанных данных
             var позиции = await _context.Позиции
                 .Include(p => p.Товар)
                 .Where(p => p.ид_документа == документ.ид_документа)
@@ -1696,13 +1651,11 @@ namespace Blank.Controllers
             var пунктПогрузки = await _context.Пункт_Погрузки.FirstOrDefaultAsync(p => p.ид_пункта_погрузки == документ.ид_пункта_погрузки);
             var пунктРазгрузки = await _context.Пункт_Разгрузки.FirstOrDefaultAsync(p => p.ид_пункта_разгрузки == документ.ид_пункта_разгрузки);
 
-            // 2. Подсчёт итогов
-            // 2. Подсчёт итогов (с НДС и без)
             decimal totalWeight = 0;
-            decimal totalCost = 0;          // стоимость без НДС
-            decimal totalNds = 0;           // сумма НДС
+            decimal totalCost = 0;     
+            decimal totalNds = 0;        
             decimal totalQuantity = позиции.Sum(p => (decimal)p.количество);
-            decimal totalSumWithNds = 0;   // стоимость с НДС
+            decimal totalSumWithNds = 0;   
 
             foreach (var pos in позиции)
             {
@@ -1718,10 +1671,8 @@ namespace Blank.Controllers
                 totalWeight += pos.масса_груза ?? 0;
             }
 
-            // Выбираем, что подставлять в {{total_sum}}:
-            decimal totalAmount = totalSumWithNds;   // теперь с НДС!
+            decimal totalAmount = totalSumWithNds;   
 
-            // 3. Загрузка шаблона
             string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "TTN.xlsx");
             if (!System.IO.File.Exists(templatePath))
                 return Content($"Файл шаблона не найден: {templatePath}");
@@ -1730,7 +1681,6 @@ namespace Blank.Controllers
             workbook.LoadFromFile(templatePath);
             Worksheet sheet = workbook.Worksheets[0];
 
-            // 4. ФИО водителя – Фамилия И.О.
             string driverFio = "";
             if (водитель != null)
             {
@@ -1750,35 +1700,34 @@ namespace Blank.Controllers
             string mark = транспорт?.Марка_Транспорта?.наименование_марки ?? "";
             var cultureForExcel = System.Globalization.CultureInfo.InvariantCulture;
 
-            // 5. Основные замены (кроме строки 37)
             var mainReplacements = new Dictionary<string, string>
-{
-    { "{sender}", (грузоотправитель?.название ?? "") + ", " + (грузоотправитель?.адрес ?? "") },
-    { "{sender_unp}", грузоотправитель?.унп ?? "" },
-    { "{receiver}", (грузополучатель?.название ?? "") + ", " + (грузополучатель?.адрес ?? "") },
-    { "{receiver_unp}", грузополучатель?.унп ?? "" },
-    { "{date}", formattedDate },
-    { "{mark}", mark },
-    { "{reg_number}", regNumber },
-    { "{driver_fio}", driverFio },
-    { "{loading_point}", пунктПогрузки?.наименование ?? "" },
-    { "{unloading_point}", пунктРазгрузки?.наименование ?? "" },
-    { "{otpusk}", документ.отпуск_разрешил ?? "" },
-    { "{sdal}", документ.сдал_грузоотправитель ?? "" },
-    { "{total_c}", totalQuantity.ToString("F0", cultureForExcel) },
-    { "{total_sum}", totalCost.ToString("F2", cultureForExcel).Replace(".", ",") },
-    { "{total_sn}", totalNds.ToString("F2", cultureForExcel).Replace(".", ",") },
-    { "{total_swn}", totalSumWithNds.ToString("F2", cultureForExcel).Replace(".", ",") },
-    { "{total_weight}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") },
-    { "{total_sn_hand}", NumToTextHelper.SumInWords(totalNds) },
-    { "{total_swn_hand}", NumToTextHelper.SumInWords(totalSumWithNds) },
-    { "{total_w_hand}", NumToTextHelper.WeightInWords(totalWeight) },
-    { "{total_w}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") }
-};
+            {
+                { "{sender}", (грузоотправитель?.название ?? "") + ", " + (грузоотправитель?.адрес ?? "") },
+                { "{sender_unp}", грузоотправитель?.унп ?? "" },
+                { "{receiver}", (грузополучатель?.название ?? "") + ", " + (грузополучатель?.адрес ?? "") },
+                { "{receiver_unp}", грузополучатель?.унп ?? "" },
+                { "{date}", formattedDate },
+                { "{mark}", mark },
+                { "{reg_number}", regNumber },
+                { "{driver_fio}", driverFio },
+                { "{loading_point}", пунктПогрузки?.наименование ?? "" },
+                { "{unloading_point}", пунктРазгрузки?.наименование ?? "" },
+                { "{otpusk}", документ.отпуск_разрешил ?? "" },
+                { "{sdal}", документ.сдал_грузоотправитель ?? "" },
+                { "{total_c}", totalQuantity.ToString("F0", cultureForExcel) },
+                { "{total_sum}", totalCost.ToString("F2", cultureForExcel).Replace(".", ",") },
+                { "{total_sn}", totalNds.ToString("F2", cultureForExcel).Replace(".", ",") },
+                { "{total_swn}", totalSumWithNds.ToString("F2", cultureForExcel).Replace(".", ",") },
+                { "{total_weight}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") },
+                { "{total_sn_hand}", NumToTextHelper.SumInWords(totalNds) },
+                { "{total_swn_hand}", NumToTextHelper.SumInWords(totalSumWithNds) },
+                { "{total_w_hand}", NumToTextHelper.WeightInWords(totalWeight) },
+                { "{total_w}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") }
+            };
 
             foreach (var cell in sheet.AllocatedRange)
             {
-                if (cell.Row == 37) continue;    // не трогаем строку-шаблон товаров
+                if (cell.Row == 37) continue;  
                 if (cell.Value != null)
                 {
                     string cellValue = cell.Value.ToString();
@@ -1799,14 +1748,12 @@ namespace Blank.Controllers
                 }
             }
 
-            // ======== 6. ТОВАРНЫЙ РАЗДЕЛ ========
             const int templateRow = 37;
 
             if (sheet.Range[templateRow, 1].Value == null ||
                 !sheet.Range[templateRow, 1].Value.ToString().Contains("{good_name}"))
                 return Content($"Строка шаблона товаров не найдена в строке {templateRow}");
 
-            // 6.1 Запоминаем объединённые диапазоны в строке 37 и сортируем их
             var merges = new List<(int startCol, int endCol)>();
             foreach (var mergedRange in sheet.MergedCells)
             {
@@ -1820,13 +1767,11 @@ namespace Blank.Controllers
             }
             merges.Sort((a, b) => a.startCol.CompareTo(b.startCol));
 
-            // 6.2 Массив плейсхолдеров
             string[] placeholders = {
-        "{good_name}", "{ed}", "{count}", "{cost}", "{sum}",
-        "{nds}", "{sum_nds}", "{sum_w_nds}", "", "{weight}", ""
-    };
+                "{good_name}", "{ed}", "{count}", "{cost}", "{sum}",
+                "{nds}", "{sum_nds}", "{sum_w_nds}", "", "{weight}", ""
+            };
 
-            // 6.3 Вставка недостающих строк (если товаров > 1)
             int rowsToInsert = позиции.Count - 1;
             if (rowsToInsert > 0)
             {
@@ -1848,13 +1793,11 @@ namespace Blank.Controllers
                 }
             }
 
-            // 6.4 Заполнение ВСЕХ строк реальными данными
             for (int i = 0; i < позиции.Count; i++)
             {
                 int currentRow = templateRow + i;
                 var pos = позиции[i];
 
-                // Расставляем ключи для новых строк (кроме шаблонной)
                 if (i > 0)
                 {
                     for (int idx = 0; idx < merges.Count; idx++)
@@ -1870,7 +1813,6 @@ namespace Blank.Controllers
                 decimal afterDiscount = cost - discount;
                 decimal vat = afterDiscount * ((pos.ставка_ндс ?? 0) / 100);
 
-                // Ставка НДС – с двумя знаками после запятой (как 20,00 или 18,33)
                 decimal rawNdsRate = pos.ставка_ндс ?? 0;
                 string ndsRateDisplay = rawNdsRate.ToString("0.00", cultureForExcel).Replace(".", ",");
 
@@ -1884,40 +1826,37 @@ namespace Blank.Controllers
 
                     switch (idx)
                     {
-                        case 0: // Наименование
+                        case 0: 
                             val = val.Replace("{good_name}", pos.Товар?.наименование ?? "");
                             break;
-                        case 1: // Единицы измерения
+                        case 1: 
                             val = val.Replace("{ed}", pos.Товар?.единицы_измерения ?? "");
                             break;
-                        case 2: // Количество
+                        case 2: 
                             val = val.Replace("{count}", qty.ToString("0.000", cultureForExcel).Replace(".", ","));
                             break;
-                        case 3: // Цена
+                        case 3: 
                             val = val.Replace("{cost}", pos.цена_за_единицу.ToString("0.00", cultureForExcel).Replace(".", ","));
                             break;
-                        case 4: // Стоимость без НДС
+                        case 4: 
                             val = val.Replace("{sum}", afterDiscount.ToString("0.00", cultureForExcel).Replace(".", ","));
                             break;
-                        case 5: // Ставка НДС (дробная)
+                        case 5: 
                             val = val.Replace("{nds}", ndsRateDisplay);
                             break;
-                        case 6: // Сумма НДС
+                        case 6: 
                             val = val.Replace("{sum_nds}", vat.ToString("0.00", cultureForExcel).Replace(".", ","));
                             break;
-                        case 7: // Стоимость с НДС
+                        case 7: 
                             val = val.Replace("{sum_w_nds}", (afterDiscount + vat).ToString("0.00", cultureForExcel).Replace(".", ","));
                             break;
-                        case 9: // Масса
+                        case 9: 
                             val = val.Replace("{weight}", (pos.масса_груза ?? 0).ToString("0.000", cultureForExcel).Replace(".", ","));
                             break;
-                            // case 8 и case 10 — пустые, без замен
                     }
-
                     mergedRange.Value = val;
                 }
 
-                // Применяем текстовый формат и перенос для всех строк, включая первую
                 foreach (var (startCol, endCol) in merges)
                 {
                     var rng = sheet.Range[currentRow, startCol, currentRow, endCol];
@@ -1926,7 +1865,6 @@ namespace Blank.Controllers
                 }
                 sheet.AutoFitRow(currentRow);
 
-                // Дополнительное оформление только для новых строк (границы, шрифт, выравнивание)
                 if (i > 0)
                 {
                     for (int idx = 0; idx < merges.Count; idx++)
@@ -1948,9 +1886,8 @@ namespace Blank.Controllers
             if (позиции.Count == 0)
                 sheet.DeleteRow(templateRow);
 
-            // Отключаем автомасштабирование, чтобы документ не сжимался по ширине
-            sheet.PageSetup.FitToPagesWide = 0;   // не подгонять под ширину страницы
-            sheet.PageSetup.FitToPagesTall = 1;   // не подгонять под высоту (можно оставить 1, если нужно)        // масштаб 100%
+            sheet.PageSetup.FitToPagesWide = 0;  
+            sheet.PageSetup.FitToPagesTall = 1;   
 
             using (var stream = new MemoryStream())
             {
@@ -2011,20 +1948,21 @@ namespace Blank.Controllers
                 totalPackages += pos.грузовых_мест ?? 0;
 
                 goodsHtml.AppendLine($@"
-            <tr class=""goods-row"">
-                <td>{pos.Товар?.наименование ?? ""}</td>
-                <td class=""center"">{pos.Товар?.единицы_измерения ?? ""}</td>
-                <td class=""right"">{pos.количество:F3}</td>
-                <td class=""right"">{pos.цена_за_единицу:F2}</td>
-                <td class=""right"">{pos.скидка ?? 0}</td>
-                <td class=""center"">{pos.ставка_ндс ?? 0}</td>
-                <td class=""right"">{afterDiscount:F2}</td>
-                <td class=""right"">{vat:F2}</td>
-                <td class=""right"">{afterDiscount + vat:F2}</td>
-                <td class=""right"">{pos.грузовых_мест ?? 0}</td>
-                <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
-                <td class=""right"">{pos.примечание ?? ""}</td>
-            </tr>");
+                    <tr class=""goods-row"">
+                        <td>{pos.Товар?.наименование ?? ""}</td>
+                        <td class=""center"">{pos.Товар?.единицы_измерения ?? ""}</td>
+                        <td class=""right"">{pos.количество:F3}</td>
+                        <td class=""right"">{pos.цена_за_единицу:F2}</td>
+                        <td class=""right"">{pos.скидка ?? 0}</td>
+                        <td class=""center"">{pos.ставка_ндс ?? 0}</td>
+                        <td class=""right"">{afterDiscount:F2}</td>
+                        <td class=""right"">{vat:F2}</td>
+                        <td class=""right"">{afterDiscount + vat:F2}</td>
+                        <td class=""right"">{pos.грузовых_мест ?? 0}</td>
+                        <td class=""right"">{pos.масса_груза ?? 0:F3}</td>
+                        <td class=""right"">{pos.примечание ?? ""}</td>
+                    </tr>"
+                );
             }
 
             var html = htmlTemplate
@@ -2071,22 +2009,8 @@ namespace Blank.Controllers
             return File(pdf.Save(), "application/pdf");
         }
 
-        // Добавьте в начало файла, если ещё нет:
-        // using Spire.Doc;
-
-        // Не забудьте добавить using в начало файла:
-        // using Spire.Doc;
-        // using Spire.Doc.Documents;
-        // using Spire.Doc.Tables;
-
-        // using Spire.Doc;
-        // using Spire.Doc.Documents;
-        // using Spire.Doc.Tables;
-        // using Spire.Pdf;
-
         private async Task<IActionResult> GenerateCmrPdf(Documents документ)
         {
-            // 1. Получение позиций
             var позиции = await _context.Позиции
                 .Include(p => p.Товар)
                 .Where(p => p.ид_документа == документ.ид_документа)
@@ -2109,11 +2033,10 @@ namespace Blank.Controllers
             int totalChunks = (int)Math.Ceiling((double)позиции.Count / maxRows);
             List<MemoryStream> pdfStreams = new List<MemoryStream>();
 
-            // 2. Расчёт итогов (с НДС, как в ТТН)
             decimal totalWeight = 0;
-            decimal totalCost = 0;          // без НДС
+            decimal totalCost = 0;         
             decimal totalNds = 0;
-            decimal totalSumWithNds = 0;    // с НДС
+            decimal totalSumWithNds = 0;   
 
             foreach (var pos in позиции)
             {
@@ -2129,7 +2052,6 @@ namespace Blank.Controllers
                 totalWeight += pos.масса_груза ?? 0;
             }
 
-            // Выбираем, что показывать как общую сумму: с НДС
             decimal totalAmount = totalSumWithNds;
 
             for (int chunk = 0; chunk < totalChunks; chunk++)
@@ -2220,19 +2142,19 @@ namespace Blank.Controllers
                     }
 
                     var replacements = new Dictionary<string, string>
-            {
-                { "{{sender}}", (грузоотправитель?.название ?? "") + ", " + (грузоотправитель?.адрес ?? "") },
-                { "{{receiver}}", (грузополучатель?.название ?? "") + ", " + (грузополучатель?.адрес ?? "") },
-                { "{{transporter}}", перевозчик?.название ?? "" },
-                { "{{unloading_point}}", пунктРазгрузки?.наименование ?? "" },
-                { "{{loading_point}}", пунктПогрузки?.наименование ?? "" },
-                { "{{date}}", документ.дата_создания.ToString("dd.MM.yyyy") },
-                { "{{reg_number}}", транспорт?.регистрационный_номер ?? "" },
-                { "{{mark}}", транспорт?.Марка_Транспорта?.наименование_марки ?? "" },
-                { "{{doc_number}}", документ?.номер_документа ?? "" },
-                { "{{total_weight}}", totalWeight.ToString("0.000", CultureInfo.InvariantCulture).Replace(".", ",") + " кг" },
-                { "{{total_sum}}", totalAmount.ToString("0.00", CultureInfo.InvariantCulture).Replace(".", ",") }
-            };
+                    {
+                        { "{{sender}}", (грузоотправитель?.название ?? "") + ", " + (грузоотправитель?.адрес ?? "") },
+                        { "{{receiver}}", (грузополучатель?.название ?? "") + ", " + (грузополучатель?.адрес ?? "") },
+                        { "{{transporter}}", перевозчик?.название ?? "" },
+                        { "{{unloading_point}}", пунктРазгрузки?.наименование ?? "" },
+                        { "{{loading_point}}", пунктПогрузки?.наименование ?? "" },
+                        { "{{date}}", документ.дата_создания.ToString("dd.MM.yyyy") },
+                        { "{{reg_number}}", транспорт?.регистрационный_номер ?? "" },
+                        { "{{mark}}", транспорт?.Марка_Транспорта?.наименование_марки ?? "" },
+                        { "{{doc_number}}", документ?.номер_документа ?? "" },
+                        { "{{total_weight}}", totalWeight.ToString("0.000", CultureInfo.InvariantCulture).Replace(".", ",") + " кг" },
+                        { "{{total_sum}}", totalAmount.ToString("0.00", CultureInfo.InvariantCulture).Replace(".", ",") }
+                    };
 
                     foreach (var kv in replacements)
                         doc.Replace(kv.Key, kv.Value, false, true);
@@ -2249,7 +2171,6 @@ namespace Blank.Controllers
                 }
             }
 
-            // Объединение PDF (без смещения)
             if (pdfStreams.Count == 1)
             {
                 return File(pdfStreams[0].ToArray(), "application/pdf");
@@ -2273,7 +2194,6 @@ namespace Blank.Controllers
 
         private async Task<IActionResult> GenerateTnPdf(Documents документ)
         {
-            // 1. Получение позиций и связанных данных
             var позиции = await _context.Позиции
                 .Include(p => p.Товар)
                 .Where(p => p.ид_документа == документ.ид_документа)
@@ -2288,7 +2208,6 @@ namespace Blank.Controllers
             var пунктПогрузки = await _context.Пункт_Погрузки.FirstOrDefaultAsync(p => p.ид_пункта_погрузки == документ.ид_пункта_погрузки);
             var пунктРазгрузки = await _context.Пункт_Разгрузки.FirstOrDefaultAsync(p => p.ид_пункта_разгрузки == документ.ид_пункта_разгрузки);
 
-            // 2. Подсчёт итогов
             decimal totalQuantity = 0, totalCost = 0, totalNds = 0, totalSumWithNds = 0, totalWeight = 0;
             int totalPackages = 0;
             foreach (var pos in позиции)
@@ -2306,7 +2225,6 @@ namespace Blank.Controllers
                 totalPackages += pos.грузовых_мест ?? 0;
             }
 
-            // 3. Загрузка шаблона
             string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Template", "TN.xlsx");
             if (!System.IO.File.Exists(templatePath))
                 return Content($"Файл шаблона не найден: {templatePath}");
@@ -2315,7 +2233,6 @@ namespace Blank.Controllers
             workbook.LoadFromFile(templatePath);
             Worksheet sheet = workbook.Worksheets[0];
 
-            // 4. ФИО водителя – Фамилия И.О.
             string driverFio = "";
             if (водитель != null)
             {
@@ -2335,35 +2252,34 @@ namespace Blank.Controllers
             string mark = транспорт?.Марка_Транспорта?.наименование_марки ?? "";
             var cultureForExcel = System.Globalization.CultureInfo.InvariantCulture;
 
-            // 5. Основные замены (кроме строки 30)
             var mainReplacements = new Dictionary<string, string>
-    {
-        { "{sender}", (грузоотправитель?.название ?? "") + ", " + (грузоотправитель?.адрес ?? "") },
-         { "{sender_unp}", грузоотправитель?.унп ?? "" },
-        { "{receiver}", (грузополучатель?.название ?? "") + ", " + (грузополучатель?.адрес ?? "") },
-         { "{receiver_unp}", грузополучатель?.унп ?? "" },
-        { "{date}", formattedDate },
-        { "{mark}", mark },
-        { "{reg_number}", regNumber },
-        { "{driver_fio}", driverFio },
-        { "{loading_point}", пунктПогрузки?.наименование ?? "" },
-        { "{unloading_point}", пунктРазгрузки?.наименование ?? "" },
-        { "{otpusk}", документ.отпуск_разрешил ?? "" },
-        { "{sdal}", документ.сдал_грузоотправитель ?? "" },
-        { "{total_c}", totalQuantity.ToString("F0", cultureForExcel) },
-        { "{total_sum}", totalCost.ToString("F2", cultureForExcel).Replace(".", ",") },
-        { "{total_sn}", totalNds.ToString("F2", cultureForExcel).Replace(".", ",") },
-        { "{total_swn}", totalSumWithNds.ToString("F2", cultureForExcel).Replace(".", ",") },
-        { "{total_weight}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") },
-        { "{total_sn_hand}", NumToTextHelper.SumInWords(totalNds) },
-        { "{total_swn_hand}", NumToTextHelper.SumInWords(totalSumWithNds) },
-        { "{total_w_hand}", NumToTextHelper.WeightInWords(totalWeight) },
-        { "{total_w}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") }
-    };
+            {
+                { "{sender}", (грузоотправитель?.название ?? "") + ", " + (грузоотправитель?.адрес ?? "") },
+                { "{sender_unp}", грузоотправитель?.унп ?? "" },
+                { "{receiver}", (грузополучатель?.название ?? "") + ", " + (грузополучатель?.адрес ?? "") },
+                { "{receiver_unp}", грузополучатель?.унп ?? "" },
+                { "{date}", formattedDate },
+                { "{mark}", mark },
+                { "{reg_number}", regNumber },
+                { "{driver_fio}", driverFio },
+                { "{loading_point}", пунктПогрузки?.наименование ?? "" },
+                { "{unloading_point}", пунктРазгрузки?.наименование ?? "" },
+                { "{otpusk}", документ.отпуск_разрешил ?? "" },
+                { "{sdal}", документ.сдал_грузоотправитель ?? "" },
+                { "{total_c}", totalQuantity.ToString("F0", cultureForExcel) },
+                { "{total_sum}", totalCost.ToString("F2", cultureForExcel).Replace(".", ",") },
+                { "{total_sn}", totalNds.ToString("F2", cultureForExcel).Replace(".", ",") },
+                { "{total_swn}", totalSumWithNds.ToString("F2", cultureForExcel).Replace(".", ",") },
+                { "{total_weight}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") },
+                { "{total_sn_hand}", NumToTextHelper.SumInWords(totalNds) },
+                { "{total_swn_hand}", NumToTextHelper.SumInWords(totalSumWithNds) },
+                { "{total_w_hand}", NumToTextHelper.WeightInWords(totalWeight) },
+                { "{total_w}", totalWeight.ToString("F3", cultureForExcel).Replace(".", ",") }
+            };
 
             foreach (var cell in sheet.AllocatedRange)
             {
-                if (cell.Row == 30) continue;    // пропускаем строку-шаблон товаров
+                if (cell.Row == 30) continue;  
                 if (cell.Value != null)
                 {
                     string cellValue = cell.Value.ToString();
@@ -2384,14 +2300,12 @@ namespace Blank.Controllers
                 }
             }
 
-            // ======== 6. ТОВАРНЫЙ РАЗДЕЛ ========
             const int templateRow = 30;
 
             if (sheet.Range[templateRow, 1].Value == null ||
                 !sheet.Range[templateRow, 1].Value.ToString().Contains("{good_name}"))
                 return Content($"Строка шаблона товаров не найдена в строке {templateRow}");
 
-            // 6.1 Запоминаем объединённые диапазоны в строке 30 и сортируем их
             var merges = new List<(int startCol, int endCol)>();
             foreach (var mergedRange in sheet.MergedCells)
             {
@@ -2405,13 +2319,11 @@ namespace Blank.Controllers
             }
             merges.Sort((a, b) => a.startCol.CompareTo(b.startCol));
 
-            // 6.2 Массив плейсхолдеров
             string[] placeholders = {
-        "{good_name}", "{ed}", "{count}", "{cost}", "{sum}",
-        "{nds}", "{sum_nds}", "{sum_w_nds}", "", "{weight}", ""
-    };
+                "{good_name}", "{ed}", "{count}", "{cost}", "{sum}",
+                "{nds}", "{sum_nds}", "{sum_w_nds}", "", "{weight}", ""
+            };
 
-            // 6.3 Вставка недостающих строк (если товаров > 1)
             int rowsToInsert = позиции.Count - 1;
             if (rowsToInsert > 0)
             {
@@ -2433,7 +2345,6 @@ namespace Blank.Controllers
                 }
             }
 
-            // 6.4 Заполнение ВСЕХ строк реальными данными
             for (int i = 0; i < позиции.Count; i++)
             {
                 int currentRow = templateRow + i;
@@ -2467,39 +2378,37 @@ namespace Blank.Controllers
 
                     switch (idx)
                     {
-                        case 0: // Наименование
+                        case 0: 
                             val = val.Replace("{good_name}", pos.Товар?.наименование ?? "");
                             break;
-                        case 1: // Единицы измерения
+                        case 1: 
                             val = val.Replace("{ed}", pos.Товар?.единицы_измерения ?? "");
                             break;
-                        case 2: // Количество
+                        case 2: 
                             val = val.Replace("{count}", qty.ToString("0.000", cultureForExcel).Replace(".", ","));
                             break;
-                        case 3: // Цена
+                        case 3: 
                             val = val.Replace("{cost}", pos.цена_за_единицу.ToString("0.00", cultureForExcel).Replace(".", ","));
                             break;
-                        case 4: // Стоимость без НДС
+                        case 4: 
                             val = val.Replace("{sum}", afterDiscount.ToString("0.00", cultureForExcel).Replace(".", ","));
                             break;
-                        case 5: // Ставка НДС
+                        case 5: 
                             val = val.Replace("{nds}", ndsRateDisplay);
                             break;
-                        case 6: // Сумма НДС
+                        case 6: 
                             val = val.Replace("{sum_nds}", vat.ToString("0.00", cultureForExcel).Replace(".", ","));
                             break;
-                        case 7: // Стоимость с НДС
+                        case 7: 
                             val = val.Replace("{sum_w_nds}", (afterDiscount + vat).ToString("0.00", cultureForExcel).Replace(".", ","));
                             break;
-                        case 9: // Масса
+                        case 9: 
                             val = val.Replace("{weight}", (pos.масса_груза ?? 0).ToString("0.000", cultureForExcel).Replace(".", ","));
                             break;
                     }
-
                     mergedRange.Value = val;
                 }
 
-                // Применяем текстовый формат и перенос для всех строк, включая первую
                 foreach (var (startCol, endCol) in merges)
                 {
                     var rng = sheet.Range[currentRow, startCol, currentRow, endCol];
@@ -2508,7 +2417,6 @@ namespace Blank.Controllers
                 }
                 sheet.AutoFitRow(currentRow);
 
-                // Дополнительное оформление только для новых строк
                 if (i > 0)
                 {
                     for (int idx = 0; idx < merges.Count; idx++)
@@ -2530,7 +2438,6 @@ namespace Blank.Controllers
             if (позиции.Count == 0)
                 sheet.DeleteRow(templateRow);
 
-            // Фиксируем масштаб
             sheet.PageSetup.FitToPagesWide = 0;
             sheet.PageSetup.FitToPagesTall = 1;
 
@@ -2557,7 +2464,6 @@ namespace Blank.Controllers
             };
         }
 
-        // Страница управления маршрутами (для админа)
         [HttpGet]
         public IActionResult ManageRoutes()
         {
@@ -2568,9 +2474,9 @@ namespace Blank.Controllers
                 .Include(r => r.Водитель)
                 .Include(r => r.Транспорт)
                 .Include(r => r.ТочкиМаршрута)
-                    .ThenInclude(t => t.ПунктПогрузки)
+                .ThenInclude(t => t.ПунктПогрузки)
                 .Include(r => r.ТочкиМаршрута)
-                    .ThenInclude(t => t.ПунктРазгрузки)
+                .ThenInclude(t => t.ПунктРазгрузки)
                 .Where(r => r.ид_организации == userOrgId)
                 .ToList();
 
@@ -2583,7 +2489,6 @@ namespace Blank.Controllers
             return View(routes);
         }
 
-        // Создание накладной по маршруту (для пользователя)
         [HttpGet]
         public IActionResult CreateDocumentFromRoute(int routeId)
         {
@@ -2602,7 +2507,6 @@ namespace Blank.Controllers
 
             if (route == null) return NotFound();
 
-            // Определяем текущую точку (первую незавершенную)
             var completedDocCount = _context.Документы
                 .Count(d => d.ид_маршрута == routeId);
 
@@ -2617,7 +2521,6 @@ namespace Blank.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Генерируем автоинкрементный номер
             var lastDocNumber = _context.Документы
                 .Where(d => d.ид_грузоотправителя == userOrgId)
                 .OrderByDescending(d => d.ид_документа)
@@ -2650,7 +2553,6 @@ namespace Blank.Controllers
                 ТипыДокументов = _context.Типы_Документов.ToList()
             };
 
-            // Передаем товары в JSON для JavaScript
             ViewBag.GoodsJson = JsonSerializer.Serialize(
                 model.Товары.Select(g => new {
                     ид_товара = g.ид_товара,
@@ -2662,7 +2564,6 @@ namespace Blank.Controllers
             return View(model);
         }
 
-        // Сохранение накладной и переход к следующей точке
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveDocumentAndNext(RouteDocumentViewModel model, string positionsData)
@@ -2697,7 +2598,6 @@ namespace Blank.Controllers
                 await _context.SaveChangesAsync();
                 await _context.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 1;");
 
-                // Сохраняем позиции
                 if (!string.IsNullOrEmpty(positionsData))
                 {
                     var positions = JsonSerializer.Deserialize<List<PositionViewModel>>(positionsData);
@@ -2725,7 +2625,6 @@ namespace Blank.Controllers
                     }
                 }
 
-                // Проверяем, есть ли следующая точка
                 var nextPoint = _context.Точки_Маршрута
                     .Where(t => t.ид_маршрута == model.ид_маршрута
                              && t.порядковый_номер > (model.текущая_точка_индекс + 1))
@@ -2743,11 +2642,8 @@ namespace Blank.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Ошибка: {ex.Message}");
-                // Перезагружаем данные для формы
                 return RedirectToAction("CreateDocumentFromRoute", new { routeId = model.ид_маршрута });
             }
         }
-        
-        
     }
 }

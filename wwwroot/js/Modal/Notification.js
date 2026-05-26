@@ -1,6 +1,4 @@
-﻿// === УНИВЕРСАЛЬНОЕ МОДАЛЬНОЕ ОКНО ДЛЯ УВЕДОМЛЕНИЙ ===
-
-function showNotification(message) {
+﻿function showNotification(message) {
     const modal = document.getElementById('notificationModal');
     const messageElement = document.getElementById('notificationMessage');
 
@@ -14,7 +12,6 @@ function closeNotification() {
     const modal = document.getElementById('notificationModal');
     if (modal) {
         modal.style.display = 'none';
-        // Проверяем, нужно ли обновить страницу
         if (modal.getAttribute('data-reload') === 'true') {
             modal.removeAttribute('data-reload');
             location.reload();
@@ -22,7 +19,6 @@ function closeNotification() {
     }
 }
 
-// Закрытие по кнопке
 document.addEventListener('DOMContentLoaded', function () {
     const closeBtn = document.getElementById('closeNotificationBtn');
     const modal = document.getElementById('notificationModal');
@@ -31,9 +27,6 @@ document.addEventListener('DOMContentLoaded', function () {
         closeBtn.addEventListener('click', closeNotification);
     }
 
-
-
-    // Закрытие при клике на фон
     if (modal) {
         modal.addEventListener('click', function (e) {
             if (e.target === modal) {

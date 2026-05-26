@@ -18,7 +18,6 @@ builder.Services.AddSession(options =>
     options.Cookie.MaxAge = TimeSpan.FromDays(2);
 });
 
-// Постоянное хранилище ключей шифрования в wwwroot/keys
 var keysPath = Path.Combine(builder.Environment.WebRootPath, "keys");
 Directory.CreateDirectory(keysPath);
 
@@ -40,13 +39,11 @@ else
     app.UseHsts();
 }
 
-// Исправленный обработчик ошибок (сохраняет сессию)
 app.UseStatusCodePagesWithReExecute("/UserWorkspace/Error{0}");
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// Middleware для установки русской культуры
 app.Use(async (context, next) =>
 {
     try
@@ -57,7 +54,7 @@ app.Use(async (context, next) =>
     }
     catch
     {
-        // Если русская культура недоступна, используем инвариантную
+       
     }
     await next();
 });
