@@ -186,12 +186,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const { positions, hasValidPositions } = collectPositions();
             const hasRows = document.querySelectorAll('#goodsTableBody tr:not(#noDataRow)').length > 0;
 
-            if (!hasRows) {
-                e.preventDefault();
-                showNotification('Добавьте хотя бы одну позицию товара!');
-                return false;
-            }
-
             if (!hasValidPositions) {
                 e.preventDefault();
                 showNotification('Заполните все обязательные поля в позициях товаров (товар, количество, цена)!');
