@@ -175,40 +175,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Удаление товара — открываем модальное окно
+    // Удаление товара — сразу удаляем, без модального окна
     document.getElementById('goodsTableBody')?.addEventListener('click', function (e) {
         if (e.target.classList.contains('remove-goods')) {
-            rowToDelete = e.target.closest('tr');
-            const modal = document.getElementById('confirmDeleteModal');
-            if (modal) {
-                modal.style.display = 'block';
-            } else {
-                removeGoodsRow(rowToDelete);
-                rowToDelete = null;
-            }
-        }
-    });
-
-    // Подтверждение удаления в модальном окне
-    document.getElementById('confirmDeleteYes')?.addEventListener('click', function () {
-        if (rowToDelete) {
-            removeGoodsRow(rowToDelete);
-            rowToDelete = null;
-        }
-        document.getElementById('confirmDeleteModal').style.display = 'none';
-    });
-
-    // Отмена удаления
-    document.getElementById('confirmDeleteNo')?.addEventListener('click', function () {
-        rowToDelete = null;
-        document.getElementById('confirmDeleteModal').style.display = 'none';
-    });
-
-    // Закрытие модального окна удаления по клику на фон
-    document.getElementById('confirmDeleteModal')?.addEventListener('click', function (e) {
-        if (e.target === this) {
-            rowToDelete = null;
-            this.style.display = 'none';
+            const row = e.target.closest('tr');
+            removeGoodsRow(row);
         }
     });
 
@@ -218,12 +189,6 @@ document.addEventListener('DOMContentLoaded', function () {
         form.addEventListener('submit', function (e) {
             const { positions, hasValidPositions } = collectPositions();
             const hasRows = document.querySelectorAll('#goodsTableBody tr:not(#noDataRow)').length > 0;
-
-            if (!hasValidPositions) {
-                e.preventDefault();
-                showNotification('Заполните все обязательные поля в позициях товаров (товар, количество, цена)!');
-                return false;
-            }
 
             document.getElementById('positionsData').value = JSON.stringify(positions);
             console.log('Отправляемые позиции:', positions);
