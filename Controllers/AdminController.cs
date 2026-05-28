@@ -245,6 +245,11 @@ namespace Blank.Controllers
         [HttpPost]
         public async Task<IActionResult> AddOrganization([FromBody] CompanyModel model)
         {
+            bool exists = await _context.Организации.AnyAsync(o =>
+                o.название == model.Name && o.унп == model.Unp);
+            if (exists)
+                return Json(new { success = false, error = "Такая организация уже существует." });
+
             _context.Организации.Add(new Organization
             {
                 название = model.Name,
@@ -309,6 +314,12 @@ namespace Blank.Controllers
         [HttpPost]
         public async Task<IActionResult> AddDriver([FromBody] DriverModel model)
         {
+            bool exists = await _context.Водители.AnyAsync(d =>
+                d.фамилия == model.LastName && d.имя == model.FirstName &&
+                d.отчество == model.MiddleName && d.номер_лицензии == model.LicenseNumber);
+            if (exists)
+                return Json(new { success = false, error = "Такой водитель уже существует." });
+
             _context.Водители.Add(new Drivers
             {
                 фамилия = model.LastName,
@@ -356,6 +367,11 @@ namespace Blank.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTransport([FromBody] TransportModel model)
         {
+            bool exists = await _context.Транспорт.AnyAsync(t =>
+                t.регистрационный_номер == model.RegNumber);
+            if (exists)
+                return Json(new { success = false, error = "Транспорт с таким регистрационным номером уже существует." });
+
             var brand = await _context.Марка_Транспорта
                 .FirstOrDefaultAsync(m => m.наименование_марки == model.BrandName);
             if (brand == null)
@@ -431,6 +447,11 @@ namespace Blank.Controllers
         [HttpPost]
         public async Task<IActionResult> AddGoods([FromBody] GoodsModel model)
         {
+            bool exists = await _context.Товары.AnyAsync(g =>
+                g.наименование == model.Name && g.код_товара == model.Code);
+            if (exists)
+                return Json(new { success = false, error = "Такой товар уже существует." });
+
             _context.Товары.Add(new Goods
             {
                 код_товара = model.Code,
@@ -472,6 +493,11 @@ namespace Blank.Controllers
         [HttpPost]
         public async Task<IActionResult> AddLoadingPoint([FromBody] PointModel model)
         {
+            bool exists = await _context.Пункт_Погрузки.AnyAsync(p =>
+                p.наименование == model.Name && p.адрес == model.Address);
+            if (exists)
+                return Json(new { success = false, error = "Такой пункт погрузки уже существует." });
+
             _context.Пункт_Погрузки.Add(new Loading_Point
             {
                 наименование = model.Name,
@@ -515,6 +541,11 @@ namespace Blank.Controllers
         [HttpPost]
         public async Task<IActionResult> AddUnloadingPoint([FromBody] PointModel model)
         {
+            bool exists = await _context.Пункт_Разгрузки.AnyAsync(p =>
+                p.наименование == model.Name && p.адрес == model.Address);
+            if (exists)
+                return Json(new { success = false, error = "Такой пункт разгрузки уже существует." });
+
             _context.Пункт_Разгрузки.Add(new Unloading_Point
             {
                 наименование = model.Name,
@@ -558,6 +589,10 @@ namespace Blank.Controllers
         [HttpPost]
         public async Task<IActionResult> AddUser([FromBody] UserModel model)
         {
+            bool exists = await _context.Пользователи.AnyAsync(u => u.почта == model.Email);
+            if (exists)
+                return Json(new { success = false, error = "Пользователь с таким email уже существует." });
+
             _context.Пользователи.Add(new Users
             {
                 почта = model.Email,

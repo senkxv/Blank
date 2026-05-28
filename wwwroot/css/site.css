@@ -394,7 +394,8 @@ footer {
     .table-container h2 {
         margin-bottom: 20px;
         color: #333;
-        font-family: Comfortaa;
+        font-family: Comfortaa !important;
+        
     }
 
 .table-wrapper {
@@ -422,12 +423,14 @@ footer {
         text-align: left;
         border-bottom: 1px solid #e0e0e0;
         white-space: nowrap;
+        font-family: 'Comfortaa', sans-serif;
     }
 
     .rounded-table tbody tr {
         background-color: white;
         cursor: pointer;
         transition: background-color 0.2s;
+        font-family: 'Comfortaa', sans-serif;
     }
 
         .rounded-table tbody tr:hover {

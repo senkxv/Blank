@@ -37,7 +37,8 @@
     <PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.1" />
     <PackageReference Include="NPOI" Version="2.8.0" />
     <PackageReference Include="OfficeOpenXml.Core.ExcelPackage" Version="1.0.0" />
-    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="26.1.0" />
+    <PackageReference Include="Select.HtmlToPdf" Version="26.2.0" />
+    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="26.2.0" />
     <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="33.2.6" />
     <PackageReference Include="Xceed.Words.NET" Version="5.2.26166.7850" />
   </ItemGroup>
