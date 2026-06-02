@@ -5,11 +5,20 @@ function showNotification(message) {
     const messageEl = document.getElementById('notificationMessage');
     if (modal && messageEl) {
         messageEl.textContent = message;
+        needReload = true;
         modal.style.display = 'block';
     } else {
         alert(message);
     }
 }
+
+// При закрытии окна — перезагружаем страницу
+document.getElementById('closeNotificationBtn')?.addEventListener('click', function () {
+    document.getElementById('notificationModal').style.display = 'none';
+    if (needReload) {
+        window.location.reload();
+    }
+});
 
 function showConfirm(message, onConfirm) {
     const modal = document.getElementById('confirmActionModal');
