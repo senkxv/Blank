@@ -60,6 +60,10 @@ namespace Blank.Controllers
         [HttpGet]
         public IActionResult Registration()
         {
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
+            {
+                return RedirectToAction("Index", "UserWorkspace");
+            }
             return View();
         }
 
@@ -67,6 +71,17 @@ namespace Blank.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Registration(RegisterViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var existingSessionUserId = HttpContext.Session.GetString("UserId");
+            if (!string.IsNullOrEmpty(existingSessionUserId))
+            {
+                return RedirectToAction("Index", "UserWorkspace");
+            }
+
             if (ModelState.IsValid)
             {
                 var fioParts = model.ФИО?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
