@@ -172,13 +172,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (form) {
         form.addEventListener('submit', function (e) {
             const submitter = e.submitter;
+
+            // Если нажата кнопка "Пропустить" — ничего не делаем, просто отправляем
             if (submitter && submitter.getAttribute('value') === 'skip') {
-                return true;
+                return;  // ← ВЫХОДИМ ИЗ ОБРАБОТЧИКА
             }
 
+            // Собираем товары для всех остальных кнопок
             const { positions, hasValidPositions } = collectPositions();
-            const hasRows = document.querySelectorAll('#goodsTableBody tr:not(#noDataRow)').length > 0;
-
             document.getElementById('positionsData').value = JSON.stringify(positions);
             console.log('Отправляемые позиции:', positions);
         });

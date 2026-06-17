@@ -205,6 +205,14 @@ namespace Blank.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateDocumentPage(Documents document, string positionsData, int? routeId = null, int? currentPointIndex = null, string action = "save")
         {
+            // ===== ПРОВЕРКА SKIP В САМОМ НАЧАЛЕ =====
+            if (action == "skip" && routeId.HasValue)
+            {
+                var nextIndex = (currentPointIndex ?? 0) + 1;
+                TempData["Success"] = "Точка пропущена.";
+                return RedirectToAction("CreateDocumentPage", new { routeId = routeId, currentPointIndex = nextIndex });
+            }
+
             try
             {
                 var userOrgIdStr = HttpContext.Session.GetString("UserOrgId");
@@ -217,8 +225,7 @@ namespace Blank.Controllers
                 }
 
                 int userOrgId = int.Parse(userOrgIdStr);
-
-                var userId = int.Parse(userIdStr ?? "1");
+                int userId = int.Parse(userIdStr);
                 document.ид_пользователя = userId;
 
                 if (routeId.HasValue)

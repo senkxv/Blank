@@ -63,16 +63,6 @@
         </div>
     }
 
-    <div id="skipPointModal" class="notification-modal" style="display:none;">
-        <div class="notification-content">
-            <p id="skipPointMessage"></p>
-            <div class="notification-buttons">
-                <button id="skipPointConfirmBtn" class="btn-save">Да, пропустить</button>
-                <button id="skipPointCancelBtn" class="btn-cancel">Отмена</button>
-            </div>
-        </div>
-    </div>
-
     <form method="post" asp-action="CreateDocumentPage" class="document-form" id="documentForm">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -265,7 +255,7 @@
                 <button type="submit" name="action" value="next" class="btn-save">
                     Сохранить и следующая точка 
                 </button>
-                <button type="button" id="skipPointBtn" class="btn-skip">
+                <button type="submit" name="action" value="skip" class="btn-skip">
                     Пропустить точку
                 </button>
             }
